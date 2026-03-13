@@ -1,1 +1,0 @@
-# ing-sw-2026-Zonzin-Pellegrini-Samarani-Roveda-
