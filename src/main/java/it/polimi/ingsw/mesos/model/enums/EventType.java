@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.mesos.model.enums;
 
 public enum EventType {
     HUNT,
