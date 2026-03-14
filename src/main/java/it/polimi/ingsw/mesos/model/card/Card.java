@@ -1,8 +1,12 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.mesos.model.card;
+
+import it.polimi.ingsw.mesos.model.enums.Era;
 
 public abstract class Card {
 
     private Era era;
+
+    public Card(Era era) { }
 
     public Era getEra() { return null; }
 
