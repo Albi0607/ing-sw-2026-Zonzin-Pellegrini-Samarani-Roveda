@@ -9,6 +9,8 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
+// in teoria l'attributo e i metodi dovrebbero essere enum (GameState) e non l'interfaccia, no? per ora li ho sostituiti
+import it.polimi.ingsw.mesos.model.enums.GameState;
 
 import java.util.List;
 import java.util.Map;
@@ -21,13 +23,13 @@ public class Game {
     private Map<Era, Deck<BuildingCard>> buildingDecks;
     private int currentRound;
     private Era currentEra;
-    private GameStateLogic currentState;
+    private GameState currentState;
 
     public Game(List<Player> players) { }
 
     public void startGame() { }
 
-    public void changeState(GameStateLogic newState) { }
+    public void changeState(GameState newState) { }
 
     public boolean checkNicknameUnique(String name) { return false; }
 
@@ -53,5 +55,5 @@ public class Game {
 
     public Era getCurrentEra() { return null; }
 
-    public GameStateLogic getCurrentState() { return null; }
+    public GameState getCurrentState() { return null; }
 }
