@@ -14,7 +14,7 @@ public class Deck<T> {
     public void shuffle() { }
 
     public T draw() { return null; }
-
+// non del tutto necessario si può togliere e fare direttamente il ciclo di draw ->alberto
     public List<T> drawN(int n) { return null; }
 
     public void push(T item) { }

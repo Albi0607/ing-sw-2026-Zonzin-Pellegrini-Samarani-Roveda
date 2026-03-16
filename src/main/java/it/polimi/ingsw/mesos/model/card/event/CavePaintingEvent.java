@@ -12,7 +12,7 @@ public class CavePaintingEvent extends EventCard {
     /** Minimum number of Artists to gain PP per Artist. */
     private int gainNumber;
 
-    /** PP lost if player has fewer than loseNumber Artists. */
+    /** PP lost if player has fewer or equal than loseNumber Artists. */
     private int losePoints;
 
     /** PP gained per Artist if player has at least gainNumber Artists. */
@@ -25,7 +25,7 @@ public class CavePaintingEvent extends EventCard {
     }
 
     /**
-     * If a player has < loseNumber Artists → loses losePoints PP.
+     * If a player has <= loseNumber Artists → loses losePoints PP.
      * If a player has >= gainNumber Artists → gains gainPoints PP per Artist.
      */
     @Override
