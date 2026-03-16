@@ -11,7 +11,7 @@ public class EventState implements GameStateLogic {
      * 1. Collect all EventCards from the lower row.
      * 2. Sort them: non-Sustenance events first (in Era order if duplicates),
      *    SustenanceEvent always last.
-     * 3. Resolve each event by calling event.resolve(game).
+     * 3. Resolve each event by calling event.resolve(game)
      * 4. Discard all Character and Event cards from lower row
      *    (Building cards stay).
      * 5. Move remaining Character and Event cards from upper row to lower row
@@ -22,6 +22,9 @@ public class EventState implements GameStateLogic {
      *    events in upper row as well, then transitions to FinishedState.
      * 9. Otherwise transitions back to PlacingState for the next round.
      */
+
+    // non chiaro chi deve risolvere l'evento se la carta evento o se lo stato e dove vada messa l'implementazione
+    // della risoluzione dei 4 eventi -> alberto
     @Override
     public void execute(Game game) { }
 }

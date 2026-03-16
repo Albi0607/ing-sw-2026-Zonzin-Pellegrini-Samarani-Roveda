@@ -44,6 +44,7 @@ public class ResolvingState implements GameStateLogic {
      * they cannot or do not want to afford.
      * Decrements pendingCardPicks accordingly.
      */
+    //ci serve davvero ->alberto
     public void skipBuilding(Game game, Player player, int index) { }
 
     /**

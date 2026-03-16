@@ -27,10 +27,10 @@ public class BuildingCard extends Card {
     public BuildingCard(Era era, int cost, int victoryPoints, BuildingEffect effect, EventType context) {
         super(era);
     }
-
+    //Non dovrebbe essere utile poiché ci sono i triggerTyper e gli edifici non fanno azioni appena acquistati ->alberto
     /** Called once when the player acquires this building. */
     public void onAcquired(Player player, Game game) { }
-
+    //è gia presente in buildingEffect non serve ->alberto
     /** Called by Game.notifyBuildingEffects for the matching trigger. */
     public void applyEffect(Player player, Game game, TriggerType trigger) { }
 

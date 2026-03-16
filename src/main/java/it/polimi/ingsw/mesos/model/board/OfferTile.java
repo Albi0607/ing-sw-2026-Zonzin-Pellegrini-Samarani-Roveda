@@ -18,7 +18,7 @@ public class OfferTile {
     public void removeTotem() { }
 
     public boolean hasTotem() { return false; }
-
+    //cosa fa di preciso? ->alberto
     public boolean isAvailableFor(int numPlayers) { return false; }
 
     public void executeAction(Player p, Game g) { }

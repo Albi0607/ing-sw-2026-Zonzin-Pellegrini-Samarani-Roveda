@@ -15,8 +15,11 @@ public class Player {
     /**
      * @return false if the player does not have enough food
      */
+    /* meglio forse che il metodo sia int cosi ritorna quanto cibo manca da pagare e cosi da sapere quanti punti
+    prestigio dover perdere di conseguenza?->alberto*/
     public boolean payFood(int amount) { return false; }
-
+    /*meglio forse avere un altro metodo per perdere punti prestigio o averne uno unico che si chiama con un modo
+    diverso per non confondere?->alberto*/
     public void addPrestige(int points) { }
 
     // --- Getters ---
