@@ -20,7 +20,11 @@ public class Player {
     public boolean payFood(int amount) { return false; }
     /*meglio forse avere un altro metodo per perdere punti prestigio o averne uno unico che si chiama con un modo
     diverso per non confondere?->alberto*/
+
+    // secondo me è meglio che l'aggiornamento dei punti sia gestito da un metodo fine turno/evento che itera
+    // l'update per tutti i player piuttosto che chiamare ripetutamente lo stesso metodo da istanze diverse di player
     public void addPrestige(int points) { }
+
 
     // --- Getters ---
 

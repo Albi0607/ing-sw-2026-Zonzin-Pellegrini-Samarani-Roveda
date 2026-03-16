@@ -2,6 +2,7 @@ package it.polimi.ingsw.mesos.model.state;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class ResolvingState implements GameStateLogic {
 
@@ -24,6 +25,8 @@ public class ResolvingState implements GameStateLogic {
     @Override
     public void execute(Game game) { }
 
+    @Override
+    public GameState getStateId() { return GameState.RESOLVING_ACTIONS; } // probabile da cambiare
     /**
      * Invoked by the controller when a player picks a card from the upper row.
      * Validates it is this player's turn and they are allowed to pick from upper.

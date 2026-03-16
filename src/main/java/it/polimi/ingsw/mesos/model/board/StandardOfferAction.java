@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.model.board;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 
-public class StandardOfferAction extends OfferAction {
+public class StandardOfferAction implements OfferAction {
 
     private int upperCount;
     private int lowerCount;

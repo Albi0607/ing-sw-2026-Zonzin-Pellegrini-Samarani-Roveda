@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.model.state;
 
 import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class EventState implements GameStateLogic {
 
@@ -27,4 +28,7 @@ public class EventState implements GameStateLogic {
     // della risoluzione dei 4 eventi -> alberto
     @Override
     public void execute(Game game) { }
+
+    @Override
+    public GameState getStateId() { return GameState.END_ROUND; } // probabile da cambiare
 }

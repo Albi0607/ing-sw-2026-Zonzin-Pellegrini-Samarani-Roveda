@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.model.state;
 
 import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class FinishedState implements GameStateLogic {
 
@@ -24,4 +25,7 @@ public class FinishedState implements GameStateLogic {
      */
     @Override
     public void execute(Game game) { }
+
+    @Override
+    public GameState getStateId() { return GameState.FINISHED; } // probabile da cambiare
 }

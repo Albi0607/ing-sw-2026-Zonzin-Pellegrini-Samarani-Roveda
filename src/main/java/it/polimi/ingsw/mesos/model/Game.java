@@ -10,9 +10,6 @@ import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
 // in teoria l'attributo e i metodi dovrebbero essere enum (GameState) e non l'interfaccia, no? per ora li ho sostituiti
-/* Secondo me dovrebbe essere l'interfaccia che poi si specializza nelle rispettive classi metodo cosi da avere
-direttamente le classi qui con quello che devono fare, e così facendo si potrebbe elliminare l'enum che non dovrebbe
-più servire -> alberto*/
 import it.polimi.ingsw.mesos.model.enums.GameState;
 
 import java.util.List;
