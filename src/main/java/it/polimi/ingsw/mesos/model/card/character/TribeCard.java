@@ -17,5 +17,4 @@ public abstract class TribeCard extends Card {
     @Override
     public boolean isBuilding() { return false; }
 
-    public int getPlayersRequired() { return 0; }
 }

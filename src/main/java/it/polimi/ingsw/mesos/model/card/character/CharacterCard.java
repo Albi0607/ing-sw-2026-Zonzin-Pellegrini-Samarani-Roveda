@@ -21,6 +21,4 @@ public abstract class CharacterCard extends TribeCard {
     //funzione utilizzata solo dagli hunter, non serve renderla generale si può implementarla solo nella classe
     //hunter ->alberto
     public void onAddedToTribe(Tribe tribe, Player player, Game game) { }
-
-    public CharacterType getType() { return null; }
 }

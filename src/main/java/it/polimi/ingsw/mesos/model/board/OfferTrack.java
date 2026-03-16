@@ -8,6 +8,8 @@ public class OfferTrack {
 
     public OfferTrack(int numPlayers) { }
 
+//    ~ getters ~
+
     public List<OfferTile> getTiles() { return null; }
 
     public OfferTile getTile(char id) { return null; }

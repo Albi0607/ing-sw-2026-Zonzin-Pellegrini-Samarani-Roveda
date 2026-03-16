@@ -18,12 +18,12 @@ public class TurnOrderTrack {
     /** Replace current order with a new one (called at end of round). */
     public void updateOrder(List<Totem> newOrder) { }
 
+//    ~ getters ~
+
     public Totem getTotemAt(int index) { return null; }
 
-    /** Returns true if index is the last slot (costs 1 food). */
     public boolean isLastSlot(int index) { return false; }
 
-    /** Returns food bonus associated with the slot (0 if none). */
     public int getFoodBonusAt(int index) { return 0; }
 
     public List<Totem> getPositions() { return null; }

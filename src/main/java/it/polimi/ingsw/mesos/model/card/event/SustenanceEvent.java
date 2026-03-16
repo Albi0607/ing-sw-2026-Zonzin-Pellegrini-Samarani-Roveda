@@ -6,7 +6,6 @@ import it.polimi.ingsw.mesos.model.enums.EventType;
 
 public class SustenanceEvent extends EventCard {
 
-    /** PP lost per unsatisfied character. Grows each Era. */
     private int prestigePoints;
 
     public SustenanceEvent(Era era, int playersRequired, int prestigePoints) {
@@ -21,6 +20,4 @@ public class SustenanceEvent extends EventCard {
      */
     @Override
     public void resolve(Game game) { }
-
-    public int getPrestigePoints() { return 0; }
 }

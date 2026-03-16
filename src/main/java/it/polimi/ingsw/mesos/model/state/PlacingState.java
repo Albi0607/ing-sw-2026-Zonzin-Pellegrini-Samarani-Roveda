@@ -3,6 +3,7 @@ package it.polimi.ingsw.mesos.model.state;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class PlacingState implements GameStateLogic {
 
@@ -20,6 +21,8 @@ public class PlacingState implements GameStateLogic {
     @Override
     public void execute(Game game) { }
 
+    @Override
+    public GameState getStateId() { return GameState.PLACING_TOTEMS; } // probabile da cambiare
     /**
      * Invoked by the controller when a player chooses a tile.
      * Validates that:

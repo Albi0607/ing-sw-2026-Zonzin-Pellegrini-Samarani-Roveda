@@ -35,9 +35,4 @@ public class Tribe {
 
     public int countCharacters(CharacterType type) { return 0; }
 
-    // --- Getters ---
-
-    public List<CharacterCard> getCharacters() { return null; }
-
-    public List<BuildingCard> getBuildings() { return null; }
 }

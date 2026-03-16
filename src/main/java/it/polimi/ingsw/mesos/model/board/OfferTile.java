@@ -11,25 +11,9 @@ public class OfferTile {
     private OfferAction action;
     private Totem hosts;
 
-    public OfferTile(char id, int minPlayers, OfferAction action) { }
-
-    public void placeTotem(Totem t) { }
-
-    public void removeTotem() { }
-
-    public boolean hasTotem() { return false; }
-    //cosa fa di preciso? ->alberto
-    public boolean isAvailableFor(int numPlayers) { return false; }
-
-    public void executeAction(Player p, Game g) { }
-
-    // --- Getters ---
-
-    public char getId() { return 0; }
-
-    public int getMinPlayers() { return 0; }
-
-    public OfferAction getAction() { return null; }
-
-    public Totem getHostedTotem() { return null; }
+    public OfferTile(char id, int minPlayers, OfferAction action) {
+    }
+/*
+il metodo place/remove totem siamo sicuri di lasciarlo in game?
+ */
 }

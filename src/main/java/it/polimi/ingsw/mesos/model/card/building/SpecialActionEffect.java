@@ -4,7 +4,7 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
-public class SpecialActionEffect extends BuildingEffect {
+public class SpecialActionEffect implements BuildingEffect {
 
     /**
      * Identifies which special behavior to apply.
@@ -16,6 +16,4 @@ public class SpecialActionEffect extends BuildingEffect {
 
     @Override
     public void applyEffect(Player player, Game game, TriggerType trigger) { }
-
-    public String getSpecialType() { return null; }
 }
