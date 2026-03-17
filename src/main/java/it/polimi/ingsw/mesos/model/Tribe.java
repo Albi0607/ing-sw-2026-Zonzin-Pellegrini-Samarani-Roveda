@@ -28,10 +28,6 @@ public class Tribe {
 
     /** Number of distinct InventionIcon values among Inventors. */
     public int getDistinctInventionCount() { return 0; }
-    //ci serve davvero? ->alberto
-    public int getCharacterCount() { return 0; }
-    //ci serve davvero? ->alberto
-    public int getBuildingCount() { return 0; }
 
     public int countCharacters(CharacterType type) { return 0; }
 

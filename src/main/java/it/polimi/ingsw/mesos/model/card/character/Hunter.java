@@ -22,6 +22,5 @@ public class Hunter extends CharacterCard {
     @Override
     public void onAddedToTribe(Tribe tribe, Player player, Game game) { }
 
-    //restituisce l'attributo direttamente
     public boolean hasIcon() { return hasIcon; }
 }
