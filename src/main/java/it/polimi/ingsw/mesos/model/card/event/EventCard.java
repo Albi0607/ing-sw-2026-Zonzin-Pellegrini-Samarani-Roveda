@@ -13,8 +13,7 @@ public abstract class EventCard extends TribeCard {
     public EventCard(Era era, int playersRequired, EventType type, boolean isFinal) {
         super(era, playersRequired);
     }
-    //metodo inutile? gli eventi si risolvono in automatico alla fine del turno con i trigger,
-    // può avere senso per alleggerire la classe Game come suggerito dal tutor?
+
     public abstract void resolve(Game game);
 
     public EventType getType() { return null; }

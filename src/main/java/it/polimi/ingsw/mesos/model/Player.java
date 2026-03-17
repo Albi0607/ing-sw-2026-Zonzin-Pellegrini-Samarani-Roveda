@@ -17,13 +17,13 @@ public class Player {
      */
     /* meglio forse che il metodo sia int cosi ritorna quanto cibo manca da pagare e cosi da sapere quanti punti
     prestigio dover perdere di conseguenza?->alberto*/
-    public boolean payFood(int amount) { return false; }
+    public int payFood(int amount) { return 0; }
     /*meglio forse avere un altro metodo per perdere punti prestigio o averne uno unico che si chiama con un modo
     diverso per non confondere?->alberto*/
 
     // secondo me è meglio che l'aggiornamento dei punti sia gestito da un metodo fine turno/evento che itera
     // l'update per tutti i player piuttosto che chiamare ripetutamente lo stesso metodo da istanze diverse di player
-    public void addPrestige(int points) { }
+    public void updatePrestige(int points) { }
 
 
     // --- Getters ---

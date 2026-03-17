@@ -13,12 +13,4 @@ public abstract class CharacterCard extends TribeCard {
     public CharacterCard(Era era, int playersRequired, CharacterType type) {
         super(era, playersRequired);
     }
-
-    /**
-     * Called immediately when this card is added to the tribe.
-     * Subclasses override this to implement their on-add effect.
-     */
-    //funzione utilizzata solo dagli hunter, non serve renderla generale si può implementarla solo nella classe
-    //hunter ->alberto
-    public void onAddedToTribe(Tribe tribe, Player player, Game game) { }
 }
