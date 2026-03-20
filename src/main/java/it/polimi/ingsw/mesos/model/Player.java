@@ -1,12 +1,14 @@
 package it.polimi.ingsw.mesos.model;
 
+import it.polimi.ingsw.mesos.model.enums.Color;
+
 public class Player {
 
     private String nickname;
     private int food;
     private int prestigePoints;
     private Tribe tribe;
-    private Totem totem;
+    private Color type;
 
     public Player(String nickname, String color) { }
 
@@ -32,5 +34,5 @@ public class Player {
 
     public Tribe getTribe() { return null; }
 
-    public Totem getTotem() { return null; }
+    public Player getPlayer() { return null; }
 }
