@@ -19,8 +19,6 @@ public class Game {
 
     private List<Player> players;
     private Board board;
-    private Deck<TribeCard> tribeDeck;
-    private Map<Era, Deck<BuildingCard>> buildingDecks;
     private int currentRound;
     private Era currentEra;
     private GameState currentState;
