@@ -12,7 +12,7 @@ public abstract class TribeCard extends Card {
 
     /**General constructor for all TribeCards
      * @param era the era of the card
-     * @param playersRequired the number of player required to use the card in the game*/
+     * @param playersRequired the number of players required to use the card in the game*/
     public TribeCard(Era era, int playersRequired) {
 
         super(era);
