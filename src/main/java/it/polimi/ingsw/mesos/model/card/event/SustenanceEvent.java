@@ -1,23 +1,66 @@
 package it.polimi.ingsw.mesos.model.card.event;
 
 import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
+import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
 
+
+//attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
+
+/**Concrete class to handle SustenanceEvents
+ * @author Alberto Roveda
+ */
 public class SustenanceEvent extends EventCard {
 
-    private int prestigePoints;
+    /**Attribute that indicates how many prestige points are lost for food that cannot be paid*/
+    private final int prestigePoints;
 
-    public SustenanceEvent(Era era, int playersRequired, int prestigePoints) {
-        super(era, playersRequired, EventType.SUSTENANCE, false);
+    /**Constructor for SustenanceEvent cards
+     *
+     * @param era the era of the card
+     * @param playersRequired the number of players required to use the card in the game
+     * @param isFinal attribute to define the two final cards
+     * @param prestigePoints indicates how many prestige points are lost for food that cannot be paid
+     */
+    public SustenanceEvent(Era era, int playersRequired, boolean isFinal, int prestigePoints) {
+        super(era, 2, EventType.SUSTENANCE,isFinal);
+        this.prestigePoints=prestigePoints;
     }
 
-    /**
-     * Each player pays 1 food per character in their tribe.
-     * For each unsatisfied character, they lose prestigePoints PP.
-     * Gatherers provide a 3-food discount each.
-     * Sustenance must always be resolved last among events.
+    /**Method that resolves SustenanceEvents.
+     For each SustenanceEvent, the player must pay 1 food for each character card in their tribe.
+     If the player does not have enough food, they lose prestige points for each unpaid food.
+     Gatherers provide a discount of 3 food that does not need to be paid, but this is handled through
+     getSustenanceDiscount in the Tribe class.
+     The SustenanceEvent is always the last event to be activated.
+     @param game it is used to get the list of players whose food and prestige points will be affected
      */
     @Override
-    public void resolve(Game game) { }
+    public void resolve(Game game) {
+        //faccio azione per tutti i giocatori in gioco
+        for (Player p : game.getPlayers()){
+            int food = 0;
+            int missingFood = 0;
+
+            //sommo tutte le carte giocatori contandole per tipo con questo metodo
+            for (CharacterType c : CharacterType.values()){
+                food += p.getTribe().countCharacters(c);
+            }
+            //ottengo sconto dato dalle carte Ghatherer
+            food = food - p.getTribe().getSustenanceDiscount();
+
+            //controllo che il cibo sia positivo prima di toglierlo per non fare danni (esempio sommare cibo se diventa negativo)
+            if(food>0){
+                missingFood = p.payFood(food);
+            }
+
+            //controllo che il giocatore paghi tutto il cibo altrimenti calcolo differenza e tolgo punti prestigio
+            if(missingFood<0){
+                p.updatePrestige(missingFood*prestigePoints);
+            }
+        }
+    }
 }
