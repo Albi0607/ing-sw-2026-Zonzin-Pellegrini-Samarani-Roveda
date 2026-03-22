@@ -18,8 +18,8 @@ import java.util.List;
 
 public class TurnOrderTrack {
 
-    private List<Player> positions;
-    private int[] slots;
+    private final List<Player> positions;
+    private final int[] slots;
     /**
      * Constructs a TurnOrderTrack with the given slots.
      *
@@ -55,7 +55,7 @@ public class TurnOrderTrack {
         if (i >= 0) {
             p.addFood(i);   // add food
         } else {
-            p.payFood(-i);
+            p.payFood(i);
             // pay food (capire in base a come è implementato pay food se mettere + o - i
         }
         // update the player's position in the track

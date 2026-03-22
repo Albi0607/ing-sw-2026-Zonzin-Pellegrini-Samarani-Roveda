@@ -19,7 +19,7 @@ public class Hunter extends CharacterCard {
      * If hasIcon is true, player gains 1 food per Hunter already in the tribe
      * (including this one).
      */
-    @Override
+
     public void onAddedToTribe(Tribe tribe, Player player, Game game) { }
 
     public boolean hasIcon() { return hasIcon; }

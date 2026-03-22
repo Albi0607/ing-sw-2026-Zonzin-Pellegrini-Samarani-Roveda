@@ -8,9 +8,13 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 
 public abstract class CharacterCard extends TribeCard {
 
-    private CharacterType type;
+    public CharacterType type;
 
     public CharacterCard(Era era, int playersRequired, CharacterType type) {
         super(era, playersRequired);
+    }
+
+    public CharacterType getType() {
+        return type;
     }
 }

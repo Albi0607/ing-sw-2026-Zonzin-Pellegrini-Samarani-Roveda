@@ -11,4 +11,8 @@ public class Inventor extends CharacterCard {
     public Inventor(Era era, int playersRequired, InventionIcon icon) {
         super(era, playersRequired, CharacterType.INVENTOR);
     }
+
+    public InventionIcon getIcon() {
+        return icon;
+    }
 }
