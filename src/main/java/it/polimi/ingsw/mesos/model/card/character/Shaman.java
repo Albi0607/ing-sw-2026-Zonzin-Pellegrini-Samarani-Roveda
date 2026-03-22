@@ -12,4 +12,8 @@ public class Shaman extends CharacterCard {
     public Shaman(Era era, int playersRequired, int numberOfIcons) {
         super(era, playersRequired, CharacterType.SHAMAN);
     }
+
+    public int getNumberOfIcons() {
+        return numberOfIcons;
+    }
 }

@@ -11,4 +11,8 @@ public class Builder extends CharacterCard {
     public Builder(Era era, int playersRequired, int discountValue, int prestigePoints) {
         super(era, playersRequired, CharacterType.BUILDER);
     }
+
+    public int getDiscountValue() {
+        return discountValue;
+    }
 }

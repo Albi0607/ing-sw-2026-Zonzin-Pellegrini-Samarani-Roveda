@@ -28,8 +28,8 @@ import java.util.Map;
 public class Board {
 
     private TurnOrderTrack turnOrderTrack;
-    private List<Card> upperRow;
-    private List<Card> lowerRow;
+    private final List<Card> upperRow;
+    private final List<Card> lowerRow;
     private Deck<TribeCard> tribeDeck;
     private Map<Era, Deck<BuildingCard>> buildingDecks;
     private List<OfferTile> tiles;
