@@ -182,6 +182,9 @@ public class Board {
 
     // crezione delle offer tiles
     public void initializeOfferTiles(int numPlayers) {
+        if (numPlayers < 2 || numPlayers > 5) {
+            throw new IllegalArgumentException("Invalid number of players");
+        }
         tiles = new ArrayList<>();
 
         OfferTile tileA = new OfferTile('A', 5);
@@ -205,11 +208,10 @@ public class Board {
         OfferTile tileG = new OfferTile('G', 4);
         tileG.setUpperCount(2); tileG.setLowerCount(1); tileG.setFoodBonus(0);
 
-        // Aggiungi tutte le tiles alla lista
         List<OfferTile> allTiles = new ArrayList<>(
                 Arrays.asList(tileA, tileB, tileC, tileD, tileE, tileF, tileG)
         );
-        // Filtra quelle compatibili con il numero di giocatori
+
         for (OfferTile t : allTiles) {
             if (t.getMinPlayers() <= numPlayers) {
                 tiles.add(t);
@@ -219,22 +221,23 @@ public class Board {
 
     // crezione delle turn order
     public void initializeTurnOrderTrack(int numPlayers) {
-        TurnOrderTrack currentTrack;
+        if (numPlayers < 2 || numPlayers > 5) {
+            throw new IllegalArgumentException("Invalid number of players");
+        }
+
         switch (numPlayers) {
             case 2:
-                currentTrack = new TurnOrderTrack(new int[]{1, -1});
+                this.turnOrderTrack = new TurnOrderTrack(new int[]{1, -1});
                 break;
             case 3:
-                currentTrack = new TurnOrderTrack(new int[]{2, 0, -1});
+                this.turnOrderTrack = new TurnOrderTrack(new int[]{2, 0, -1});
                 break;
             case 4:
-                currentTrack = new TurnOrderTrack(new int[]{2, 1, 0, -1});
+                this.turnOrderTrack = new TurnOrderTrack(new int[]{2, 1, 0, -1});
                 break;
             case 5:
-                currentTrack = new TurnOrderTrack(new int[]{3, 1, 0, 0, -1});
+                this.turnOrderTrack = new TurnOrderTrack(new int[]{3, 1, 0, 0, -1});
                 break;
-            default:
-                throw new IllegalArgumentException("Invalid number of players: " + numPlayers);
         }
     }
 }

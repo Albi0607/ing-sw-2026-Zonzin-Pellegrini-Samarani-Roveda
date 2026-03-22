@@ -50,12 +50,20 @@ public class TurnOrderTrack {
      * @param p the player to occupy the slot
      * @throws IndexOutOfBoundsException if the index is invalid
      */
+
     public void setPlayerAt(int index, Player p) {
-        int i = slots[index];
-        if (i >= 0) {
-            p.addFood(i);   // add food
+        if (index < 0 || index >= positions.size()) {
+            throw new IndexOutOfBoundsException("Index not valid: " + index);
+        }
+        if (positions.get(index) != null) {
+            throw new IllegalStateException("Index not free: " + index);
+        }
+
+        int effect = slots[index];
+        if (effect >= 0) {
+            p.addFood(effect);    // add food
         } else {
-            p.payFood(-i);
+            p.payFood(-effect);
             // pay food (capire in base a come è implementato pay food se mettere + o - i
         }
         // update the player's position in the track
@@ -101,6 +109,10 @@ public class TurnOrderTrack {
 
     public List<Player> getPositions() {
         return new ArrayList<>(positions); // return a copy to avoid external modification
+    }
+
+    public int[] getSlots() {
+        return slots;
     }
 
     // --- Setters ---
