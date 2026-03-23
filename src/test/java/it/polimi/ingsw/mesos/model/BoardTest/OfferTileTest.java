@@ -2,11 +2,12 @@ package it.polimi.ingsw.mesos.model.BoardTest;
 
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.enums.Color;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 
-import static it.polimi.ingsw.mesos.model.enums.Color.blue;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,12 +16,12 @@ public class OfferTileTest {
     void testIsAvailable() {
         OfferTile tile = new OfferTile('B', 2);
 
-        // inizialmente disponibile
+        // available
         assertTrue(tile.isAvailable());
 
-        Player p = new Player("Bob","blu");
+        Player p = new Player("Bob", Color.BLUE);
         tile.setHost(p);
-
+        // not available
         assertFalse(tile.isAvailable());
     }
 
