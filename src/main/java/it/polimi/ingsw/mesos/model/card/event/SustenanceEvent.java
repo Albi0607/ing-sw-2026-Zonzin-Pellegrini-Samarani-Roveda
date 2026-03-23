@@ -49,8 +49,9 @@ public class SustenanceEvent extends EventCard {
             for (CharacterType c : CharacterType.values()){
                 food += p.getTribe().countCharacters(c);
             }
-            //ottengo sconto dato dalle carte Ghatherer
+            //ottengo sconto dato dalle carte Ghatherer e da discount presente in un attributo del giocatore
             food = food - p.getTribe().getSustenanceDiscount();
+            food = food - p.getSustenanceDiscount();
 
             //controllo che il cibo sia positivo prima di toglierlo per non fare danni (esempio sommare cibo se diventa negativo)
             if(food>0){

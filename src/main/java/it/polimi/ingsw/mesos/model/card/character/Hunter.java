@@ -32,9 +32,10 @@ public class Hunter extends CharacterCard {
      * @param player player the player who owns the tribe
      */
 
+    //gestire il più uno se l'effetto viene chiamato quando è già nella tribù o no
     public void onAddedToTribe(Tribe tribe, Player player) {
         if(hasIcon()){
-            int bonus=tribe.countCharacters(CharacterType.HUNTER)+1;
+            int bonus=tribe.countCharacters(CharacterType.HUNTER);
             player.addFood(bonus);
         }
     }
