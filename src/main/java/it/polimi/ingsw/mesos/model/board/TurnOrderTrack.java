@@ -63,8 +63,12 @@ public class TurnOrderTrack {
         if (effect >= 0) {
             p.addFood(effect);    // add food
         } else {
-            p.payFood(-effect);
-            // pay food (capire in base a come è implementato pay food se mettere + o - i
+            boolean paid = p.payFood(-effect);
+
+            if (!paid) {
+                p.updatePrestige(-2);
+                // if the payer do not have enough food have to pay in prestige points
+            }
         }
         // update the player's position in the track
         positions.set(index, p);
@@ -116,10 +120,10 @@ public class TurnOrderTrack {
     }
 
     // --- Setters ---
-public void setSlot(int index, int value) {
-    if (index < 0 || index >= slots.length) {
+    public void setSlot(int index, int value) {
+        if (index < 0 || index >= slots.length) {
         throw new IndexOutOfBoundsException("Invalid slot index");
-    }
+     }
     slots[index] = value;
 }
 }
