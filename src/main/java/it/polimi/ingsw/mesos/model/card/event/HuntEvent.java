@@ -20,8 +20,8 @@ public class HuntEvent extends EventCard {
      * @param playersRequired the number of players required to use the card in the game
      * @param prestigePoints defines the prestige points to be gained for each Hunter in the player's tribe
      */
-    public HuntEvent(Era era, int playersRequired, int prestigePoints) {
-        super(era, 2, EventType.HUNT, false);
+    public HuntEvent(Era era, int playersRequired, boolean isFinal, int prestigePoints) {
+        super(era, playersRequired, EventType.HUNT, isFinal);
         this.prestigePoints=prestigePoints;
     }
 
@@ -35,7 +35,7 @@ public class HuntEvent extends EventCard {
     public void resolve(Game game) {
 
         for(Player p : game.getPlayers()){
-            int numHunters = p.getTribe().countCharacters(CharacterType.HUNTER);
+            int numHunters = p.getTribe().getCharactersTypeCount(CharacterType.HUNTER);
             p.addFood(numHunters);
             p.updatePrestige(numHunters*prestigePoints);
         }

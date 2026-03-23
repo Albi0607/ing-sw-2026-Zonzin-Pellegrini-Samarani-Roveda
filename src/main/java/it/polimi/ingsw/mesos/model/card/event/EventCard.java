@@ -25,7 +25,7 @@ public abstract class EventCard extends TribeCard {
      */
     public EventCard(Era era, int playersRequired, EventType type, boolean isFinal) {
 
-        super(era, 2);
+        super(era, playersRequired);
         this.type=type;
         this.isFinal=isFinal;
     }

@@ -1,0 +1,98 @@
+[
+  {
+    "type": "HUNT",
+    "era": "ERA_I",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 1
+  },
+  {
+    "type": "SUSTENANCE",
+    "era": "ERA_I",
+    "playersRequired": 2,
+    "isFinal": false,
+    "losePoints": 1
+  },
+  {
+    "type": "SHAMAN_RITUAL",
+    "era": "ERA_I",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 5,
+    "losePoints": 3
+  },
+  {
+    "type": "PAINTING",
+    "era": "ERA_I",
+    "playersRequired": 2,
+    "isFinal": false,
+    "loseNumber": 0,
+    "gainNumber": 1,
+    "gainPoints": 1,
+    "losePoints": 2
+  },
+  {
+    "type": "HUNT",
+    "era": "ERA_II",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 2
+  },
+  {
+    "type": "SUSTENANCE",
+    "era": "ERA_II",
+    "playersRequired": 2,
+    "isFinal": false,
+    "losePoints": 2
+  },
+  {
+    "type": "SHAMAN_RITUAL",
+    "era": "ERA_II",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 10,
+    "losePoints": 5
+  },
+  {
+    "type": "PAINTING",
+    "era": "ERA_II",
+    "playersRequired": 2,
+    "isFinal": false,
+    "loseNumber": 1,
+    "gainNumber": 2,
+    "gainPoints": 2,
+    "losePoints": 2
+  },
+  {
+    "type": "HUNT",
+    "era": "ERA_III",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 3
+  },
+  {
+    "type": "PAINTING",
+    "era": "ERA_III",
+    "playersRequired": 2,
+    "isFinal": false,
+    "loseNumber": 2,
+    "gainNumber": 3,
+    "gainPoints": 2,
+    "losePoints": 3
+  },
+  {
+    "type": "SUSTENANCE",
+    "era": "ERA_III",
+    "playersRequired": 2,
+    "isFinal": false,
+    "losePoints": 3
+  },
+  {
+    "type": "SHAMAN_RITUAL",
+    "era": "ERA_III",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 15,
+    "losePoints": 7
+  }
+]

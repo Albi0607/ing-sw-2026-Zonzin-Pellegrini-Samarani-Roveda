@@ -24,7 +24,7 @@ public class ShamanicRitualEvent extends EventCard {
      * @param isFinal attribute to define the two final cards
      */
     public ShamanicRitualEvent(Era era, int playersRequired, boolean isFinal, int gainPrestige, int losePrestige) {
-        super(era, 2, EventType.SHAMAN_RITUAL,isFinal);
+        super(era, playersRequired, EventType.SHAMAN_RITUAL,isFinal);
         this.gainPrestige=gainPrestige;
         this.losePrestige=losePrestige;
     }

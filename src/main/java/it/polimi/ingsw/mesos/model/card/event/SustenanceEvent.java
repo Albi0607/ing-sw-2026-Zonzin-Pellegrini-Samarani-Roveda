@@ -26,7 +26,7 @@ public class SustenanceEvent extends EventCard {
      * @param prestigePoints indicates how many prestige points are lost for food that cannot be paid
      */
     public SustenanceEvent(Era era, int playersRequired, boolean isFinal, int prestigePoints) {
-        super(era, 2, EventType.SUSTENANCE,isFinal);
+        super(era, playersRequired, EventType.SUSTENANCE,isFinal);
         this.prestigePoints=prestigePoints;
     }
 
@@ -47,20 +47,22 @@ public class SustenanceEvent extends EventCard {
 
             //sommo tutte le carte giocatori contandole per tipo con questo metodo
             for (CharacterType c : CharacterType.values()){
-                food += p.getTribe().countCharacters(c);
+                food += p.getTribe().getCharactersTypeCount(c);
             }
             //ottengo sconto dato dalle carte Ghatherer e da discount presente in un attributo del giocatore
             food = food - p.getTribe().getSustenanceDiscount();
             food = food - p.getSustenanceDiscount();
 
             //controllo che il cibo sia positivo prima di toglierlo per non fare danni (esempio sommare cibo se diventa negativo)
-            if(food>0){
-                missingFood = p.payFood(food);
+            if(food>0&&food<=p.getFood()){
+                p.payFood(food);
             }
 
             //controllo che il giocatore paghi tutto il cibo altrimenti calcolo differenza e tolgo punti prestigio
-            if(missingFood<0){
-                p.updatePrestige(missingFood*prestigePoints);
+            else if(food>0&&food>p.getFood()){
+                int diff = food-p.getFood();
+                p.payFood(food-diff);
+                p.updatePrestige(diff*prestigePoints);
             }
         }
     }

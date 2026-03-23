@@ -1,23 +1,31 @@
 package it.polimi.ingsw.mesos.model.deck;
 
+import it.polimi.ingsw.mesos.model.Tribe;
+import it.polimi.ingsw.mesos.model.card.Card;
+
 import java.util.List;
 import java.util.Stack;
 
-public class Deck<T> {
+public class Deck<TribeCard> {
 
-    private Stack<T> cards;
+    private Stack<TribeCard> cards;
 
     public Deck() { }
 
-    public Deck(List<T> cards) { }
+    public Deck(List<TribeCard> cards) { }
 
     public void shuffle() { }
 
-    public T draw() { return null; }
+    public TribeCard draw() {
+        if (this.isEmpty()){return null;}
+        return cards.pop();
+    }
 
-    public void push(T item) { }
 
-    public boolean isEmpty() { return false; }
+    public boolean isEmpty() {
+        return this.size() == 0;
+        }
+
 
     public int size() { return 0; }
 }
