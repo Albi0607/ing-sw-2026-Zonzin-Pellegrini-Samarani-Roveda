@@ -73,7 +73,6 @@ public class CreateCharacterCard {
                                 j.playersRequired
                         );
                         break;
-
                 }
 
                 if(card != null){
