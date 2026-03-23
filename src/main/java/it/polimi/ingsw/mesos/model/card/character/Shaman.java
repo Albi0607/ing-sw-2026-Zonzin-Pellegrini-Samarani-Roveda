@@ -29,4 +29,8 @@ public class Shaman extends CharacterCard {
     public int getNumberOfIcons() {
         return numberOfIcons;
     }
+
+    public int getNumberOfIcons() {
+        return numberOfIcons;
+    }
 }
