@@ -30,7 +30,7 @@ public class Game {
 
     public void changeState(GameState newState) { }
 
-    public boolean checkNicknameUnique(String name) { return false; }
+    public boolean checkNicknameUnique(String name) { return true; }
 
     public void placeTotemOnOffer(Player p, OfferTile t) { }
 

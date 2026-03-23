@@ -31,6 +31,8 @@ public class Hunter extends CharacterCard {
      * @param tribe  tribe the tribe to which the card is added
      * @param player player the player who owns the tribe
      */
+    @Override
+    public void onAddedToTribe(Tribe tribe, Player player, Game game) { }
 
     //gestire il più uno se l'effetto viene chiamato quando è già nella tribù o no
     public void onAddedToTribe(Tribe tribe, Player player) {

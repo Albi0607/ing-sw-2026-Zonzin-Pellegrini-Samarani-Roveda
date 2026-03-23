@@ -42,4 +42,8 @@ public class Builder extends CharacterCard {
     public int getPrestigePoints() {
         return prestigePoints;
     }
+
+    public int getDiscountValue() {
+        return discountValue;
+    }
 }

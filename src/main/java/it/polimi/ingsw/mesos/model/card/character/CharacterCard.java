@@ -14,6 +14,7 @@ public abstract class CharacterCard extends TribeCard {
 
     /**Attribute specifying the type of the character card*/
     private final CharacterType type;
+    public CharacterType type;
 
     /**General constructor for all character cards
      * @param era the era of the card
@@ -30,6 +31,10 @@ public abstract class CharacterCard extends TribeCard {
      * @return the type of the character card
      */
     public CharacterType getCharacterType(){
+        return type;
+    }
+
+    public CharacterType getType() {
         return type;
     }
 }
