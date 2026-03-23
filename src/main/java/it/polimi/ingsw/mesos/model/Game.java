@@ -6,6 +6,7 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 import it.polimi.ingsw.mesos.model.deck.Deck;
 import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
@@ -54,4 +55,6 @@ public class Game {
     public Era getCurrentEra() { return null; }
 
     public GameState getCurrentState() { return null; }
+
+    public EventType getCurrentEventType(){return null; }
 }

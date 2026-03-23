@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
+import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.enums.Color;
 
 public class Player {
@@ -9,6 +10,14 @@ public class Player {
     private int prestigePoints;
     private Tribe tribe;
     private Color type;
+
+    //parametri che servono per gli edifici
+    private boolean shamanNotLosePoints = false;
+    private boolean shamanDoublePoints = false;
+    private int extraShamanIcons = 0;
+    private int sustenanceDiscount = 0;
+    private boolean foodOnTotemSlot = false;
+    private boolean extraDraw = false;
 
     public Player(String nickname, String color) { }
 
@@ -35,4 +44,30 @@ public class Player {
     public Tribe getTribe() { return null; }
 
     public Player getPlayer() { return null; }
+
+    //metodi che servono per i building
+    public void setShamanNotLosePoints(){
+        this.shamanNotLosePoints=true;
+    }
+    public void setShamanDoublePoints(){
+        this.shamanDoublePoints=true;
+    }
+    public boolean getShamanNotLosePoints(){return shamanNotLosePoints;}
+    public boolean getShamanDoublePoints(){
+        return shamanDoublePoints;
+    }
+    public void setExtraShamanIcons(int num){extraShamanIcons=num;}
+    public int getExtraShamanIcons(){
+        return extraShamanIcons;
+    }
+
+    public void setSustenanceDiscount(int num){sustenanceDiscount=num;}
+    public int getSustenanceDiscount(){
+        return sustenanceDiscount;
+    }
+
+    public void setFoodOnTotemSlot(){this.foodOnTotemSlot=true;}
+    public boolean getFoodOnTotemSlot(){return foodOnTotemSlot;}
+    public void setExtraDraw(){this.extraDraw=true;}
+    public boolean getExtraDraw(){return extraDraw;}
 }

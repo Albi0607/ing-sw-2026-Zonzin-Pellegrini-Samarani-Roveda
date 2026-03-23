@@ -9,28 +9,28 @@ import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
 public class BuildingCard extends Card {
 
-    private int cost;
-    private int victoryPoints;
-    private BuildingEffect effect;
-    private EventType context;
+    private final int cost;
+    private final int victoryPoints;
+    private final BuildingEffect effect;
 
-    public BuildingCard(Era era, int cost, int victoryPoints, BuildingEffect effect, EventType context) {
+    public BuildingCard(Era era, int cost, int victoryPoints, BuildingEffect effect) {
         super(era);
+        this.cost = cost;
+        this.victoryPoints = victoryPoints;
+        this.effect = effect;
     }
-
-    @Override
-    public boolean isPersistent() { return true; }
-
-    @Override
-    public boolean isBuilding() { return true; }
 
     // --- Getters ---
 
-    public int getCost() { return 0; }
+    public int getCost() {
+        return this.cost;
+    }
 
-    public int getVictoryPoints() { return 0; }
+    public int getVictoryPoints() {
+        return this.victoryPoints;
+    }
 
-    public BuildingEffect getEffect() { return null; }
-
-    public EventType getContext() { return null; }
+    public BuildingEffect getEffect() {
+        return this.effect;
+    }
 }
