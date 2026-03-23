@@ -103,7 +103,9 @@ public class TurnOrderTrackTest {
         Player p2 = new Player("Bob", Color.RED);
         board.getTurnOrderTrack().setPlayerAt(0, p2);
 
-        assertEquals(-1, board.getTurnOrderTrack().getFirstFreeSlot()); // all slot occupied
+        assertThrows(IllegalStateException.class, () -> {
+            board.getTurnOrderTrack().getFirstFreeSlot();  // all slot occupied
+        });
     }
 
 
