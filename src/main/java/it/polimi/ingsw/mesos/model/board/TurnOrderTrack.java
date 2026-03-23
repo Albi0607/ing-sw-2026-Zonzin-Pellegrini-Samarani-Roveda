@@ -84,7 +84,7 @@ public class TurnOrderTrack {
                 return i; // first free slot
             }
         }
-        return -1; // no free slots available
+        throw new IllegalStateException("No free slots available"); // no free slots available
     }
     /**
      * Replaces the current player order with a new order.

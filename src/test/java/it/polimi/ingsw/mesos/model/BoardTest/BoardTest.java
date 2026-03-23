@@ -46,6 +46,7 @@ public class BoardTest {
         assertTrue(board.getLowerRow().contains(c1)); // the method have to move c1
         assertFalse(board.getUpperRow().contains(c1)); // the method don't have to move c2, because it is a building
         assertTrue(board.getUpperRow().contains(c2)); // c2 remains in the upper row
+        assertFalse(board.getLowerRow().contains(c2));
     }
 
     @Test
@@ -146,8 +147,20 @@ public class BoardTest {
     void testTakeCardFromLowerInvalidIndex() {
         Board board = new Board(2);
 
+        Card c1 = new Artist(Era.ERA_I,2);
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c3 = new Artist(Era.ERA_I,4);
+
+        board.getLowerRow().add(c1);
+        board.getLowerRow().add(c2);
+        board.getLowerRow().add(c3);
+
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromLower(0);
+            board.takeCardFromLower(-1);
+        });
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            board.takeCardFromLower(7);
         });
     }
 
@@ -155,13 +168,25 @@ public class BoardTest {
     void testTakeCardFromUpperInvalidIndex() {
         Board board = new Board(2);
 
+        Card c1 = new Artist(Era.ERA_I,2);
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c3 = new Artist(Era.ERA_I,4);
+
+        board.getUpperRow().add(c1);
+        board.getUpperRow().add(c2);
+        board.getUpperRow().add(c3);
+
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromUpper(0);
+            board.takeCardFromUpper(-1);
+        });
+
+        assertThrows(IndexOutOfBoundsException.class, () -> {
+            board.takeCardFromUpper(7);
         });
     }
     // getAvailableTiles
-    //initializeOfferTiles
 
+    // initializeOfferTiles
     @Test
     void testInitializeOfferTiles() {
         Board board = new Board(4);
