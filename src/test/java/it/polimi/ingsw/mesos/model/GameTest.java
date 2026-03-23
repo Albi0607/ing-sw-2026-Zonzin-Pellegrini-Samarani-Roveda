@@ -1,5 +1,7 @@
 package it.polimi.ingsw.mesos.model;
 
+import it.polimi.ingsw.mesos.model.enums.CharacterType;
+import it.polimi.ingsw.mesos.model.enums.Color;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,10 +14,10 @@ class GameTest {
     @Test
     void check_Ok_Nickname() {
         List<Player> name= new ArrayList<Player>();
-        Player P1 = new Player("Alberto","Black");
-        Player P2 = new Player("Anna","Red");
-        Player P3 = new Player("Luca","Blue");
-        Player P4 = new Player("Mattia","Yellow");
+        Player P1 = new Player("Alberto",Color.PURPLE);
+        Player P2 = new Player("Anna",Color.RED);
+        Player P3 = new Player("Luca",Color.BLUE);
+        Player P4 = new Player("Mattia",Color.YELLOW);
         name.add(P1);
         name.add(P2);
         name.add(P3);
@@ -27,10 +29,10 @@ class GameTest {
     @Test
     void check_Wrong_Nickname() {
         List<Player> name= new ArrayList<Player>();
-        Player P1 = new Player("Alberto","Black");
-        Player P2 = new Player("Anna","Red");
-        Player P3 = new Player("Luca","Blue");
-        Player P4 = new Player("Mattia","Yellow");
+        Player P1 = new Player("Alberto", Color.PURPLE);
+        Player P2 = new Player("Anna",Color.RED);
+        Player P3 = new Player("Luca",Color.BLUE);
+        Player P4 = new Player("Mattia",Color.YELLOW);
         name.add(P1);
         name.add(P2);
         name.add(P3);
