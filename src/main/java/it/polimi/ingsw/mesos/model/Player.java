@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
+import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Color;
 
 public class Player {
@@ -18,7 +19,6 @@ public class Player {
     private boolean foodOnTotemSlot = false;
     private boolean extraDraw = false;
 
-    public Player(String nickname, String color) { }
     public Player(String nickname, Color color) {
         this.nickname = nickname;
         this.color = color;
@@ -61,8 +61,6 @@ public class Player {
     public void updatePrestige(int points) {
         this.prestigePoints += points;
     }
-
-
     // --- Getters ---
 
     public String getNickname() {

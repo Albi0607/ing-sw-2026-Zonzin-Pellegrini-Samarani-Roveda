@@ -9,7 +9,7 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 public class Shaman extends CharacterCard {
 
     /**Attribute ranging from 1 to 3 to define the number of Shaman icons to use in ShamanicRitualEvent*/
-    private int numberOfIcons;
+    private final  int numberOfIcons;
 
     /**Constructor for Shaman Card
      *
@@ -26,9 +26,6 @@ public class Shaman extends CharacterCard {
      *
      * @return Shaman icons
      */
-    public int getNumberOfIcons() {
-        return numberOfIcons;
-    }
 
     public int getNumberOfIcons() {
         return numberOfIcons;

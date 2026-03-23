@@ -6,6 +6,7 @@ import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.Inventor;
 import it.polimi.ingsw.mesos.model.card.character.Shaman;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
+import it.polimi.ingsw.mesos.model.enums.InventionIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,9 +88,8 @@ public class Tribe {
                 .mapToInt(Shaman::getNumberOfIcons)
                 .sum();
     }
-    /** Number of distinct InventionIcon values among Inventors. */
-    public int getDistinctInventionCount() { return 0; }
-    public List<InventionIcon> getDistinctInventionIcons(){return null;};
+
+    public List<InventionIcon> getDistinctInventionIcons(){return null;}
 
     /**
      * Number of distinct InventionIcon values among Inventors.
@@ -108,6 +108,9 @@ public class Tribe {
         return characters.size();
     }
 
+    //per contare quanti character dello stesso tipo ci sono
+    public int getCharactersTypeCount(CharacterType type){return 0;}
+
     public int getBuildingsCount() {
         return buildings.size();
     }
@@ -115,9 +118,9 @@ public class Tribe {
     public List<CharacterCard> getCharacters() {
         return new ArrayList<>(characters);
     }
+
     public CharacterCard getLastCard(){return null;}
 
     public List<Inventor> getInventors(){return null;}
-    public List<BuildingCard> getBuildingCard(){return null;}
 
 }

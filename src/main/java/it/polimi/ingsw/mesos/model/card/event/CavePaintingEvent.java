@@ -30,10 +30,10 @@ public class CavePaintingEvent extends EventCard {
      * @param losePoints prestige points lost if the number of Artists is equal to or less than loseNumber
      * @param gainPoints prestige points gain if the number of Artists is equal to or more than gainNumber
      */
-    public CavePaintingEvent(Era era, int playersRequired,
+    public CavePaintingEvent(Era era, int playersRequired,boolean isFinal,
                              int loseNumber, int gainNumber,
                              int losePoints, int gainPoints) {
-        super(era, 2, EventType.ROCK_ART, false);
+        super(era, playersRequired, EventType.PAINTING, isFinal);
         this.loseNumber=loseNumber;
         this.gainNumber=gainNumber;
         this.losePoints=losePoints;
@@ -54,7 +54,7 @@ public class CavePaintingEvent extends EventCard {
         //faccio l'azione per tutti i giocatori in gioco
         for(Player p : game.getPlayers()){
             //conto i numeri di artisti all'interno della tribù
-            int numArtists = p.getTribe().countCharacters(CharacterType.ARTIST);
+            int numArtists = p.getTribe().getCharactersTypeCount(CharacterType.ARTIST);
 
             //controllo se il giocatore ha pochi artisti e deve perdere punti prestigio
             if(numArtists<=loseNumber){

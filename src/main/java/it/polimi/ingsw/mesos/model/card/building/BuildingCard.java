@@ -7,12 +7,24 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
+/**"Generic class for building cards"
+ * @author Alberto Roveda
+ */
 public class BuildingCard extends Card {
-
+    /**Attribute for the cost of the building card*/
     private final int cost;
+    /**Attribute that identifies the prestige points to be gained at the end of the game*/
     private final int victoryPoints;
+    /**Attribute that identifies the effect class of the building*/
     private final BuildingEffect effect;
 
+    /**Constructor for building cards
+     *
+     * @param era the era of the card
+     * @param cost the cost of the building card
+     * @param victoryPoints identifies the prestige points to be gained at the end of the game
+     * @param effect identifies the effect class of the building
+     */
     public BuildingCard(Era era, int cost, int victoryPoints, BuildingEffect effect) {
         super(era);
         this.cost = cost;
@@ -22,14 +34,23 @@ public class BuildingCard extends Card {
 
     // --- Getters ---
 
+    /**Getter method that returns the cost of the building to be paid for purchase
+     *
+     * @return the cost of the building card
+     */
     public int getCost() {
         return this.cost;
     }
 
+    /**Getter method that returns the prestige points gained from the building at the end of the game
+     *
+     * @return the prestige points to be gained at the end of the game
+     */
     public int getVictoryPoints() {
         return this.victoryPoints;
     }
 
+    /**Getter method that @returns the effect class of the building*/
     public BuildingEffect getEffect() {
         return this.effect;
     }

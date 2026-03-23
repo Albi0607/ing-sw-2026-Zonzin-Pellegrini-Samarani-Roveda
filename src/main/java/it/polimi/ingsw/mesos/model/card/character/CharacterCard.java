@@ -14,7 +14,6 @@ public abstract class CharacterCard extends TribeCard {
 
     /**Attribute specifying the type of the character card*/
     private final CharacterType type;
-    public CharacterType type;
 
     /**General constructor for all character cards
      * @param era the era of the card
