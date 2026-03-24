@@ -71,6 +71,24 @@ public class OfferTile {
     }
 
 
+    public void placeTotem(Player player) {
+        if (player == null) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
+
+        if (host != null) {
+            throw new IllegalStateException("This tile is already occupied");
+        }
+
+        host = player;
+    }
+
+
+    public void reset() {
+        host = null;
+    }
+
+
     // --- Setters ---
     public void setUpperCount(int upperCount) {
         this.upperCount = upperCount;

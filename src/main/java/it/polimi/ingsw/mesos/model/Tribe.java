@@ -119,6 +119,8 @@ public class Tribe {
         return new ArrayList<>(characters);
     }
 
+    public List<BuildingCard> getBuildings() { return new ArrayList<>(buildings); }
+
     public CharacterCard getLastCard(){return null;}
 
     public List<Inventor> getInventors(){return null;}

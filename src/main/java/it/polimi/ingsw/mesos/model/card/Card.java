@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.model.card;
 
+import it.polimi.ingsw.mesos.model.card.event.EventCard;
 import it.polimi.ingsw.mesos.model.enums.Era;
 
 /** Abstract class to represent any type of card
@@ -19,6 +20,10 @@ public abstract class Card {
      * @return the era of the card*/
     public Era getEra() {
         return this.era;
+    }
+
+    public EventCard getAsEventCard() {
+        return null;
     }
 
 }
