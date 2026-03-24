@@ -40,12 +40,6 @@ public class PlacingState implements GameStateLogic {
         System.out.println("--- Entering PLACING PHASE ---");
         System.out.println("Waiting for players to place their totems...");
 
-        // TODO for the team:
-        // 1. Logic to check if all players have placed their totems.
-        // 2. This execute might be called multiple times or wait for controller input.
-
-        // Example transition (to be triggered when all totems are placed):
-        // g.changeState(new ResolvingState());
     }
 
 

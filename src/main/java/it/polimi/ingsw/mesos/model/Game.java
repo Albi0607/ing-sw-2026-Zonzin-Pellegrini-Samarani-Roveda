@@ -48,7 +48,7 @@ public class Game {
         this.board = new Board(this.players.size());
 
         this.currentRound = 1;
-        this.currentEra = Era.ERA_I; // Assicurati che l'enum si chiami esattamente così
+        this.currentEra = Era.ERA_I;
 
         this.currentState = new SetupState();
     }
@@ -63,8 +63,6 @@ public class Game {
         this.board.initializeOfferTiles(numPlayers);
         this.board.initializeTurnOrderTrack(numPlayers);
         System.out.println("Board initialized with Offer Tiles and Turn Order Track for " + numPlayers + " players.");
-
-        //this.board.initializeDecks();
 
         java.util.Collections.shuffle(this.players);
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
@@ -196,11 +194,10 @@ public class Game {
             this.board.shiftBuildingsToLower();
             System.out.println("- Passaggio 2 eseguito: Edifici spostati dalla fila superiore alla fila inferiore.");
 
-            // REGOLE - PASSAGGIO 3: Piazzare i nuovi Edifici
-            // Il Game dice alla Board di prendere il mazzetto dell'era appena iniziata
-            // e metterlo nella fila superiore.
-            // TODO per il team: assicurarsi che la Board abbia un metodo per farlo
-            // Esempio: this.board.deployBuildingsForEra(this.currentEra);
+
+
+
+
             System.out.println("- Passaggio 3 eseguito: Nuovi edifici dell'Era " + this.currentEra + " piazzati nella fila superiore.");
         }
     }
