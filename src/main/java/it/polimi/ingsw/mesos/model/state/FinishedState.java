@@ -2,6 +2,15 @@ package it.polimi.ingsw.mesos.model.state;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.enums.GameState;
+/**
+ * Represents the terminal phase of the game.
+ * <p>
+ * In this state, the game has officially concluded (usually after Era III).
+ * The system calculates the final scores, applies any end-game effects
+ * (such as {@link }), and determines the winner.
+ * No further gameplay actions can be taken by the players.
+ * </p>
+ */
 
 public class FinishedState implements GameStateLogic {
 
@@ -23,8 +32,27 @@ public class FinishedState implements GameStateLogic {
      *
      * Does not transition to any further state.
      */
+
+
+
+    /**
+     * Executes the final scoring and game termination logic.
+     *
+     * @param g The main game context. Must not be null.
+     */
     @Override
-    public void execute(Game game) { }
+    public void execute(Game g) {
+        System.out.println("--- Entering FINISHED PHASE ---");
+        System.out.println("The game is over! Calculating final scores...");
+
+        // TODO for the team:
+        // 1. Trigger all EndGameScoringEffects for each player's tribe.
+        // 2. Tally up the final prestige points.
+        // 3. Determine and announce the winner (e.g., g.getWinner()).
+
+        // No further state transitions are called from here.
+        // The game loop naturally ends.
+    }
 
     @Override
     public GameState getStateId() { return GameState.FINISHED; } // probabile da cambiare

@@ -17,6 +17,7 @@ package it.polimi.ingsw.mesos.model.board;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
+import it.polimi.ingsw.mesos.model.card.event.EventCard;
 import it.polimi.ingsw.mesos.model.deck.Deck;
 import it.polimi.ingsw.mesos.model.enums.Era;
 
@@ -239,5 +240,32 @@ public class Board {
                 this.turnOrderTrack = new TurnOrderTrack(new int[]{3, 1, 0, 0, -1});
                 break;
         }
+    }
+
+
+
+    public List<EventCard> getEvents() {
+        List<EventCard> events = new ArrayList<>();
+
+        for (Card card : this.lowerRow) {
+            // Chiediamo alla carta di "trasformarsi" in evento
+            EventCard event = card.getAsEventCard();
+
+            // Se non è null, significa che era davvero un EventCard!
+            if (event != null) {
+                events.add(event);
+            }
+        }
+
+        return events;
+    }
+
+    public Deck<TribeCard> getTribeDeck() {
+        return this.tribeDeck;
+    }
+
+
+    public boolean allTotemsPlaced() {
+        return tiles.stream().noneMatch(OfferTile::isAvailable);
     }
 }

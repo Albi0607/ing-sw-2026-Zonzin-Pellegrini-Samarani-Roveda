@@ -16,6 +16,11 @@ public abstract class EventCard extends TribeCard {
      to place at the bottom of the deck*/
     private final boolean isFinal;
 
+    @Override
+    public EventCard getAsEventCard() {
+        return this;
+    }
+
     /**General constructor for all event cards
      *
      * @param era the era of the card

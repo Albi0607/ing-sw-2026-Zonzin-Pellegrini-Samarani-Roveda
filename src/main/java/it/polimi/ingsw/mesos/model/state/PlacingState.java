@@ -5,6 +5,16 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 
+/**
+ * Represents the phase where players place their totems on the offer track.
+ * <p>
+ * During this state, the game waits for players to take turns placing
+ * their totems on available {@link OfferTile}s. The state remains active
+ * until all totems for the current round have been placed.
+ * Once placement is complete, it transitions to the {@link ResolvingState}.
+ * </p>
+ */
+
 public class PlacingState implements GameStateLogic {
 
     /** How many players have already placed their totem this round. */
@@ -18,23 +28,52 @@ public class PlacingState implements GameStateLogic {
      * waits for each player to place their totem in turn.
      * When all players have placed, transitions to ResolvingState.
      */
-    @Override
-    public void execute(Game game) { }
 
-    @Override
-    public GameState getStateId() { return GameState.PLACING_TOTEMS; } // probabile da cambiare
+
     /**
-     * Invoked by the controller when a player chooses a tile.
-     * Validates that:
-     * - it is this player's turn to place
-     * - the chosen tile is free and available for the current player count
-     * Places the totem and increments totemPlacedCount.
-     * When totemPlacedCount == numPlayers, triggers transition.
+     * Executes the logic for the totem placement phase.
+     *
+     * @param g The main game context. Must not be null.
      */
-    public void placeTotem(Game game, Player player, OfferTile tile) { }
+    @Override
+    public void execute(Game g) {
+        System.out.println("--- Entering PLACING PHASE ---");
+        System.out.println("Waiting for players to place their totems...");
 
-    /** Returns the player whose turn it is to place, based on TurnOrderTrack. */
-    public Player getCurrentPlacer(Game game) { return null; }
+        // TODO for the team:
+        // 1. Logic to check if all players have placed their totems.
+        // 2. This execute might be called multiple times or wait for controller input.
 
-    public int getTotemPlacedCount() { return 0; }
+        // Example transition (to be triggered when all totems are placed):
+        // g.changeState(new ResolvingState());
+    }
+
+
+    /**
+     * Executes the logic for placing a player's totem on an offer tile.
+     * <p>
+     * This overrides the default interface behavior because totem placement
+     * is fully legal and expected during this specific phase.
+     * </p>
+     *
+     * @param g The main game context.
+     * @param p The player placing the totem.
+     * @param t The target offer tile.
+     */
+    @Override
+    public void placeTotemOnOffer(Game g, Player p, OfferTile t) {
+
+        t.placeTotem(p);
+
+        System.out.println(p.getNickname() + " placed a totem on tile " + t.getId());
+
+        if (g.getBoard().allTotemsPlaced()) {
+            g.changeState(new ResolvingState());
+        }
+    }
+
+
+    @Override
+    public GameState getStateId() { return GameState.PLACING_TOTEMS; }
+
 }
