@@ -9,11 +9,11 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 
 import java.util.*;
 
-public class Deck {
+public class Deck<T> {
 
     private Stack<TribeCard> cards;
 
-    public Deck() {
+    public Deck(int numPlayers) {
         this.cards = new Stack<>();
 
         List<CharacterCard> cCard = new CreateCharacterCard().getAllCharacterCards();
@@ -23,7 +23,7 @@ public class Deck {
         List<EventCard> finalCards = new ArrayList<>();
         List<EventCard> noFinalCards = new ArrayList<>();
 
-        //divido le carte evento finali da non finali così so quali sono le utlime 2 carte da piazzare in fondo al mazzo
+        //divido le carte evento finali da non finali così so quali sono le ultime 2 carte da piazzare in fondo al mazzo
         for(EventCard e : eCard){
             if(e.isFinal()) finalCards.add(e);
             else noFinalCards.add(e);
@@ -32,7 +32,7 @@ public class Deck {
         for(Era era: Era.values()){
             List<TribeCard> eraCards = new ArrayList<>();
             for(CharacterCard c : cCard){
-                if(c.getEra()==era) eraCards.add(c);
+                if(c.getEra()==era && c.getPlayerRequired()<=numPlayers) eraCards.add(c);
             }
 
             for(EventCard e : noFinalCards){
