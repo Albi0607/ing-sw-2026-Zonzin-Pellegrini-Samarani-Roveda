@@ -45,13 +45,6 @@ public class FinishedState implements GameStateLogic {
         System.out.println("--- Entering FINISHED PHASE ---");
         System.out.println("The game is over! Calculating final scores...");
 
-        // TODO for the team:
-        // 1. Trigger all EndGameScoringEffects for each player's tribe.
-        // 2. Tally up the final prestige points.
-        // 3. Determine and announce the winner (e.g., g.getWinner()).
-
-        // No further state transitions are called from here.
-        // The game loop naturally ends.
     }
 
     @Override
