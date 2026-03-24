@@ -84,14 +84,14 @@
     "type": "SUSTENANCE",
     "era": "ERA_III",
     "playersRequired": 2,
-    "isFinal": false,
+    "isFinal": true,
     "losePoints": 3
   },
   {
     "type": "SHAMAN_RITUAL",
     "era": "ERA_III",
     "playersRequired": 2,
-    "isFinal": false,
+    "isFinal": true,
     "gainPoints": 15,
     "losePoints": 7
   }
