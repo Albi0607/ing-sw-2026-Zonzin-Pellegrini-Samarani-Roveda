@@ -192,6 +192,8 @@ public class BoardTest {
         CreateOfferTile factory = new CreateOfferTile();
         List<OfferTile> tiles = factory.initializeOfferTiles(4);
 
+        board.setOfferTiles(tiles);
+
         assertNotNull(tiles);
         assertFalse(tiles.isEmpty());
 
@@ -233,7 +235,7 @@ public class BoardTest {
         };
 
         for (int i = 2; i <= 5; i++) {
-            factory.initializeTurnOrderTrack(i);
+            board.setTurnOrderTrack(factory.initializeTurnOrderTrack(i));
             assertArrayEquals(expectedSlots[i - 2], board.getTurnOrderTrack().getSlots());
         }
     }
