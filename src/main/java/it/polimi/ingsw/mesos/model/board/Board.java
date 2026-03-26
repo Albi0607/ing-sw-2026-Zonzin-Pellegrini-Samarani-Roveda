@@ -214,7 +214,7 @@ public class Board {
         this.turnOrderTrack = turnOrderTrack;
     }
 
-    public void setOfferTiles(List<OfferTile> tiles) {
+    public void setTiles(List<OfferTile> tiles) {
         if (tiles == null) {
             throw new IllegalArgumentException("Offer tiles cannot be null");
         }
