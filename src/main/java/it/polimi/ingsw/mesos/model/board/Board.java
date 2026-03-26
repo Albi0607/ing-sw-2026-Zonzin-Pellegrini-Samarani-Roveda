@@ -39,16 +39,17 @@ public class Board {
         this.upperRow = new ArrayList<>();
         this.lowerRow = new ArrayList<>();
         this.tiles = new ArrayList<>();
+        this.tribeDeck = new Deck<>(numPlayers, new TribeDeckStrategy());
+        this.buildingDecks = new Deck<>(numPlayers, new BuildingDeckStrategy());
     }
 
     /**
      * Fills the upper row with cards drawn from the provided deck.
      * The number of cards added is determined by the target size.
      *
-     * @param deck the deck to draw cards from
      * @param targetSize the desired number of cards in the upper row
      */
-    public void refillRows(Deck<TribeCard> deck, int targetSize) {
+    public void refillRows(int targetSize) {
         // Calculate how many cards are needed to reach the target size
         int cardsNeeded = targetSize - upperRow.size();
 
@@ -59,14 +60,14 @@ public class Board {
         }
 
         // capire se va lanciato da qui il fatto che il gioco è finito
-        if (deck.isEmpty()) {
+        if (this.tribeDeck.isEmpty()) {
             return;
         }
 
         // Draw cards from the deck until the row reaches the target size
         // or the deck runs out of cards
-        while (upperRow.size() < targetSize && !deck.isEmpty()) {
-            TribeCard card = deck.draw();
+        while (upperRow.size() < targetSize && !this.tribeDeck.isEmpty()) {
+            TribeCard card = this.tribeDeck.draw();
             upperRow.add(card);
         }
     }
@@ -180,70 +181,6 @@ public class Board {
         return available;
     }
 
-
-    // crezione delle offer tiles
-    public void initializeOfferTiles(int numPlayers) {
-        if (numPlayers < 2 || numPlayers > 5) {
-            throw new IllegalArgumentException("Invalid number of players");
-        }
-        tiles = new ArrayList<>();
-
-        OfferTile tileA = new OfferTile('A', 5);
-        tileA.setUpperCount(0); tileA.setLowerCount(0); tileA.setFoodBonus(3);
-
-        OfferTile tileB = new OfferTile('B', 0);
-        tileB.setUpperCount(0); tileB.setLowerCount(1); tileB.setFoodBonus(0);
-
-        OfferTile tileC = new OfferTile('C', 0);
-        tileC.setUpperCount(1); tileC.setLowerCount(0); tileC.setFoodBonus(0);
-
-        OfferTile tileD = new OfferTile('D', 3);
-        tileD.setUpperCount(0); tileD.setLowerCount(2); tileD.setFoodBonus(0);
-
-        OfferTile tileE = new OfferTile('E', 0);
-        tileE.setUpperCount(1); tileE.setLowerCount(1); tileE.setFoodBonus(0);
-
-        OfferTile tileF = new OfferTile('F', 0);
-        tileF.setUpperCount(2); tileF.setLowerCount(0); tileF.setFoodBonus(0);
-
-        OfferTile tileG = new OfferTile('G', 4);
-        tileG.setUpperCount(2); tileG.setLowerCount(1); tileG.setFoodBonus(0);
-
-        List<OfferTile> allTiles = new ArrayList<>(
-                Arrays.asList(tileA, tileB, tileC, tileD, tileE, tileF, tileG)
-        );
-
-        for (OfferTile t : allTiles) {
-            if (t.getMinPlayers() <= numPlayers) {
-                tiles.add(t);
-            }
-        }
-    }
-
-    // crezione delle turn order
-    public void initializeTurnOrderTrack(int numPlayers) {
-        if (numPlayers < 2 || numPlayers > 5) {
-            throw new IllegalArgumentException("Invalid number of players");
-        }
-
-        switch (numPlayers) {
-            case 2:
-                this.turnOrderTrack = new TurnOrderTrack(new int[]{1, -1});
-                break;
-            case 3:
-                this.turnOrderTrack = new TurnOrderTrack(new int[]{2, 0, -1});
-                break;
-            case 4:
-                this.turnOrderTrack = new TurnOrderTrack(new int[]{2, 1, 0, -1});
-                break;
-            case 5:
-                this.turnOrderTrack = new TurnOrderTrack(new int[]{3, 1, 0, 0, -1});
-                break;
-        }
-    }
-
-
-
     public List<EventCard> getEvents() {
         List<EventCard> events = new ArrayList<>();
 
@@ -263,7 +200,6 @@ public class Board {
     public Deck<TribeCard> getTribeDeck() {
         return this.tribeDeck;
     }
-
 
     public boolean allTotemsPlaced() {
         return tiles.stream().noneMatch(OfferTile::isAvailable);
