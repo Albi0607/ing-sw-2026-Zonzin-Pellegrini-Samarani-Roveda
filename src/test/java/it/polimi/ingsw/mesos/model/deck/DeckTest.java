@@ -17,22 +17,23 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DeckTest {
     @Test
     void testCorrectNumberOfCardInDeck(){
-        Deck<TribeCard> deck = new Deck<>(5);
+        Deck deck = new Deck(5,new TribeDeckStrategy());
         assertEquals(96,deck.size());
     }
 
     @Test
     void testPresenceOfGatherer(){
-        Deck<TribeCard> deck = new Deck<>(5);
+        Deck deck = new Deck(5,new TribeDeckStrategy());
         Gatherer gatherer = new Gatherer(Era.ERA_I,3);
         boolean flag = false;
 
         while(!deck.isEmpty()){
             Card c = deck.draw();
             if(c instanceof Gatherer){
-                if (c.getEra()==gatherer.getEra() && ((Gatherer) c).getPlayerRequired()==gatherer.getPlayerRequired())
+                if (c.getEra()==gatherer.getEra() && ((Gatherer) c).getPlayerRequired()==gatherer.getPlayerRequired()) {
                     flag = true;
-                break;
+                    break;
+                }
             }
         }
 
@@ -41,7 +42,7 @@ public class DeckTest {
 
     @Test
     void testPresenceOfHunter(){
-        Deck<TribeCard> deck = new Deck<>(5);
+        Deck deck = new Deck(5,new TribeDeckStrategy());
         Hunter hunter = new Hunter(Era.ERA_I,2,true);
         boolean flag = false;
 
@@ -62,7 +63,7 @@ public class DeckTest {
 
     @Test
     void testNoPresenceOfHunter(){
-        Deck<TribeCard> deck = new Deck<>(5);
+        Deck deck = new Deck(5,new TribeDeckStrategy());
         Hunter hunter = new Hunter(Era.ERA_I,3,true);
         boolean flag = false;
 
@@ -84,7 +85,7 @@ public class DeckTest {
 
     @Test
     void presenceOf3HuntEventCard(){
-        Deck<TribeCard> deck = new Deck<>(2);
+        Deck deck = new Deck(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -98,7 +99,7 @@ public class DeckTest {
 
     @Test
     void presenceOf3CavePaintingEvent(){
-        Deck<TribeCard> deck = new Deck<>(2);
+        Deck deck = new Deck(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -112,7 +113,7 @@ public class DeckTest {
 
     @Test
     void presenceOf3SustenanceEvent(){
-        Deck<TribeCard> deck = new Deck<>(2);
+        Deck deck = new Deck(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -126,7 +127,7 @@ public class DeckTest {
 
     @Test
     void presenceOf3ShamanicRitualEvent(){
-        Deck<TribeCard> deck = new Deck<>(2);
+        Deck deck = new Deck(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -140,7 +141,7 @@ public class DeckTest {
 
     @Test
     void testLastsFinalCards(){
-        Deck<TribeCard> deck = new Deck<>(5);
+        Deck deck = new Deck(5,new TribeDeckStrategy());
         List<TribeCard> list = new ArrayList<>();
         while(!deck.isEmpty()){
             list.add(deck.draw());
@@ -155,7 +156,7 @@ public class DeckTest {
 
     @Test
     void firstCardOfDeckEra_I(){
-        Deck<TribeCard> deck = new Deck<>(2);
+        Deck deck = new Deck(2,new TribeDeckStrategy());
         boolean flag = false;
         if(Era.ERA_I == deck.draw().getEra()) flag = true;
 

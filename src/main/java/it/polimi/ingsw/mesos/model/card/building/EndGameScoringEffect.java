@@ -19,7 +19,7 @@ public class EndGameScoringEffect implements BuildingEffect {
     /**Prestige points to be gained at the end of the game*/
     private final int prestigePoints;
     /**Attribute that defines whether to double the prestige points gained from Builders in the player's tribe*/
-    private final boolean doubleBuildingPoints;
+    private final boolean doubleBuilderPoints;
     /**Character type used as multiplier (e.g. HUNTER → PP per Hunter)*/
     private final CharacterType multiplierRef;
 
@@ -33,7 +33,7 @@ public class EndGameScoringEffect implements BuildingEffect {
     public EndGameScoringEffect(int pointsPerSet, int prestigePoints, boolean doubleBuildingPoints, CharacterType multiplierRef) {
         this.pointsPerSet = pointsPerSet;
         this.prestigePoints = prestigePoints;
-        this.doubleBuildingPoints = doubleBuildingPoints;
+        this.doubleBuilderPoints = doubleBuildingPoints;
         this.multiplierRef = multiplierRef;
     }
 
@@ -67,7 +67,7 @@ public class EndGameScoringEffect implements BuildingEffect {
                 player.updatePrestige(count * prestigePoints);
             }
             /**Handles effect 9, which doubles the prestige points indicated on Builder cards in the tribe*/
-            if (doubleBuildingPoints) {
+            if (doubleBuilderPoints) {
                 int totalBuilerPoints = 0;
                 for (CharacterCard card : player.getTribe().getCharacters()) {
                     if(card instanceof Builder){

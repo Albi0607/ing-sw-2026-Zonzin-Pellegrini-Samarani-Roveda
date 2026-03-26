@@ -121,6 +121,8 @@ public class Tribe {
 
     public List<BuildingCard> getBuildings() { return new ArrayList<>(buildings); }
 
+
+    //attenzione il giocatore sceglie 2 carte in un round si potrebbe perdere effetto della penultima carta
     public CharacterCard getLastCard(){return null;}
 
     public List<Inventor> getInventors(){return null;}

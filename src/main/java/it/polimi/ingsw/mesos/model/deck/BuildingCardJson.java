@@ -6,9 +6,7 @@ import it.polimi.ingsw.mesos.model.enums.*;
 public class BuildingCardJson {
     public Era era;
     public int cost;
-
     public int victoryPoints;
-
     public String effect;
 
     //ResourceBonusEffect
@@ -26,7 +24,7 @@ public class BuildingCardJson {
     //EndGameScoringEffect
     public Integer pointsPerSet;
     public Integer prestigePoints;
-    public Boolean doubleBuildingPoints;
+    public Boolean doubleBuilderPoints;
     public CharacterType multiplierRef;
 
     //SpecialActionEffect
