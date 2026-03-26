@@ -82,7 +82,6 @@ public class Player {
     public Color getColor() {
         return color;
     }
-    public Player getPlayer() { return null; }
 
     //metodi che servono per i building
     public void setShamanNotLosePoints(){
