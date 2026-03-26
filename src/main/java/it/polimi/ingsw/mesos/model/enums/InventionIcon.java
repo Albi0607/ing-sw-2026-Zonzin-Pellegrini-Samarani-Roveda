@@ -1,14 +1,14 @@
 package it.polimi.ingsw.mesos.model.enums;
 
 public enum InventionIcon {
-    WHEEL,
-    FIRE,
-    AXE,
-    POTTERY,
+    BOAT,
     SPEAR,
-    BOW,
-    KNIFE,
+    HOOK,
+    NECKLACE,
+    BOWL,
     ROPE,
+    DOLL,
+    STICK,
     CLOTH,
-    BOAT
+    BREAD
 }
