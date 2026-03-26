@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CreateCharacterCardTest {
     @Test
     void testCorrectNumberOfCard(){
-        List<CharacterCard> list = new CreateCharacterCard().getAllCharacterCards();
+        List<CharacterCard> list = new CreateCharacterCard("characters.json").getAllCharacterCards();
         assertEquals(84,list.size());
     }
 

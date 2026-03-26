@@ -13,7 +13,7 @@ public class CreateEventCardTest {
 
     @Test
     void testCorrectNumberOfEvent(){
-        List<EventCard> list = new CreateEventCard().getAllEventCards();
+        List<EventCard> list = new CreateEventCard("event.json").getAllEventCards();
         assertEquals(12,list.size());
     }
 

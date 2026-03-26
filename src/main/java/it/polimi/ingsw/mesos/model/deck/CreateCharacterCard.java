@@ -11,14 +11,14 @@ public class CreateCharacterCard {
 
     private List<CharacterCard> allCharacterCards;
 
-    public CreateCharacterCard(){
-        loadCards();
+    public CreateCharacterCard(String path){
+        loadCards(path);
     }
 
-    private void loadCards(){
+    private void loadCards(String path){
         try {
             List<CharacterCardJson> characterCardJsons = OpenFileJson.loadList(
-                    "characters.json",
+                    path,
                     new TypeReference<List<CharacterCardJson>>() {}
             );
 

@@ -43,7 +43,7 @@ public class SetupState implements GameStateLogic {
         int targetSize = numPlayers + 4;
 
         if (board.getTribeDeck() != null) {
-            board.refillRows(board.getTribeDeck(), targetSize);
+            //board.refillRows(board.getTribeDeck(), targetSize);
             System.out.println("-> Fila superiore riempita.");
         }
 
