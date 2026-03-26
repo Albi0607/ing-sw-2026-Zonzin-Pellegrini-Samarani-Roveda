@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.board.Board;
+import it.polimi.ingsw.mesos.model.board.*;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
@@ -9,11 +9,11 @@ import it.polimi.ingsw.mesos.model.deck.Deck;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
-import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
 // in teoria l'attributo e i metodi dovrebbero essere enum (GameState) e non l'interfaccia, no? per ora li ho sostituiti
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.SetupState;
+import jdk.jfr.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +59,20 @@ public class Game {
 
         int numPlayers = this.players.size();
 
-        // 1. INIZIALIZZAZIONE DELLA PLANCIA
-        this.board.initializeOfferTiles(numPlayers);
-        this.board.initializeTurnOrderTrack(numPlayers);
+
+
+        // 1. INIZIALIZZAZIONE COMPONENTI
+        CreateOfferTile tileCreator = new CreateOfferTile();
+        CreateTurnOrderTrack trackCreator = new CreateTurnOrderTrack();
+
+        // Generiamo le tessere e la track
+        List<OfferTile> generatedTiles = tileCreator.initializeOfferTiles(numPlayers);
+        TurnOrderTrack generatedTrack = trackCreator.initializeTurnOrderTrack(numPlayers);
+
+        // Passiamo gli oggetti creati alla Board
+        this.board.setTiles(generatedTiles);
+        this.board.setTurnOrderTrack(generatedTrack);
+
         System.out.println("Board initialized with Offer Tiles and Turn Order Track for " + numPlayers + " players.");
 
         java.util.Collections.shuffle(this.players);
