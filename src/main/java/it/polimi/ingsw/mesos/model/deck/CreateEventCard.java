@@ -12,15 +12,15 @@ import java.util.List;
 public class CreateEventCard {
     private List<EventCard> allEventCards;
 
-    public CreateEventCard(){
-        loadCards();
+    public CreateEventCard(String path){
+        loadCards(path);
     }
 
-    public void loadCards(){
+    public void loadCards(String path){
 
         try {
             List<EventCardJson> eventCardJsons = OpenFileJson.loadList(
-                    "event.json",
+                    path,
                     new TypeReference<List<EventCardJson>>() {}
             );
 

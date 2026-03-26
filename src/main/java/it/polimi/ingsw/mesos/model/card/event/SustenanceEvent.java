@@ -45,7 +45,7 @@ public class SustenanceEvent extends EventCard {
             int food = 0;
             int missingFood = 0;
 
-            //sommo tutte le carte giocatori contandole per tipo con questo metodo
+            //sommo tutte le carte giocatori contandole per tipo
             for (CharacterType c : CharacterType.values()){
                 food += p.getTribe().getCharactersTypeCount(c);
             }

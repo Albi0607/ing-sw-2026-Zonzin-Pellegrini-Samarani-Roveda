@@ -12,14 +12,14 @@ public class CreateBuildingCard {
 
     private List<BuildingCard> allBuildingCards;
 
-    public CreateBuildingCard() {
-        loadCards();
+    public CreateBuildingCard(String path) {
+        loadCards(path);
     }
 
-    private void loadCards() {
+    private void loadCards(String path) {
         try {
             List<BuildingCardJson> buildingCardJsons = OpenFileJson.loadList(
-                    "building.json",
+                    path,
                     new TypeReference<List<BuildingCardJson>>() {
                     }
             );
@@ -53,7 +53,7 @@ public class CreateBuildingCard {
                         effect = new EndGameScoringEffect(
                                 j.pointsPerSet,
                                 j.prestigePoints,
-                                j.doubleBuildingPoints,
+                                j.doubleBuilderPoints,
                                 j.multiplierRef
                         );
                         break;

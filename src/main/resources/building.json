@@ -1,0 +1,170 @@
+[
+  {
+    "era": "ERA_I",
+    "cost": 4,
+    "victoryPoints": 3,
+    "effect": "ResourceBonusEffect",
+    "reward": "FOOD",
+    "amount": 5
+  },
+  {
+    "era": "ERA_I",
+    "cost": 4,
+    "victoryPoints": 4,
+    "effect": "EventModifierEffect",
+    "eventContext": "SUSTENANCE",
+    "countRef": "Gatherer",
+    "discount": 1
+  },
+  {
+    "era": "ERA_I",
+    "cost": 5,
+    "victoryPoints": 3,
+    "effect": "EventModifierEffect",
+    "eventContext": "SUSTENANCE",
+    "countRef": "Inventor",
+    "discount": 1
+  },
+  {
+    "era": "ERA_I",
+    "cost": 5,
+    "victoryPoints": 2,
+    "effect": "EventModifierEffect",
+    "noLosePrestige": "true"
+  },
+  {
+    "era": "ERA_I",
+    "cost": 3,
+    "victoryPoints": 3,
+    "effect": "SpecialActionEffect",
+    "specialType": "FOOD_ON_TOTEM_SLOT"
+
+  },
+  {
+    "era": "ERA_I",
+    "cost": 3,
+    "victoryPoints": 4,
+    "effect": "ResourceBonusEffect",
+    "countRef": "Inventor",
+    "reward": "FOOD",
+    "amount": 3
+  },
+  {
+    "era": "ERA_II",
+    "cost": 7,
+    "victoryPoints": 0,
+    "effect": "EventModifierEffect",
+    "doublePrestige": true
+  },
+  {
+    "era": "ERA_II",
+    "cost": 6,
+    "victoryPoints": 4,
+    "effect": "EventModifierEffect",
+    "virtualIcons": 3
+  },
+  {
+    "era": "ERA_II",
+    "cost": 7,
+    "victoryPoints": 4,
+    "effect": "EventModifierEffect",
+    "eventContext": "SUSTENANCE",
+    "countRef": "Inventor",
+    "discount": 1
+  },
+  {
+    "era": "ERA_II",
+    "cost": 7,
+    "victoryPoints": 2,
+    "effect": "ResourceBonusEffect",
+    "eventContext": "HUNTER",
+    "countRef": "Hunter",
+    "amount": 1
+  },
+  {
+    "era": "ERA_II",
+    "cost": 6,
+    "victoryPoints": 4,
+    "effect": "EndGameScoringEffect",
+    "doubleBuilderPoints": "true"
+  },
+  {
+    "era": "ERA_II",
+    "cost": 5,
+    "victoryPoints": 6,
+    "effect": "ResourceBonusEffect",
+    "eventContext": "PAINTING",
+    "countRef": "ARTIST",
+    "reward": "FOOD",
+    "amount": 1
+  },
+  {
+    "era": "ERA_II",
+    "cost": 5,
+    "victoryPoints": 6,
+    "effect": "EndGameScoringEffect",
+    "pointsPerSet": 6
+  },
+  {
+    "era": "ERA_III",
+    "cost": 8,
+    "victoryPoints": 8,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 3,
+    "multiplierRef": "Hunter"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 7,
+    "victoryPoints": 6,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 4,
+    "multiplierRef": "Gatherer"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 7,
+    "victoryPoints": 4,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 4,
+    "multiplierRef": "Shaman"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 6,
+    "victoryPoints": 3,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 4,
+    "multiplierRef": "Builder"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 7,
+    "victoryPoints": 4,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 4,
+    "multiplierRef": "Artist"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 6,
+    "victoryPoints": 6,
+    "effect": "EndgameScoringEffect",
+    "prestigePoints": 2,
+    "multiplierRef": "Inventor"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 9,
+    "victoryPoints": 3,
+    "effect": "SpecialActionEffect",
+    "specialType": "EXTRA_DRAW"
+  },
+  {
+    "era": "ERA_III",
+    "cost": 10,
+    "victoryPoints": 0,
+    "effect": "EndGameScoringEffect",
+    "prestigePoints": 25
+  }
+]
