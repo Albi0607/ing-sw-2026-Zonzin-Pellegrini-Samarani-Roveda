@@ -47,4 +47,3 @@ import java.util.List;
             return tiles;
         }
     }
-}
