@@ -2,6 +2,7 @@ package it.polimi.ingsw.mesos.model.BoardTest;
 
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
+import it.polimi.ingsw.mesos.model.board.CreateTurnOrderTrack;
 import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
 import it.polimi.ingsw.mesos.model.enums.Color;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAt() {
         Board board = new Board(3);
-        board.initializeTurnOrderTrack(3);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
         Player p = new Player("Alice", Color.RED);
 
         board.getTurnOrderTrack().setPlayerAt(0, p);
@@ -26,7 +28,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAtAlreadyTaken() {
         Board board = new Board(3);
-        board.initializeTurnOrderTrack(3);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
         Player p1 = new Player("Alice", Color.RED);
         Player p2 = new Player("Anna", Color.BLUE);
 
@@ -39,7 +42,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAtInvalidIndex() {
         Board board = new Board(3);
-        board.initializeTurnOrderTrack(3);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
         Player p = new Player("Anna", Color.BLUE);
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
@@ -50,7 +54,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAtPositiveEffect() {
         Board board = new Board(2);
-        board.initializeTurnOrderTrack(2); // slots = {1, -1}
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // slots = {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
 
@@ -62,7 +67,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAtNegativeEffectPaySuccess() {
         Board board = new Board(2);
-        board.initializeTurnOrderTrack(2); // {1, -1}
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(2);
@@ -76,7 +82,8 @@ public class TurnOrderTrackTest {
     @Test
     void testSetPlayerAtNegativeEffectNotEnoughFood() {
         Board board = new Board(2);
-        board.initializeTurnOrderTrack(2); // {1, -1}
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(0);
@@ -91,7 +98,8 @@ public class TurnOrderTrackTest {
     @Test
     void testGetFirstFreeSlot() {
         Board board = new Board(2);
-        board.initializeTurnOrderTrack(2);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
 
         assertEquals(0, board.getTurnOrderTrack().getFirstFreeSlot());
 

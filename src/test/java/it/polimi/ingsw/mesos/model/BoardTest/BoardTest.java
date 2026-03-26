@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.model.BoardTest;
 
-import it.polimi.ingsw.mesos.model.board.Board;
-import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.board.*;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.EndGameScoringEffect;
@@ -36,7 +35,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
         board.getUpperRow().add(c1);
         board.getUpperRow().add(c2);
@@ -54,7 +53,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
         board.getLowerRow().add(c1);
         board.getLowerRow().add(c2);
@@ -70,7 +69,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
         board.getLowerRow().add(c1);
         board.getLowerRow().add(c2);
@@ -86,7 +85,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
         board.getUpperRow().add(c1);
         board.getUpperRow().add(c2);
@@ -104,7 +103,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
         board.getLowerRow().add(c1);
@@ -126,7 +125,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
         board.getUpperRow().add(c1);
@@ -148,7 +147,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
         board.getLowerRow().add(c1);
@@ -169,7 +168,7 @@ public class BoardTest {
         Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
-        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2, CharacterType.ARTIST),EventType.SHAMAN_RITUAL );  // building
+        Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
         board.getUpperRow().add(c1);
@@ -190,10 +189,8 @@ public class BoardTest {
     @Test
     void testInitializeOfferTiles() {
         Board board = new Board(4);
-
-        board.initializeOfferTiles(4);
-
-        List<OfferTile> tiles = board.getTiles();
+        CreateOfferTile factory = new CreateOfferTile();
+        List<OfferTile> tiles = factory.initializeOfferTiles(4);
 
         assertNotNull(tiles);
         assertFalse(tiles.isEmpty());
@@ -206,18 +203,18 @@ public class BoardTest {
 
     @Test
     void testInitializeOfferTiles_invalidPlayersTooLow() {
-        Board board = new Board(1);
+        CreateOfferTile factory = new CreateOfferTile();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            board.initializeOfferTiles(1);
+            factory.initializeOfferTiles(1);
         });
     }
     @Test
     void testInitializeOfferTiles_invalidPlayersTooHigh() {
-        Board board = new Board(6);
+        CreateOfferTile factory = new CreateOfferTile();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            board.initializeOfferTiles(6);
+            factory.initializeOfferTiles(6);
         });
     }
 
@@ -225,6 +222,7 @@ public class BoardTest {
     @Test
     void testInitializeTurnOrderTrack_allValidPlayers() {
         Board board = new Board(2);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
 
         // expected slot based on the number of players
         int[][] expectedSlots = {
@@ -235,26 +233,26 @@ public class BoardTest {
         };
 
         for (int i = 2; i <= 5; i++) {
-            board.initializeTurnOrderTrack(i);
+            factory.initializeTurnOrderTrack(i);
             assertArrayEquals(expectedSlots[i - 2], board.getTurnOrderTrack().getSlots());
         }
     }
 
     @Test
     void testInitializeTurnOrderTrack_invalidTooLow() {
-        Board board = new Board(1);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            board.initializeTurnOrderTrack(1);
+            factory.initializeTurnOrderTrack(1);
         });
     }
 
     @Test
     void testInitializeTurnOrderTrack_invalidTooHigh() {
-        Board board = new Board(6);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            board.initializeTurnOrderTrack(6);
+            factory.initializeTurnOrderTrack(6);
         });
     }
 
