@@ -42,6 +42,7 @@ public class Board {
         this.tiles = new ArrayList<>();
         this.tribeDeck = new Deck<>(numPlayers, new TribeDeckStrategy());
         this.buildingDecks = new Deck<>(numPlayers, new BuildingDeckStrategy());
+
     }
 
     /**
@@ -204,5 +205,19 @@ public class Board {
 
     public boolean allTotemsPlaced() {
         return tiles.stream().noneMatch(OfferTile::isAvailable);
+    }
+
+    public void setTurnOrderTrack(TurnOrderTrack turnOrderTrack) {
+        if (turnOrderTrack == null) {
+            throw new IllegalArgumentException("TurnOrderTrack cannot be null");
+        }
+        this.turnOrderTrack = turnOrderTrack;
+    }
+
+    public void setTiles(List<OfferTile> tiles) {
+        if (tiles == null) {
+            throw new IllegalArgumentException("Offer tiles cannot be null");
+        }
+        this.tiles = tiles;
     }
 }

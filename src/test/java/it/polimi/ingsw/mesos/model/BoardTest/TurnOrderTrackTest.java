@@ -19,6 +19,8 @@ public class TurnOrderTrackTest {
         Board board = new Board(3);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
         TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
+
+        board.setTurnOrderTrack(track);
         Player p = new Player("Alice", Color.RED);
 
         board.getTurnOrderTrack().setPlayerAt(0, p);
@@ -30,6 +32,8 @@ public class TurnOrderTrackTest {
         Board board = new Board(3);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
         TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
+
+        board.setTurnOrderTrack(track);
         Player p1 = new Player("Alice", Color.RED);
         Player p2 = new Player("Anna", Color.BLUE);
 
@@ -44,6 +48,8 @@ public class TurnOrderTrackTest {
         Board board = new Board(3);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
         TurnOrderTrack track = factory.initializeTurnOrderTrack(3);
+
+        board.setTurnOrderTrack(track);
         Player p = new Player("Anna", Color.BLUE);
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
@@ -55,7 +61,9 @@ public class TurnOrderTrackTest {
     void testSetPlayerAtPositiveEffect() {
         Board board = new Board(2);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
-        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // slots = {1, -1}
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
+
+        board.setTurnOrderTrack(track); // slots = {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
 
@@ -68,7 +76,9 @@ public class TurnOrderTrackTest {
     void testSetPlayerAtNegativeEffectPaySuccess() {
         Board board = new Board(2);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
-        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // {1, -1}
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
+
+        board.setTurnOrderTrack(track); // {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(2);
@@ -83,7 +93,9 @@ public class TurnOrderTrackTest {
     void testSetPlayerAtNegativeEffectNotEnoughFood() {
         Board board = new Board(2);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
-        TurnOrderTrack track = factory.initializeTurnOrderTrack(3); // {1, -1}
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
+
+        board.setTurnOrderTrack(track); // {1, -1}
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(0);
@@ -100,6 +112,8 @@ public class TurnOrderTrackTest {
         Board board = new Board(2);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
         TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
+
+        board.setTurnOrderTrack(track);
 
         assertEquals(0, board.getTurnOrderTrack().getFirstFreeSlot());
 
