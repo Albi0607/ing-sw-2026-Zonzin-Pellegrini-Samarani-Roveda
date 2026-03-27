@@ -4,6 +4,8 @@
     "cost": 4,
     "victoryPoints": 3,
     "effect": "ResourceBonusEffect",
+    "eventContext": null,
+    "countRef": null,
     "reward": "FOOD",
     "amount": 5
   },
@@ -14,7 +16,10 @@
     "effect": "EventModifierEffect",
     "eventContext": "SUSTENANCE",
     "countRef": "GATHERER",
-    "discount": 1
+    "discount": 1,
+    "virtualIcons": 0,
+    "doublePrestige": "false",
+    "noLosePrestige": "false"
   },
   {
     "era": "ERA_I",
@@ -23,13 +28,21 @@
     "effect": "EventModifierEffect",
     "eventContext": "SUSTENANCE",
     "countRef": "ARTIST",
-    "discount": 1
+    "discount": 1,
+    "virtualIcons": 0,
+    "doublePrestige": "false",
+    "noLosePrestige": "false"
   },
   {
     "era": "ERA_I",
     "cost": 5,
     "victoryPoints": 2,
     "effect": "EventModifierEffect",
+    "eventContext": null,
+    "countRef": null,
+    "discount": 0,
+    "virtualIcons": 0,
+    "doublePrestige": "false",
     "noLosePrestige": "true"
   },
   {
@@ -38,13 +51,13 @@
     "victoryPoints": 3,
     "effect": "SpecialActionEffect",
     "specialType": "FOOD_ON_TOTEM_SLOT"
-
   },
   {
     "era": "ERA_I",
     "cost": 3,
     "victoryPoints": 4,
     "effect": "ResourceBonusEffect",
+    "eventContext": null,
     "countRef": "INVENTOR",
     "reward": "FOOD",
     "amount": 3
@@ -54,14 +67,24 @@
     "cost": 7,
     "victoryPoints": 0,
     "effect": "EventModifierEffect",
-    "doublePrestige": true
+    "eventContext": null,
+    "countRef": null,
+    "discount": 0,
+    "virtualIcons": 0,
+    "doublePrestige": "true",
+    "noLosePrestige": "false"
   },
   {
     "era": "ERA_II",
     "cost": 6,
     "victoryPoints": 4,
     "effect": "EventModifierEffect",
-    "virtualIcons": 3
+    "eventContext": null,
+    "countRef": null,
+    "discount": 0,
+    "virtualIcons": 3,
+    "doublePrestige":"false",
+    "noLosePrestige": "false"
   },
   {
     "era": "ERA_II",
@@ -70,7 +93,10 @@
     "effect": "EventModifierEffect",
     "eventContext": "SUSTENANCE",
     "countRef": "INVENTOR",
-    "discount": 1
+    "discount": 1,
+    "virtualIcons": 0,
+    "doublePrestige": "false",
+    "noLosePrestige": "false"
   },
   {
     "era": "ERA_II",
@@ -79,6 +105,7 @@
     "effect": "ResourceBonusEffect",
     "eventContext": "HUNT",
     "countRef": "HUNTER",
+    "reward": null,
     "amount": 1
   },
   {
@@ -86,7 +113,10 @@
     "cost": 6,
     "victoryPoints": 4,
     "effect": "EndGameScoringEffect",
-    "doubleBuilderPoints": "true"
+    "pointsPerSet": 0,
+    "prestigePoints": 0,
+    "doubleBuilderPoints": "true" ,
+    "multiplierRef": null
   },
   {
     "era": "ERA_II",
@@ -103,14 +133,19 @@
     "cost": 5,
     "victoryPoints": 6,
     "effect": "EndGameScoringEffect",
-    "pointsPerSet": 6
+    "pointsPerSet": 6,
+    "prestigePoints": 0,
+    "doubleBuilderPoints": "false",
+    "multiplierRef": null
   },
   {
     "era": "ERA_III",
     "cost": 8,
     "victoryPoints": 8,
     "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 3,
+    "doubleBuilderPoints": "false",
     "multiplierRef": "HUNTER"
   },
   {
@@ -118,7 +153,9 @@
     "cost": 7,
     "victoryPoints": 6,
     "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 4,
+    "doubleBuilderPoints": "false" ,
     "multiplierRef": "GATHERER"
   },
   {
@@ -126,7 +163,9 @@
     "cost": 7,
     "victoryPoints": 4,
     "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 4,
+    "doubleBuilderPoints": "false" ,
     "multiplierRef": "SHAMAN"
   },
   {
@@ -134,7 +173,9 @@
     "cost": 6,
     "victoryPoints": 3,
     "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 4,
+    "doubleBuilderPoints": "false",
     "multiplierRef": "BUILDER"
   },
   {
@@ -142,15 +183,19 @@
     "cost": 7,
     "victoryPoints": 4,
     "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 4,
+    "doubleBuilderPoints": "false",
     "multiplierRef": "ARTIST"
   },
   {
     "era": "ERA_III",
     "cost": 6,
     "victoryPoints": 6,
-    "effect": "EndgameScoringEffect",
+    "effect": "EndGameScoringEffect",
+    "pointsPerSet": 0,
     "prestigePoints": 2,
+    "doubleBuilderPoints": "false",
     "multiplierRef": "INVENTOR"
   },
   {
@@ -165,6 +210,9 @@
     "cost": 10,
     "victoryPoints": 0,
     "effect": "EndGameScoringEffect",
-    "prestigePoints": 25
+    "pointsPerSet": 0,
+    "prestigePoints": 25,
+    "doubleBuilderPoints": "false",
+    "multiplierRef": null
   }
 ]

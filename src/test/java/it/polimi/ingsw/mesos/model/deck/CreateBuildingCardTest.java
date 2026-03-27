@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CreateBuildingCardTest {
     @Test
     void testCorrectNumberOfBuilding(){
-        List<BuildingCard> buildingDeck = new CreateBuildingCard("building:json").getAllBuildingCards();
+        List<BuildingCard> buildingDeck = new CreateBuildingCard("building.json").getAllBuildingCards();
         assertEquals(21,buildingDeck.size());
     }
 

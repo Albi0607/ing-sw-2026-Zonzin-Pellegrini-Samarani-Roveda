@@ -8,16 +8,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**Class that allows creating all event cards for the Mesos game using the appropriate JSON file
+ * @author Alberto Roveda
+ */
 
 public class CreateEventCard {
+
+    /**List containing all event cards*/
     private List<EventCard> allEventCards;
 
+    /**Constructor of the class that creates all the cards from a JSON file, using EventCardJson as a helper class
+     *  to distinguish the creation of different event cards
+     *  @param path file JSON in resources with all event card
+     *  */
     public CreateEventCard(String path){
-        loadCards(path);
-    }
-
-    public void loadCards(String path){
-
         try {
             List<EventCardJson> eventCardJsons = OpenFileJson.loadList(
                     path,
@@ -84,7 +88,8 @@ public class CreateEventCard {
         }
     }
 
-
+    /**Method to return to the caller the list containing all the created cards
+     * @return list with all cards*/
     public List<EventCard> getAllEventCards() {
         return allEventCards;
     }

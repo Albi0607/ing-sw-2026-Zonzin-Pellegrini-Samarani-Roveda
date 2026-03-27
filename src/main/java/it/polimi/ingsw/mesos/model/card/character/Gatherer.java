@@ -8,13 +8,17 @@ import it.polimi.ingsw.mesos.model.enums.Era;
  */
 public class Gatherer extends CharacterCard {
 
+    private final int discount;
+
     /**Constructor for Gatherer Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
+     * @param discount the number of food items not to be paid for in SustenanceEvent
      */
-    public Gatherer(Era era, int playersRequired) {
+    public Gatherer(Era era, int playersRequired,int discount) {
         super(era, playersRequired, CharacterType.GATHERER);
+        this.discount=discount;
     }
 
     /**Getter method to obtain the discount for the SustenanceEvent
@@ -22,7 +26,7 @@ public class Gatherer extends CharacterCard {
      * @return discount for the SustenanceEvent
      */
     public int getFoodDiscount() {
-        return 3;
+        return discount;
     }
 
 }
