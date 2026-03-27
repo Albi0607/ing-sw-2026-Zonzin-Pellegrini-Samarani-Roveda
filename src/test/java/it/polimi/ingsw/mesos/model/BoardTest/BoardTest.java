@@ -11,6 +11,7 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,16 +19,55 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {
     @Test
-    void testRefillRows() {
+    void testRefillRowsAddsCards() {
         Board board = new Board(2);
 
-        Deck<Artist> deck = new Deck<>();
-        //deck.add(new Artist(Era.ERA_I,2));
-       // deck.add(new TribeCard());
+        Artist c1 = new Artist(Era.ERA_I, 2);
+        Artist c2 = new Artist(Era.ERA_I, 2);
+        Artist c3 = new Artist(Era.ERA_I, 4);
 
-        //board.refillRows(deck, 2);
+        board.getTribeDeck().put(c1);
+        board.getTribeDeck().put(c2);
+        board.getTribeDeck().put(c3);
 
-        assertEquals(2, board.getUpperRow().size());
+        // La riga superiore inizialmente è vuota
+        assertEquals(0, board.getUpperRow().size());
+
+        board.refillRows(3);
+
+        assertEquals(3, board.getUpperRow().size());
+    }
+
+    @Test
+    void testRefillRowsDoesNotOverfill() {
+        Board board = new Board(2);
+
+        Artist c1 = new Artist(Era.ERA_I, 2);
+        Artist c2 = new Artist(Era.ERA_I, 3);
+        Artist c3 = new Artist(Era.ERA_I, 1);
+
+        board.getTribeDeck().put(c1);
+        board.getTribeDeck().put(c2);
+        board.getTribeDeck().put(c3);
+
+        // Inseriamo già una carta nella riga
+        board.getUpperRow().add(new Artist(Era.ERA_I, 1));
+
+        board.refillRows(3);
+
+        // Ora la riga deve contenere 3 carte in totale
+        assertEquals(3, board.getUpperRow().size());
+    }
+
+    @Test
+    void testRefillRowsWithEmptyDeck() {
+        Board board = new Board(2);
+
+        // Mazzo vuoto
+        board.refillRows(3);
+
+        // La riga rimane vuota
+        assertEquals(0, board.getUpperRow().size());
     }
 
     @Test
@@ -192,7 +232,7 @@ public class BoardTest {
         CreateOfferTile factory = new CreateOfferTile();
         List<OfferTile> tiles = factory.initializeOfferTiles(4);
 
-        board.setOfferTiles(tiles);
+        board.setTiles(tiles);
 
         assertNotNull(tiles);
         assertFalse(tiles.isEmpty());
