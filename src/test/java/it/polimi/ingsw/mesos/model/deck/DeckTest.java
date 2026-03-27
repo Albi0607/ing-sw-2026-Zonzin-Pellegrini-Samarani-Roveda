@@ -1,6 +1,5 @@
 package it.polimi.ingsw.mesos.model.deck;
 
-import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.character.Gatherer;
 import it.polimi.ingsw.mesos.model.card.character.Hunter;
@@ -16,15 +15,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DeckTest {
     @Test
-    void testCorrectNumberOfCardInDeck(){
-        Deck deck = new Deck(5,new TribeDeckStrategy());
+    void testCorrectNumberOfTribeCardInDeckFor5Players(){
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
         assertEquals(96,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfTribeCardInDeckFor4Players(){
+        Deck<TribeCard> deck = new Deck<>(4,new TribeDeckStrategy());
+        assertEquals(85,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfTribeCardInDeckFor3Players(){
+        Deck<TribeCard> deck = new Deck<>(3,new TribeDeckStrategy());
+        assertEquals(74,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfTribeCardInDeckFor2Players(){
+        Deck<TribeCard> deck = new Deck<>(2,new TribeDeckStrategy());
+        assertEquals(63,deck.size());
     }
 
     @Test
     void testPresenceOfGatherer(){
-        Deck deck = new Deck(5,new TribeDeckStrategy());
-        Gatherer gatherer = new Gatherer(Era.ERA_I,3);
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
+        Gatherer gatherer = new Gatherer(Era.ERA_I,3,3);
         boolean flag = false;
 
         while(!deck.isEmpty()){
@@ -42,7 +56,7 @@ public class DeckTest {
 
     @Test
     void testPresenceOfHunter(){
-        Deck deck = new Deck(5,new TribeDeckStrategy());
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
         Hunter hunter = new Hunter(Era.ERA_I,2,true);
         boolean flag = false;
 
@@ -63,7 +77,7 @@ public class DeckTest {
 
     @Test
     void testNoPresenceOfHunter(){
-        Deck deck = new Deck(5,new TribeDeckStrategy());
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
         Hunter hunter = new Hunter(Era.ERA_I,3,true);
         boolean flag = false;
 
@@ -84,8 +98,8 @@ public class DeckTest {
 
 
     @Test
-    void presenceOf3HuntEventCard(){
-        Deck deck = new Deck(2,new TribeDeckStrategy());
+    void presenceOfHuntEventCard(){
+        Deck<TribeCard> deck = new Deck<>(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -98,8 +112,8 @@ public class DeckTest {
     }
 
     @Test
-    void presenceOf3CavePaintingEvent(){
-        Deck deck = new Deck(2,new TribeDeckStrategy());
+    void presenceOfCavePaintingEvent(){
+        Deck<TribeCard> deck = new Deck<>(3,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -112,8 +126,8 @@ public class DeckTest {
     }
 
     @Test
-    void presenceOf3SustenanceEvent(){
-        Deck deck = new Deck(2,new TribeDeckStrategy());
+    void presenceOfSustenanceEvent(){
+        Deck<TribeCard> deck = new Deck<>(4,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -126,8 +140,8 @@ public class DeckTest {
     }
 
     @Test
-    void presenceOf3ShamanicRitualEvent(){
-        Deck deck = new Deck(2,new TribeDeckStrategy());
+    void presenceOfShamanicRitualEvent(){
+        Deck<TribeCard> deck = new Deck<>(2,new TribeDeckStrategy());
         int count = 0;
         while(!deck.isEmpty()){
             Card e = deck.draw();
@@ -141,7 +155,7 @@ public class DeckTest {
 
     @Test
     void testLastsFinalCards(){
-        Deck deck = new Deck(5,new TribeDeckStrategy());
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
         List<TribeCard> list = new ArrayList<>();
         while(!deck.isEmpty()){
             list.add(deck.draw());
@@ -156,7 +170,7 @@ public class DeckTest {
 
     @Test
     void firstCardOfDeckEra_I(){
-        Deck deck = new Deck(2,new TribeDeckStrategy());
+        Deck<TribeCard> deck = new Deck<>(2,new TribeDeckStrategy());
         boolean flag = false;
         if(Era.ERA_I == deck.draw().getEra()) flag = true;
 

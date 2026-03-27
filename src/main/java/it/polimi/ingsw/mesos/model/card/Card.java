@@ -8,7 +8,7 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 public abstract class Card {
 
     /**Era attribute for all cards*/
-    private Era era;
+    private final Era era;
 
     /**General constructor for all cards
      * @param era the era of the card*/

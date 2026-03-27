@@ -10,8 +10,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
+/**Class that overrides the method of the corresponding interface to create the main game deck in era order,
+ * placing the two isFinal cards at the end of the deck, and returning a stack
+ * @author Alberto Roveda*/
 public class TribeDeckStrategy implements CreateStrategy<TribeCard>{
 
+    /**
+     * Implementation of the method to create the deck, building the main tribe deck
+     * @param numPlayers number of players used to manage the variation of cards in the deck
+     * @return a stack representing the deck from which cards are drawn during the game
+     */
     @Override
     public  Stack <TribeCard> createDeck(int numPlayers) {
 

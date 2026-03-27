@@ -7,15 +7,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**Class that allows creating all character cards for the Mesos game using the appropriate JSON file
+ * @author Alberto Roveda
+ */
 public class CreateCharacterCard {
 
+    /**List containing all character cards*/
     private List<CharacterCard> allCharacterCards;
 
+    /**Constructor of the class that creates all the cards from a JSON file, using CharacterCardJson as a helper class
+     *  to distinguish the creation of different character cards
+     *  @param path file JSON in resources with all character card
+     *  */
     public CreateCharacterCard(String path){
-        loadCards(path);
-    }
-
-    private void loadCards(String path){
         try {
             List<CharacterCardJson> characterCardJsons = OpenFileJson.loadList(
                     path,
@@ -39,7 +43,8 @@ public class CreateCharacterCard {
                     case GATHERER:
                         card = new Gatherer(
                                 j.era,
-                                j.playersRequired
+                                j.playersRequired,
+                                j.discountValue
                         );
                         break;
 
@@ -89,7 +94,8 @@ public class CreateCharacterCard {
         }
     }
 
-
+    /**Method to return to the caller the list containing all the created cards
+     * @return list with all cards*/
     public List<CharacterCard> getAllCharacterCards() {
         return allCharacterCards;
     }
