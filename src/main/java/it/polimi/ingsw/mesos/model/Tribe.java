@@ -89,8 +89,6 @@ public class Tribe {
                 .sum();
     }
 
-    public List<InventionIcon> getDistinctInventionIcons(){return null;}
-
     /**
      * Number of distinct InventionIcon values among Inventors.
      * @return total distinct icons of inventors card
@@ -109,7 +107,12 @@ public class Tribe {
     }
 
     //per contare quanti character dello stesso tipo ci sono
-    public int getCharactersTypeCount(CharacterType type){return 0;}
+    public int getCharactersTypeCount(CharacterType type){
+        return characters.stream()
+                .filter( c -> c.getType() == type)
+                .mapToInt(c -> 1)
+                .sum();
+    }
 
     public int getBuildingsCount() {
         return buildings.size();
@@ -123,8 +126,20 @@ public class Tribe {
 
 
     //attenzione il giocatore sceglie 2 carte in un round si potrebbe perdere effetto della penultima carta
-    public CharacterCard getLastCard(){return null;}
+    // luca: due soluzioni, la prima fai prendere a questo metodo una sottolista con le utlime due carte e
+    // lo gestisci nel metodo con un doppio controllo, oppure usi quel metodo iterandolo ad ogni aggiunta e va bene cosi
+    public CharacterCard getLastCard(){
+        /*if (//selezione del player è di tipo character && player selected two card)
+            //return characters.get(-i)
+          */
+        return characters.get(characters.size() -1);
+    }
 
-    public List<Inventor> getInventors(){return null;}
+    public List<Inventor> getInventors(){
+        return characters.stream()
+                .filter( c -> c.getType() == CharacterType.INVENTOR)
+                .map(c -> (Inventor)c )
+                .toList();
+    }
 
 }

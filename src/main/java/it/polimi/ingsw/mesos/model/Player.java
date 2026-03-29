@@ -61,6 +61,7 @@ public class Player {
     public void updatePrestige(int points) {
         this.prestigePoints += points;
     }
+
     // --- Getters ---
 
     public String getNickname() {
@@ -84,28 +85,53 @@ public class Player {
     }
 
     //metodi che servono per i building
+
     public void setShamanNotLosePoints(){
         this.shamanNotLosePoints=true;
     }
+
     public void setShamanDoublePoints(){
         this.shamanDoublePoints=true;
     }
-    public boolean getShamanNotLosePoints(){return shamanNotLosePoints;}
+
+    public boolean getShamanNotLosePoints(){
+        return shamanNotLosePoints;
+    }
+
     public boolean getShamanDoublePoints(){
         return shamanDoublePoints;
     }
-    public void setExtraShamanIcons(int num){extraShamanIcons=num;}
+
+    public void setExtraShamanIcons(int num){
+        extraShamanIcons=num;
+    }
+
     public int getExtraShamanIcons(){
         return extraShamanIcons;
     }
 
-    public void setSustenanceDiscount(int num){sustenanceDiscount=num;}
+    public void setSustenanceDiscount(int num){
+        sustenanceDiscount=num;
+    }
+
     public int getSustenanceDiscount(){
         return sustenanceDiscount;
     }
 
-    public void setFoodOnTotemSlot(){this.foodOnTotemSlot=true;}
-    public boolean getFoodOnTotemSlot(){return foodOnTotemSlot;}
-    public void setExtraDraw(){this.extraDraw=true;}
-    public boolean getExtraDraw(){return extraDraw;}
+    public void setFoodOnTotemSlot(){
+        this.foodOnTotemSlot=true;
+    }
+
+    public boolean getFoodOnTotemSlot(){
+        return foodOnTotemSlot;
+    }
+
+    public void setExtraDraw(){
+        this.extraDraw=true;
+    }
+
+    public boolean getExtraDraw(){
+        return extraDraw;
+    }
+
 }
