@@ -36,4 +36,10 @@ public abstract class CharacterCard extends TribeCard {
     public CharacterType getType() {
         return type;
     }
+
+    @Override
+    public void addTo(Player player) {
+        // 1. Aggiungiamo il personaggio alla lista dei personaggi della tribù
+        player.getTribe().addCharacter(this);
+    }
 }

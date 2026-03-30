@@ -2,6 +2,7 @@ package it.polimi.ingsw.mesos.model.card.building;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
@@ -38,6 +39,7 @@ public class BuildingCard extends Card {
      *
      * @return the cost of the building card
      */
+    @Override
     public int getCost() {
         return this.cost;
     }
@@ -54,4 +56,10 @@ public class BuildingCard extends Card {
     public BuildingEffect getEffect() {
         return this.effect;
     }
+
+    @Override
+    public void addTo(Player player) {
+        player.getTribe().addBuilding(this); // Chiama il tuo metodo specifico
+    }
+
 }

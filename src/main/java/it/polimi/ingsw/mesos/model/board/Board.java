@@ -14,6 +14,7 @@
  */
 package it.polimi.ingsw.mesos.model.board;
 
+import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
@@ -51,26 +52,29 @@ public class Board {
      *
      * @param targetSize the desired number of cards in the upper row
      */
-    public void refillRows(int targetSize) {
-        // Calculate how many cards are needed to reach the target size
-        int cardsNeeded = targetSize - upperRow.size();
+    public void refillRows(int targetSize, Game g) {
+        if (this.tribeDeck.isEmpty()) return;
 
-        // If the row is already full or the deck is empty, do nothing
 
-        if (cardsNeeded <= 0) {
-            return;
-        }
+        int tribeCardsDrawn = 0;
+        boolean eraChanged = false;
+        Era newEraDetected = g.getCurrentEra();
 
-        // capire se va lanciato da qui il fatto che il gioco è finito
-        if (this.tribeDeck.isEmpty()) {
-            return;
-        }
-
-        // Draw cards from the deck until the row reaches the target size
-        // or the deck runs out of cards
-        while (upperRow.size() < targetSize && !this.tribeDeck.isEmpty()) {
+        while (tribeCardsDrawn < targetSize && !this.tribeDeck.isEmpty()) {
             TribeCard card = this.tribeDeck.draw();
+
+            if (card.getEra().ordinal() > g.getCurrentEra().ordinal()) {
+                eraChanged = true;
+                newEraDetected = card.getEra();
+            }
+
             upperRow.add(card);
+            tribeCardsDrawn++;
+        }
+
+        // SOLO ORA, se è stato rilevato un cambio, scatta la transizione degli edifici
+        if (eraChanged) {
+            g.handleEraTransition(newEraDetected);
         }
     }
 
@@ -203,9 +207,7 @@ public class Board {
         return this.tribeDeck;
     }
 
-    public boolean allTotemsPlaced() {
-        return tiles.stream().noneMatch(OfferTile::isAvailable);
-    }
+    public Deck<BuildingCard> getBuildingDeck() { return this.buildingDecks; }
 
     public void setTurnOrderTrack(TurnOrderTrack turnOrderTrack) {
         if (turnOrderTrack == null) {

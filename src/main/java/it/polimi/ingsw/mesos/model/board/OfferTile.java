@@ -44,6 +44,7 @@ public class OfferTile {
 
     // attualmente prende la prima carta perchè va implementato
     // il metodo di acquisizione del dato da parte del controller
+    /*
     public void execute(Player player, Game game) {
         Board board = game.getBoard();
 
@@ -69,7 +70,12 @@ public class OfferTile {
         // 3. Add food bonus
         player.addFood(foodBonus);
     }
+    */
 
+    // 1. Azione automatica (Cibo)
+    public void giveFoodBonus(Player p) {
+        p.addFood(this.foodBonus);
+    }
 
     public void placeTotem(Player player) {
         if (player == null) {
