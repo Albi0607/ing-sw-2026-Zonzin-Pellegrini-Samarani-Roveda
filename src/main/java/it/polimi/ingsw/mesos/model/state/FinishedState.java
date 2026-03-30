@@ -1,7 +1,15 @@
 package it.polimi.ingsw.mesos.model.state;
 
 import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.Tribe;
+import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
+import it.polimi.ingsw.mesos.model.card.character.Builder;
+import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.model.enums.TriggerType;
+
 /**
  * Represents the terminal phase of the game.
  * <p>
@@ -14,25 +22,6 @@ import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class FinishedState implements GameStateLogic {
 
-    /**
-     * Fully automatic — no player input required.
-     *
-     * Adds end-game PP to each player in this order:
-     * 1. PP from Builder cards (printed value on each Builder).
-     * 2. PP from Inventors: numInventors × distinctInventionIconCount.
-     * 3. PP from Artists: 10 PP per every 2 Artists.
-     * 4. PP from Building cards: base victoryPoints + END_GAME building effects.
-     *
-     * Calls game.notifyBuildingEffects(TriggerType.END_GAME, null) to let
-     * buildings apply their own end-game scoring effects.
-     *
-     * Winner = player with highest PP.
-     * Tiebreaker: most food.
-     * Further tie: shared victory.
-     *
-     * Does not transition to any further state.
-     */
-
 
 
     /**
@@ -43,10 +32,66 @@ public class FinishedState implements GameStateLogic {
     @Override
     public void execute(Game g) {
         System.out.println("--- Entering FINISHED PHASE ---");
+        g.notifyBuildingEffects(TriggerType.END_GAME);
         System.out.println("The game is over! Calculating final scores...");
+
+        for (Player p : g.getPlayers()) {
+            // Calcoliamo i bonus dalla Tribù
+            int bonusPoints = calculateFinalPrestige(p.getTribe());
+
+            // Aggiungiamo i punti al totale del giocatore
+            p.updatePrestige(bonusPoints);
+
+            System.out.println("Giocatore " + p.getNickname() + ": +" + bonusPoints + " PP calcolati.");
+        }
+
+        // Determiniamo il vincitore
+        Player winner = g.getWinner();
+
+        if (winner != null) {
+            System.out.println("\n IL VINCITORE È: " + winner.getNickname() + "!");
+            System.out.println("Punti totali: " + winner.getPrestigePoints());
+            System.out.println("Cibo rimanente: " + winner.getFood());
+        }
 
     }
 
+    private int calculateFinalPrestige(Tribe tribe) {
+        int points = 0;
+
+        // 1. PP dei Costruttori
+        // Sommiamo i punti stampati su ogni carta Builder presente
+        points += tribe.getCharacters().stream()
+                .filter(c -> c.getType() == CharacterType.BUILDER)
+                .map(c -> (Builder) c)
+                .mapToInt(Builder::getPrestigePoints)
+                .sum();
+
+        // 2. PP degli Inventori
+        // Formula: (Numero Inventori) * (Numero icone invenzione distinte)
+        int numInventors = tribe.getInventors().size();
+        long distinctIcons = tribe.getDistinctInventionCount();
+        points += (int) (numInventors * distinctIcons);
+
+        // 3. PP degli Artisti (10 PP ogni 2 Artisti)
+        int numArtists = tribe.getCharactersTypeCount(CharacterType.ARTIST);
+        points += (numArtists / 2) * 10;
+
+        // 4. PP degli Edifici (Punti base + Effetti di fine partita)
+        for (BuildingCard b : tribe.getBuildings()) {
+            // Punti base stampati sulla carta edificio
+            points += b.getVictoryPoints();
+        }
+
+        return points;
+    }
+
+
     @Override
-    public GameState getStateId() { return GameState.FINISHED; } // probabile da cambiare
+    public void placeTotemOnOffer(Game g, Player p, OfferTile t) {
+        throw new IllegalStateException("Errore: Non puoi piazzare totem durante questa fase!!!");
+    }
+
+    @Override
+    public GameState getStateId() { return GameState.FINISHED; }
 }

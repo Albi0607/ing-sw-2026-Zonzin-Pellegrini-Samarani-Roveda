@@ -1,5 +1,8 @@
 package it.polimi.ingsw.mesos.model.card;
 
+import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.card.event.EventCard;
 import it.polimi.ingsw.mesos.model.enums.Era;
 
@@ -25,5 +28,10 @@ public abstract class Card {
     public EventCard getAsEventCard() {
         return null;
     }
+
+    // uso il polimorfismo anzichè instanceof in offertile
+    public void addTo(Player player){}
+
+    public int getCost() {return 0; }
 
 }

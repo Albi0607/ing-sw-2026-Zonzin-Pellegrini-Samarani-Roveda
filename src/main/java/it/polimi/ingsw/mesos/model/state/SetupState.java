@@ -4,7 +4,14 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
+import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
+import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.model.enums.TriggerType;
+
+import java.util.List;
+
 /**
  * Represents the setup phase of a single round in the game.
  * <p>
@@ -33,24 +40,38 @@ public class SetupState implements GameStateLogic {
         System.out.println("Preparing the board for the current round...");
 
         Board board = g.getBoard();
+        int n = g.getPlayers().size();
+        int targetSize = n + 4;
 
+        board.clearLowerRow();
 
         board.shiftUpperToLower();
-        System.out.println("-> Personaggi scalati nella fila inferiore.");
 
-        // 2. Calcolo dinamico del targetSize: numero giocatori + 4
-        int numPlayers = g.getPlayers().size();
-        int targetSize = numPlayers + 4;
+        board.refillRows(targetSize, g);
+        g.setCurrentRound(g.getCurrentRound()+1);
+        int nextTrackIndex = 0;
+        List<OfferTile> tiles = board.getTiles();
+        TurnOrderTrack turnOrderTrack = board.getTurnOrderTrack();
 
-        if (board.getTribeDeck() != null) {
-            //board.refillRows(board.getTribeDeck(), targetSize);
-            System.out.println("-> Fila superiore riempita.");
+        for (OfferTile tile : tiles) {
+            Player playerOnTile = tile.getHost();
+
+            if (playerOnTile != null) {
+                turnOrderTrack.setPlayerAt(nextTrackIndex, playerOnTile);
+                g.notifyBuildingEffects(TriggerType.ON_TURN_ORDER_PLACEMENT);
+
+                nextTrackIndex++;
+
+                tile.reset();
+            }
         }
 
+        System.out.println("Board pronta. Passaggio al piazzamento totem.");
 
-        System.out.println("Setup completato. Passaggio alla fase di piazzamento!");
         g.changeState(new PlacingState());
+
     }
+
 
     @Override
     public void placeTotemOnOffer(Game g, Player p, OfferTile t) {

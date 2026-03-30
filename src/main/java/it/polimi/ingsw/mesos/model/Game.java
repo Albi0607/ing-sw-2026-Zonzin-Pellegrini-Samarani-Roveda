@@ -10,16 +10,19 @@ import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
-// in teoria l'attributo e i metodi dovrebbero essere enum (GameState) e non l'interfaccia, no? per ora li ho sostituiti
 import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.model.state.PlacingState;
 import it.polimi.ingsw.mesos.model.state.SetupState;
 import jdk.jfr.Event;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class Game {
+
+    private static final int MAX_ROUNDS = 10;
 
     private List<Player> players;
     private Board board;
@@ -50,7 +53,7 @@ public class Game {
         this.currentRound = 1;
         this.currentEra = Era.ERA_I;
 
-        this.currentState = new SetupState();
+        this.currentState = new PlacingState();
     }
 
 
@@ -96,9 +99,50 @@ public class Game {
             System.out.println("Preparato giocatore " + (i+1) + ": " + p.getNickname());
         }
 
-        System.out.println("--- SYSTEM: Handing over control to the initial state ---");
+        // Fila Inferiore (N+1 carte, gli Eventi saltano sopra)
+        int lowerTarget = numPlayers + 1;
+        int cardsPlacedInLower = 0;
 
-        // Passiamo  al SetupState
+        while (cardsPlacedInLower < lowerTarget && !board.getTribeDeck().isEmpty()) {
+            TribeCard drawn = board.getTribeDeck().draw();
+            if (drawn.getAsEventCard()!=null) {
+                board.getUpperRow().add(drawn); // Salta sopra
+                System.out.println("-> Evento saltato nella fila superiore.");
+            } else {
+                board.getLowerRow().add(drawn); // Personaggio resta sotto
+                cardsPlacedInLower++;
+            }
+        }
+
+        // Punto 5: Fila Superiore (N+4 carte totali)
+        int upperTarget = numPlayers + 4;
+        while (board.getUpperRow().size() < upperTarget && !board.getTribeDeck().isEmpty()) {
+            board.getUpperRow().add(board.getTribeDeck().draw());
+        }
+
+
+        Deck<BuildingCard> buildingDeck = board.getBuildingDeck();
+
+        while (!buildingDeck.isEmpty()) {
+            BuildingCard card = buildingDeck.draw();
+
+
+            // Controllo Era per debugging e logica
+            if (card.getEra() == Era.ERA_I) {
+                board.getUpperRow().add(card);
+                System.out.println(" Edificio Era I aggiunto: " + card.getClass().getSimpleName());
+            }else{
+                // Se abbiamo pescato un edificio dell'Era II, lo rimettiamo sopra
+                buildingDeck.put(card);
+                System.out.println("ℹ️ Trovato edificio " + card.getEra() + ", rimesso nel mazzo. Setup Era I terminato.");
+                break; // Usciamo dal ciclo: non ci sono più edifici Era I in cima
+            }
+
+        }
+
+        System.out.println("--- SYSTEM: Round 1 Setup Complete. Ready to Play! ---");
+
+
         if (this.currentState != null) {
             this.currentState.execute(this);
         } else {
@@ -176,41 +220,44 @@ public class Game {
      * Step 3: Place the new Era's Building cards in the upper row.
      * </p>
      *
-     * @param newCard The card that triggered the era transition.
+     * @param nextEra The card's era that triggered the era transition.
      */
-    public void handleEraTransition(Card newCard) {
-        System.out.println("\n--- [EVENTO] Transizione di Era in corso... ---");
+    public void handleEraTransition(Era nextEra) {
+        System.out.println("\n--- Transizione all'Era " + nextEra + " ---");
 
-        if (this.currentEra == Era.ERA_I) {
-            this.currentEra = Era.ERA_II;
-            System.out.println("Il gioco avanza all'ERA II!");
+        // 1. Gli edifici dell'era precedente "scendono" accanto alla fila inferiore
+        this.board.shiftBuildingsToLower();
+        System.out.println("- Edifici correnti spostati nella fila inferiore.");
 
-        } else if (this.currentEra == Era.ERA_II) {
-            this.currentEra = Era.ERA_III;
-            System.out.println("Il gioco avanza all'ERA III!");
+        // 2. Se passiamo all'Era III, gli edifici dell'Era I (che erano già sotto) spariscono
+        if (nextEra == Era.ERA_III) {
+            this.board.clearBuildingsFromLower();
+            System.out.println("- Edifici rimossi definitivamente.");
+        }
+
+        // 3. Aggiorniamo l'era del gioco
+        this.currentEra = nextEra;
+        //da testare
+        Deck<BuildingCard> buildingDeck = board.getBuildingDeck();
+
+        while (!buildingDeck.isEmpty()) {
+            BuildingCard card = buildingDeck.draw();
 
 
-            if (this.board != null) {
-                this.board.clearBuildingsFromLower();
-                System.out.println("- Passaggio 1 eseguito: Edifici rimossi dalla fila inferiore.");
+            // Controllo Era per debugging e logica
+            if (card.getEra() == nextEra) {
+                board.getUpperRow().add(card);
+                System.out.println(" Edificio Era I aggiunto: " + card.getClass().getSimpleName());
+            }else{
+                // Se abbiamo pescato un edificio di un' altra era, lo rimettiamo sopra
+                buildingDeck.put(card);
+                System.out.println("ℹ Trovato edificio " + card.getEra() + ", rimesso nel mazzo. Setup Era I terminato.");
+                break; // Usciamo dal ciclo: non ci sono più edifici Era I in cima
             }
-        } else {
-            System.out.println("Siamo già nell'Era III. Nessun avanzamento.");
-            return; // Se siamo già alla fine, interrompiamo il metodo qui
+
         }
 
-        // Se siamo arrivati qui, significa che c'è stato un salto (all'Era II o all'Era III)
-        if (this.board != null) {
-            // Spostare gli edifici dalla superiore all'inferiore
-            this.board.shiftBuildingsToLower();
-            System.out.println("- Passaggio 2 eseguito: Edifici spostati dalla fila superiore alla fila inferiore.");
-
-
-
-
-
-            System.out.println("- Passaggio 3 eseguito: Nuovi edifici dell'Era " + this.currentEra + " piazzati nella fila superiore.");
-        }
+        System.out.println("- Nuovi edifici Era " + nextEra + " aggiunti alla fila superiore.");
     }
 
     /**
@@ -222,7 +269,7 @@ public class Game {
      * {@code applyEffect(Player, Game, TriggerType)}.
      *
      */
-    public void notifyBuildingEffects(TriggerType trigger, Object context) {
+    public void notifyBuildingEffects(TriggerType trigger) {
 
         if (trigger == null) {
             throw new IllegalArgumentException("Trigger type cannot be null");
@@ -249,17 +296,13 @@ public class Game {
      */
     public Player getWinner() {
         return players.stream()
-                .max((p1, p2) -> {
-                    int prestigeCompare = Integer.compare(p1.getPrestigePoints(), p2.getPrestigePoints());
-                    if (prestigeCompare != 0) return prestigeCompare;
-                    return Integer.compare(p1.getFood(), p2.getFood());
-                })
+                .max(Comparator.comparingInt(Player::getPrestigePoints)
+                        .thenComparingInt(Player::getFood))
                 .orElse(null);
     }
 
     public boolean isGameFinished() {
-        // da sistemare....
-        return true;
+        return currentRound >= MAX_ROUNDS || board.getTribeDeck().isEmpty();
     }
 
     // --- Getters ---

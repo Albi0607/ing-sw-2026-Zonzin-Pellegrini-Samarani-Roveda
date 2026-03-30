@@ -24,6 +24,11 @@ public class Deck<T extends Card> {
         this.deck = strategy.createDeck(numPlayers);
     }
 
+    // costruttore solo per il test
+    public Deck(Stack<T> manualStack) {
+        this.deck = manualStack;
+    }
+
     /**differentiates the creation of the tribe deck from the building one
      * Method that draws one card at a time from the deck
      * @return
