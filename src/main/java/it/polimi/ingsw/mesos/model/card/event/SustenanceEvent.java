@@ -62,8 +62,10 @@ public class SustenanceEvent extends EventCard {
             else if(food>0&&food>p.getFood()){
                 int diff = food-p.getFood();
                 p.payFood(food-diff);
-                p.updatePrestige(diff*prestigePoints);
+                p.updatePrestige(-diff*prestigePoints);
             }
+            //rimetto a 0 in modo tale da fare la somma corretta nel prossimo evento
+            p.setSustenanceDiscount(0);
         }
     }
 }

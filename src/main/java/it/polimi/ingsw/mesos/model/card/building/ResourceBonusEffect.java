@@ -6,6 +6,8 @@ import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.Inventor;
 import it.polimi.ingsw.mesos.model.enums.*;
 
+import static java.lang.Integer.sum;
+
 
 /**"Concrete class that handles the building effects:
 
@@ -50,7 +52,7 @@ public class ResourceBonusEffect implements BuildingEffect {
      */
     @Override
     public void applyEffect(Player player, Game game, TriggerType trigger) {
-        if(trigger==TriggerType.ON_CHARACTER_ADDED) {
+        if(trigger==TriggerType.ON_CHARACTER_ADDED&&eventContext==null) {
             //condizione per gestire l'effetto 1 che da 5 di cibo per ogni volta che si completa un set di 6 character
             //controllo che il numero di carte con lo stesso tipo di quello appena aggiunto sia il numero minimo o
             // uguale rispetto agli altri
@@ -75,7 +77,7 @@ public class ResourceBonusEffect implements BuildingEffect {
             /**Condition to handle effect 5: gain 3 food each time a pair of identical Inventors is obtained*/
             if(countRef == CharacterType.INVENTOR && lastCard instanceof Inventor){
                 Inventor inv = (Inventor) lastCard;
-                long sameIconCount = player.getTribe().getInventors().stream()
+                int sameIconCount = (int)player.getTribe().getInventors().stream()
                         .filter(i -> i.getIcon().equals(inv.getIcon()))
                         .count();
                 if(sameIconCount % 2 == 0) { // ogni coppia

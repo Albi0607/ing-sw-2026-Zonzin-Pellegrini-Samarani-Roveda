@@ -78,19 +78,17 @@ public class CreateCharacterCard {
                                 j.playersRequired
                         );
                         break;
+
+                    default:
+                        throw new IllegalArgumentException( "Unknow character type " + j.type);
+
                 }
 
-                if(card != null){
-                    allCharacterCards.add(card);
-                }
+                allCharacterCards.add(card);
             }
-
+            //mi devo ricordare di gestire queste eccezioni con ramo try catch quando verrà creato il deck in main
         } catch(IOException e){
-            System.err.println("Error loading cards: " + e.getMessage());
-        }
-
-        catch (Exception e){
-            e.printStackTrace();
+            throw new RuntimeException("Error loading cards",e);
         }
     }
 

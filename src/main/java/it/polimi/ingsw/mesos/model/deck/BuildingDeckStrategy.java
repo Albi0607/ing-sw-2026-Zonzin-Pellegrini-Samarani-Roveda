@@ -21,14 +21,14 @@ public class BuildingDeckStrategy implements CreateStrategy<BuildingCard>{
     @Override
     public Stack<BuildingCard> createDeck(int numPlayers) {
         int num1,num2,num3;
-        List<BuildingCard> buildingDeckCreated = new CreateBuildingCard("building.json").getAllBuildingCards();
+        List<BuildingCard> buildingDeckCreated = new CreateBuildingCard("buildings.json").getAllBuildingCards();
         List<BuildingCard> tempBuildingDeck = new ArrayList<>();
         Stack<BuildingCard> buildingDeck = new Stack<>();
 
         //capisco quanti building per era devo mettere nel mazzo per via del numero di giocatori
         if(numPlayers==2){
             num1=1;
-            num2=1;
+            num2=2;
             num3=3;
         }
         else if(numPlayers==3){

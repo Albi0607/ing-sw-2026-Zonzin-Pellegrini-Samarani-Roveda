@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.model.deck;
 import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
 import it.polimi.ingsw.mesos.model.enums.*;
 
-/**Java DTO class that maps the attributes of the building.json file to determine which type of effect to construct and,
+/**Java DTO class that maps the attributes of the buildings.json file to determine which type of effect to construct and,
  *  consequently, the entire building that depends on that effect, assigning the corresponding parameters for each effect type
  *  @author Alberto Roveda
  *  */
