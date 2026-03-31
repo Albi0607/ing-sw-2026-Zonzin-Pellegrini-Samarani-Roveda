@@ -4,15 +4,23 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Stack;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateBuildingCardTest {
+class CreateBuildingCardTest {
     @Test
     void testCorrectNumberOfBuilding(){
-        List<BuildingCard> buildingDeck = new CreateBuildingCard("building.json").getAllBuildingCards();
+        List<BuildingCard> buildingDeck = new CreateBuildingCard("buildings.json").getAllBuildingCards();
         assertEquals(21,buildingDeck.size());
+    }
+
+    @Test
+    void testWrongInputFromJson(){
+        assertThrows(IllegalArgumentException.class,()->new CreateBuildingCard("wrongBuildingsForTest.json"));
+    }
+    @Test
+    void testWrongFile(){
+        assertThrows(RuntimeException.class,()->new CreateBuildingCard("prova.json"));
     }
 
 }

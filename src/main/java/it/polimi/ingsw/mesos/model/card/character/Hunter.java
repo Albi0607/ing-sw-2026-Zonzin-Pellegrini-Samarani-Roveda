@@ -29,20 +29,19 @@ public class Hunter extends CharacterCard {
     public void addTo(Player player) {
         super.addTo(player);
 
-        this.onAddedToTribe(player.getTribe(), player);
+        this.onAddedToTribe(player);
     }
 
     /**
      * Called when the card is added to a tribe.
      * If hasIcon is true, player gains 1 food per Hunter already in the tribe (including this one)
-     * @param tribe  tribe the tribe to which the card is added
      * @param player player the player who owns the tribe
      */
 
     //gestire il più uno se l'effetto viene chiamato quando è già nella tribù o no
-    public void onAddedToTribe(Tribe tribe, Player player) {
+    public void onAddedToTribe(Player player) {
         if(hasIcon()){
-            int bonus=tribe.getCharactersTypeCount(CharacterType.HUNTER);
+            int bonus=player.getTribe().getCharactersTypeCount(CharacterType.HUNTER);
             player.addFood(bonus);
         }
     }

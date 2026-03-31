@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.model.deck;
 
 import it.polimi.ingsw.mesos.model.card.Card;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.Gatherer;
 import it.polimi.ingsw.mesos.model.card.character.Hunter;
 import it.polimi.ingsw.mesos.model.card.event.*;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DeckTest {
+class DeckTest {
     @Test
     void testCorrectNumberOfTribeCardInDeckFor5Players(){
         Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
@@ -33,6 +34,12 @@ public class DeckTest {
     void testCorrectNumberOfTribeCardInDeckFor2Players(){
         Deck<TribeCard> deck = new Deck<>(2,new TribeDeckStrategy());
         assertEquals(63,deck.size());
+    }
+
+    @Test
+    void testWrongNumberOfPlayerInTribeDeck(){
+        assertThrows(IllegalArgumentException.class,()-> new Deck<>(1,new TribeDeckStrategy()));
+        assertThrows(IllegalArgumentException.class,()-> new Deck<>(6,new TribeDeckStrategy()));
     }
 
     @Test
@@ -175,6 +182,47 @@ public class DeckTest {
         if(Era.ERA_I == deck.draw().getEra()) flag = true;
 
         assertTrue(flag);
+    }
+
+    @Test
+    void testDrawWithEmptyDeck(){
+        Deck<TribeCard> deck = new Deck<>(5,new TribeDeckStrategy());
+        int cont = 96;
+        while(cont!=0){
+            deck.draw();
+            cont--;
+        }
+
+        Card c = deck.draw();
+
+        assertNull(c);
+    }
+
+    @Test
+    void testWrongNumberOfPlayerInBuildingDeck(){
+        assertThrows(IllegalArgumentException.class,()-> new Deck<>(1,new BuildingDeckStrategy()));
+        assertThrows(IllegalArgumentException.class,()-> new Deck<>(6,new BuildingDeckStrategy()));
+    }
+
+    @Test
+    void testCorrectNumberOfBuildingCardInDeckFor5Players(){
+        Deck<BuildingCard> deck = new Deck<>(5,new BuildingDeckStrategy());
+        assertEquals(10,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfBuildingCardInDeckFor4Players(){
+        Deck<BuildingCard> deck = new Deck<>(4,new BuildingDeckStrategy());
+        assertEquals(9,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfBuildingCardInDeckFor3Players(){
+        Deck<BuildingCard> deck = new Deck<>(3,new BuildingDeckStrategy());
+        assertEquals(8,deck.size());
+    }
+    @Test
+    void testCorrectNumberOfBuildingCardInDeckFor2Players(){
+        Deck<BuildingCard> deck = new Deck<>(2,new BuildingDeckStrategy());
+        assertEquals(6,deck.size());
     }
 
 }

@@ -22,9 +22,12 @@ public class TribeDeckStrategy implements CreateStrategy<TribeCard>{
      */
     @Override
     public  Stack <TribeCard> createDeck(int numPlayers) {
+        if(numPlayers<2||numPlayers>5){
+            throw new IllegalArgumentException("Numero di giocatori non valido");
+        }
 
         List<CharacterCard> cCard = new CreateCharacterCard("characters.json").getAllCharacterCards();
-        List<EventCard> eCard = new CreateEventCard("event.json").getAllEventCards();
+        List<EventCard> eCard = new CreateEventCard("events.json").getAllEventCards();
 
         List<TribeCard> tempDeck = new ArrayList<>();
         List<EventCard> finalCards = new ArrayList<>();

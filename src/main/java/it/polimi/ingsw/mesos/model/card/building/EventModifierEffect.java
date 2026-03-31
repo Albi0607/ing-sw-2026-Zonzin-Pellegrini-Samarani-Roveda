@@ -74,7 +74,7 @@ public class EventModifierEffect implements BuildingEffect {
              * characters of a specific type in your tribe*/
         if(trigger==TriggerType.ON_EVENT&&game.getCurrentEventType()==eventContext&&discount>0){
             int calculatedDiscount = discount*player.getTribe().getCharactersTypeCount(countRef);
-            player.setSustenanceDiscount(calculatedDiscount);
+            player.setSustenanceDiscount(player.getSustenanceDiscount()+calculatedDiscount);
         }
     }
 }

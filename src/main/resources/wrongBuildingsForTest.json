@@ -1,0 +1,10 @@
+[{
+  "era": "ERA_I",
+  "cost": 4,
+  "victoryPoints": 3,
+  "effect": "ResourceBonus",
+  "eventContext": null,
+  "countRef": null,
+  "reward": "FOOD",
+  "amount": 5
+}]

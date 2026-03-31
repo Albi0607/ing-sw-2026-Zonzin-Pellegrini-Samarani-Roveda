@@ -2,17 +2,26 @@ package it.polimi.ingsw.mesos.model.deck;
 
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import org.junit.jupiter.api.Test;
-import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreateCharacterCardTest {
+class CreateCharacterCardTest {
     @Test
     void testCorrectNumberOfCardFor5Players() {
         List<CharacterCard> list = new CreateCharacterCard("characters.json").getAllCharacterCards();
         assertEquals(84, list.size());
+    }
+
+    @Test
+    void testWrongInputFromJson(){
+        assertThrows(RuntimeException.class,()->new CreateCharacterCard("wrongCharactersForTest.json"));
+    }
+
+    @Test
+    void testWrongFile(){
+        assertThrows(RuntimeException.class,()->new CreateCharacterCard("prova.json"));
     }
 
 }

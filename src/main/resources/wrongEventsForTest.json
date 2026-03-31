@@ -1,0 +1,9 @@
+[
+  {
+    "type": "HUNTER",
+    "era": "ERA_I",
+    "playersRequired": 2,
+    "isFinal": false,
+    "gainPoints": 1
+  }
+]

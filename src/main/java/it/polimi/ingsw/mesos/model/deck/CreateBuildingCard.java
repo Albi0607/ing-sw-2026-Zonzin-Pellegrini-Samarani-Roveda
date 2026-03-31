@@ -20,6 +20,7 @@ public class CreateBuildingCard {
     /**Constructor of the class that creates all the cards from a JSON file, using BuildingCardJson as a helper class
      *  to distinguish the creation of different building cards
      *  @param path file JSON in resources with all building card
+     * @throws
      *  */
     public CreateBuildingCard(String path) {
         try {
@@ -32,7 +33,7 @@ public class CreateBuildingCard {
             allBuildingCards = new ArrayList<>();
 
             for (BuildingCardJson j : buildingCardJsons) {
-                BuildingEffect effect = null;
+                BuildingEffect effect;
                 switch (j.effect) {
                     case "ResourceBonusEffect":
                         effect = new ResourceBonusEffect(
@@ -69,8 +70,10 @@ public class CreateBuildingCard {
                         );
                         break;
 
+                    default:
+                        throw new IllegalArgumentException( "Unknow building effect " + j.effect);
+
                 }
-                if (effect != null) {
                     BuildingCard card = new BuildingCard(
                             j.era,
                             j.cost,
@@ -79,12 +82,10 @@ public class CreateBuildingCard {
                     );
                     allBuildingCards.add(card);
 
-                }
             }
-        } catch (IOException e) {
-            System.err.println("Error loading cards: " + e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
+            //mi devo ricordare di gestire queste eccezioni con ramo try catch quando verrà creato il deck in main
+        } catch(IOException e){
+            throw new RuntimeException("Error loading cards",e);
         }
     }
 

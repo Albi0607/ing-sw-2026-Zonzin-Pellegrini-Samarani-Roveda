@@ -72,20 +72,21 @@ public class CreateEventCard {
                                 j.gainPoints
                         );
                         break;
+
+                    default:
+                        throw new IllegalArgumentException( "Unknow event type " + j.type);
+
                 }
 
-                if(card != null){
-                    allEventCards.add(card);
-                }
+                allEventCards.add(card);
+
             }
 
+            //mi devo ricordare di gestire queste eccezioni con ramo try catch quando verrà creato il deck in main
         } catch(IOException e){
-            System.err.println("Error loading cards: " + e.getMessage());
+            throw new RuntimeException("Error loading cards",e);
         }
 
-        catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     /**Method to return to the caller the list containing all the created cards
