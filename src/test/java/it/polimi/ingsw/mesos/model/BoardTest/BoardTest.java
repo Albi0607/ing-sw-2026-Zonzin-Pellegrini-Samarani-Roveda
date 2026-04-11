@@ -1,5 +1,7 @@
 package it.polimi.ingsw.mesos.model.BoardTest;
 
+import it.polimi.ingsw.mesos.model.Game;
+import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.*;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
@@ -7,8 +9,10 @@ import it.polimi.ingsw.mesos.model.card.building.EndGameScoringEffect;
 import it.polimi.ingsw.mesos.model.card.character.Artist;
 import it.polimi.ingsw.mesos.model.deck.Deck;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
+import it.polimi.ingsw.mesos.model.enums.Color;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -18,209 +22,200 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class BoardTest {
+    private Game game;
+
     @Test
     void testRefillRowsAddsCards() {
-        Board board = new Board(2);
 
         Artist c1 = new Artist(Era.ERA_I, 2);
         Artist c2 = new Artist(Era.ERA_I, 2);
         Artist c3 = new Artist(Era.ERA_I, 4);
 
-        board.getTribeDeck().put(c1);
-        board.getTribeDeck().put(c2);
-        board.getTribeDeck().put(c3);
+        game.getBoard().getTribeDeck().put(c1);
+        game.getBoard().getTribeDeck().put(c2);
+        game.getBoard().getTribeDeck().put(c3);
 
         // La riga superiore inizialmente è vuota
-        assertEquals(0, board.getUpperRow().size());
+        assertEquals(0, game.getBoard().getUpperRow().size());
 
-        board.refillRows(3);
+        game.getBoard().refillRows(3,game);
 
-        assertEquals(3, board.getUpperRow().size());
+        assertEquals(3, game.getBoard().getUpperRow().size());
     }
 
     @Test
     void testRefillRowsDoesNotOverfill() {
-        Board board = new Board(2);
 
         Artist c1 = new Artist(Era.ERA_I, 2);
         Artist c2 = new Artist(Era.ERA_I, 3);
         Artist c3 = new Artist(Era.ERA_I, 1);
 
-        board.getTribeDeck().put(c1);
-        board.getTribeDeck().put(c2);
-        board.getTribeDeck().put(c3);
+        game.getBoard().getTribeDeck().put(c1);
+        game.getBoard().getTribeDeck().put(c2);
+        game.getBoard().getTribeDeck().put(c3);
 
         // Inseriamo già una carta nella riga
-        board.getUpperRow().add(new Artist(Era.ERA_I, 1));
+        game.getBoard().getUpperRow().add(new Artist(Era.ERA_I, 1));
 
-        board.refillRows(3);
+        game.getBoard().refillRows(3,game);
 
         // Ora la riga deve contenere 3 carte in totale
-        assertEquals(3, board.getUpperRow().size());
+        assertEquals(3, game.getBoard().getUpperRow().size());
     }
 
     @Test
     void testRefillRowsWithEmptyDeck() {
-        Board board = new Board(2);
 
         // Mazzo vuoto
-        board.refillRows(3);
+        game.getBoard().refillRows(3,game);
 
         // La riga rimane vuota
-        assertEquals(0, board.getUpperRow().size());
+        assertEquals(0, game.getBoard().getUpperRow().size());
     }
 
     @Test
     void testShiftUpperToLower() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
-        board.getUpperRow().add(c1);
-        board.getUpperRow().add(c2);
+        game.getBoard().getUpperRow().add(c1);
+        game.getBoard().getUpperRow().add(c2);
 
-        board.shiftUpperToLower();
+        game.getBoard().shiftUpperToLower();
 
-        assertTrue(board.getLowerRow().contains(c1)); // the method have to move c1
-        assertFalse(board.getUpperRow().contains(c1)); // the method don't have to move c2, because it is a building
-        assertTrue(board.getUpperRow().contains(c2)); // c2 remains in the upper row
-        assertFalse(board.getLowerRow().contains(c2));
+        assertTrue(game.getBoard().getLowerRow().contains(c1)); // the method have to move c1
+        assertFalse(game.getBoard().getUpperRow().contains(c1)); // the method don't have to move c2, because it is a building
+        assertTrue(game.getBoard().getUpperRow().contains(c2)); // c2 remains in the upper row
+        assertFalse(game.getBoard().getLowerRow().contains(c2));
     }
 
     @Test
     void testClearLowerRow() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
-        board.getLowerRow().add(c1);
-        board.getLowerRow().add(c2);
+        game.getBoard().getLowerRow().add(c1);
+        game.getBoard().getLowerRow().add(c2);
 
-        board.clearLowerRow();
+        game.getBoard().clearLowerRow();
 
-        assertFalse(board.getLowerRow().contains(c1)); // remove
-        assertTrue(board.getLowerRow().contains(c2));  // remain
+        assertFalse(game.getBoard().getLowerRow().contains(c1)); // remove
+        assertTrue(game.getBoard().getLowerRow().contains(c2));  // remain
     }
 
     @Test
     void clearBuildingsFromLower() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
-        board.getLowerRow().add(c1);
-        board.getLowerRow().add(c2);
+        game.getBoard().getLowerRow().add(c1);
+        game.getBoard().getLowerRow().add(c2);
 
-        board.clearBuildingsFromLower();
+        game.getBoard().clearBuildingsFromLower();
 
-        assertTrue(board.getLowerRow().contains(c1)); // remove
-        assertFalse(board.getLowerRow().contains(c2));  // remain
+        assertTrue(game.getBoard().getLowerRow().contains(c1)); // remove
+        assertFalse(game.getBoard().getLowerRow().contains(c2));  // remain
     }
 
     @Test
     void shiftBuildingsToLower() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);     // not a building
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
 
-        board.getUpperRow().add(c1);
-        board.getUpperRow().add(c2);
+        game.getBoard().getUpperRow().add(c1);
+        game.getBoard().getUpperRow().add(c2);
 
-        board.shiftBuildingsToLower();
+        game.getBoard().shiftBuildingsToLower();
 
-        assertFalse(board.getLowerRow().contains(c1)); // the method do not have to move c1
-        assertTrue(board.getUpperRow().contains(c1)); // the method have to move c2, because it is a building
-        assertFalse(board.getUpperRow().contains(c2)); // c2 have to be in the lower row
-        assertTrue(board.getLowerRow().contains(c2));
+        assertFalse(game.getBoard().getLowerRow().contains(c1)); // the method do not have to move c1
+        assertTrue(game.getBoard().getUpperRow().contains(c1)); // the method have to move c2, because it is a building
+        assertFalse(game.getBoard().getUpperRow().contains(c2)); // c2 have to be in the lower row
+        assertTrue(game.getBoard().getLowerRow().contains(c2));
     }
 
     @Test
     void takeCardFromLower() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
-        board.getLowerRow().add(c1);
-        board.getLowerRow().add(c2);
-        board.getLowerRow().add(c3);
+        game.getBoard().getLowerRow().add(c1);
+        game.getBoard().getLowerRow().add(c2);
+        game.getBoard().getLowerRow().add(c3);
 
-        Card taken = board.takeCardFromLower(2);
+        Card taken = game.getBoard().takeCardFromLower(2);
 
         assertEquals(c3, taken);
-        assertFalse(board.getLowerRow().contains(c3));
+        assertFalse(game.getBoard().getLowerRow().contains(c3));
         assertNotEquals(c1, taken);
         assertNotEquals(c2, taken);
-        assertTrue(board.getLowerRow().contains(c1));
-        assertTrue(board.getLowerRow().contains(c2));
+        assertTrue(game.getBoard().getLowerRow().contains(c1));
+        assertTrue(game.getBoard().getLowerRow().contains(c2));
     }
 
     @Test
     void testTakeCardFromUpper() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
-        board.getUpperRow().add(c1);
-        board.getUpperRow().add(c2);
-        board.getUpperRow().add(c3);
+        game.getBoard().getUpperRow().add(c1);
+        game.getBoard().getUpperRow().add(c2);
+        game.getBoard().getUpperRow().add(c3);
 
-        Card taken = board.takeCardFromUpper(2);
+        Card taken = game.getBoard().takeCardFromUpper(2);
 
         assertEquals(c3, taken);
-        assertFalse(board.getUpperRow().contains(c3));
+        assertFalse(game.getBoard().getUpperRow().contains(c3));
         assertNotEquals(c1, taken);
         assertNotEquals(c2, taken);
-        assertTrue(board.getUpperRow().contains(c1));
-        assertTrue(board.getUpperRow().contains(c2));
+        assertTrue(game.getBoard().getUpperRow().contains(c1));
+        assertTrue(game.getBoard().getUpperRow().contains(c2));
     }
 
     @Test
     void testTakeCardFromLowerInvalidIndex() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
-        board.getLowerRow().add(c1);
-        board.getLowerRow().add(c2);
-        board.getLowerRow().add(c3);
+        game.getBoard().getLowerRow().add(c1);
+        game.getBoard().getLowerRow().add(c2);
+        game.getBoard().getLowerRow().add(c3);
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromLower(-1);
+            game.getBoard().takeCardFromLower(-1);
         });
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromLower(7);
+            game.getBoard().takeCardFromLower(7);
         });
     }
 
     @Test
     void testTakeCardFromUpperInvalidIndex() {
-        Board board = new Board(2);
 
         Card c1 = new Artist(Era.ERA_I,2);
         Card c2 = new BuildingCard(Era.ERA_I, 1,2,new EndGameScoringEffect(2,2,false, CharacterType.ARTIST));  // building
         Card c3 = new Artist(Era.ERA_I,4);
 
-        board.getUpperRow().add(c1);
-        board.getUpperRow().add(c2);
-        board.getUpperRow().add(c3);
+        game.getBoard().getUpperRow().add(c1);
+        game.getBoard().getUpperRow().add(c2);
+        game.getBoard().getUpperRow().add(c3);
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromUpper(-1);
+            game.getBoard().takeCardFromUpper(-1);
         });
 
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            board.takeCardFromUpper(7);
+            game.getBoard().takeCardFromUpper(7);
         });
     }
     // getAvailableTiles
@@ -228,11 +223,10 @@ public class BoardTest {
     // initializeOfferTiles
     @Test
     void testInitializeOfferTiles() {
-        Board board = new Board(4);
         CreateOfferTile factory = new CreateOfferTile();
         List<OfferTile> tiles = factory.initializeOfferTiles(4);
 
-        board.setTiles(tiles);
+        game.getBoard().setTiles(tiles);
 
         assertNotNull(tiles);
         assertFalse(tiles.isEmpty());
@@ -263,7 +257,6 @@ public class BoardTest {
     //initializeTurnOrderTrack
     @Test
     void testInitializeTurnOrderTrack_allValidPlayers() {
-        Board board = new Board(2);
         CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
 
         // expected slot based on the number of players
@@ -275,8 +268,8 @@ public class BoardTest {
         };
 
         for (int i = 2; i <= 5; i++) {
-            board.setTurnOrderTrack(factory.initializeTurnOrderTrack(i));
-            assertArrayEquals(expectedSlots[i - 2], board.getTurnOrderTrack().getSlots());
+            game.getBoard().setTurnOrderTrack(factory.initializeTurnOrderTrack(i));
+            assertArrayEquals(expectedSlots[i - 2], game.getBoard().getTurnOrderTrack().getSlots());
         }
     }
 
