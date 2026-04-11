@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
 /**Concrete class to handle CavePaintingEvents
@@ -50,6 +51,9 @@ public class CavePaintingEvent extends EventCard {
      */
     @Override
     public void resolve(Game game) {
+
+        //chiamo gli edifici di tutti i giocatori che potrebbero modificare questo evento
+        game.notifyBuildingEffects(TriggerType.ON_PAINTING_EVENT);
 
         //faccio l'azione per tutti i giocatori in gioco
         for(Player p : game.getPlayers()){

@@ -11,7 +11,7 @@ public class Player {
     private final Tribe tribe;
     private final Color color;
 
-    //parametri che servono per gli edifici
+    //parametri che servono per gli edifici settati di default in modo che non siano in utilizzo
     private boolean shamanNotLosePoints = false;
     private boolean shamanDoublePoints = false;
     private int extraShamanIcons = 0;

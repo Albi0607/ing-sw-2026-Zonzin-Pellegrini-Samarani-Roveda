@@ -72,7 +72,7 @@ public class EventModifierEffect implements BuildingEffect {
         }
             /**Handles effect 2, which grants a food discount during the Sustenance event based on the number of
              * characters of a specific type in your tribe*/
-        if(trigger==TriggerType.ON_EVENT&&game.getCurrentEventType()==eventContext&&discount>0){
+        if(trigger==TriggerType.ON_SUSTENANCE_EVENT&&eventContext==EventType.SUSTENANCE&&discount>0){
             int calculatedDiscount = discount*player.getTribe().getCharactersTypeCount(countRef);
             player.setSustenanceDiscount(player.getSustenanceDiscount()+calculatedDiscount);
         }

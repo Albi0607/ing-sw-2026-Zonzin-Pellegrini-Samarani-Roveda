@@ -326,8 +326,6 @@ public class Game {
         return currentState;
     }
 
-    public EventType getCurrentEventType(){return null;}
-
     public void setCurrentRound(int round) {
         this.currentRound = round;
     }

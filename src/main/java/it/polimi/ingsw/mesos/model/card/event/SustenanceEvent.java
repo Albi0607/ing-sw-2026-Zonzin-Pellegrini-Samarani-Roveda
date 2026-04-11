@@ -6,6 +6,7 @@ import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
 
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
@@ -40,6 +41,10 @@ public class SustenanceEvent extends EventCard {
      */
     @Override
     public void resolve(Game game) {
+
+        //chiamo gli edifici di tutti i giocatori che potrebbero modificare questo evento
+        game.notifyBuildingEffects(TriggerType.ON_SUSTENANCE_EVENT);
+
         //faccio azione per tutti i giocatori in gioco
         for (Player p : game.getPlayers()){
             int food = 0;
@@ -49,7 +54,7 @@ public class SustenanceEvent extends EventCard {
             for (CharacterType c : CharacterType.values()){
                 food += p.getTribe().getCharactersTypeCount(c);
             }
-            //ottengo sconto dato dalle carte Ghatherer e da discount presente in un attributo del giocatore
+            //ottengo sconto dato dalle carte Gatherer e da discount presente in un attributo del giocatore
             food = food - p.getTribe().getSustenanceDiscount();
             food = food - p.getSustenanceDiscount();
 
