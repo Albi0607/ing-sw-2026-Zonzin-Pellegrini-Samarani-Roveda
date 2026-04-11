@@ -1,3 +1,4 @@
+
 package it.polimi.ingsw.mesos.model.BoardTest;
 
 import it.polimi.ingsw.mesos.model.Game;

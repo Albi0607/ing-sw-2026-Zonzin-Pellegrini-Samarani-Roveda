@@ -143,10 +143,10 @@ class ResourceBonusEffectTest {
         p4.getTribe().addCharacter(artist);
 
 
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_HUNT_EVENT);
 
         assertEquals(0,p1.getFood());
         assertEquals(0,p1.getPrestigePoints());
@@ -253,10 +253,10 @@ class ResourceBonusEffectTest {
         p4.getTribe().addCharacter(inventor6);
 
 
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_HUNT_EVENT);
 
         assertEquals(0,p1.getFood());
         assertEquals(0,p1.getPrestigePoints());
@@ -297,12 +297,10 @@ class ResourceBonusEffectTest {
 
         p3.getTribe().addCharacter(hunter1);
 
-        //mettere game con il current event corretto
-
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_HUNT_EVENT);
 
 
         assertEquals(3,p1.getFood());
@@ -344,12 +342,10 @@ class ResourceBonusEffectTest {
 
         p3.getTribe().addCharacter(hunter1);
 
-        //mettere game con il current event sbagliato
-
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_PAINTING_EVENT);
 
 
         assertEquals(0,p1.getFood());
@@ -365,6 +361,7 @@ class ResourceBonusEffectTest {
         assertEquals(0,p4.getPrestigePoints());
     }
 
+    //un po ripetitivo
     @Test
     void testApplyEffectBuilding10WrongTrigger(){
         Player p1 = new Player("Alberto", Color.BLUE);
@@ -435,11 +432,10 @@ class ResourceBonusEffectTest {
 
         p3.getTribe().addCharacter(artist);
 
-        //mettere game con il current event corretto
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_PAINTING_EVENT);
 
 
         assertEquals(3,p1.getFood());
@@ -480,11 +476,10 @@ class ResourceBonusEffectTest {
 
         p3.getTribe().addCharacter(artist);
 
-        //mettere game con il current event sbagliato
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p2,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p3,game,TriggerType.ON_EVENT);
-        building.getEffect().applyEffect(p4,game,TriggerType.ON_EVENT);
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p3,game,TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p4,game,TriggerType.ON_HUNT_EVENT);
 
 
         assertEquals(0,p1.getFood());
@@ -500,6 +495,7 @@ class ResourceBonusEffectTest {
         assertEquals(0,p4.getPrestigePoints());
     }
 
+    //un po ripetitivo
     @Test
     void testApplyEffectBuilding12WrongTrigger(){
         Player p1 = new Player("Alberto", Color.BLUE);

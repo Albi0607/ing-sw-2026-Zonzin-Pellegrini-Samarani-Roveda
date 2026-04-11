@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Era;
 import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
 /**Concrete class to handle HunteEvents
@@ -33,6 +34,9 @@ public class HuntEvent extends EventCard {
      */
     @Override
     public void resolve(Game game) {
+
+        //chiamo gli edifici di tutti i giocatori che potrebbero modificare questo evento
+        game.notifyBuildingEffects(TriggerType.ON_HUNT_EVENT);
 
         for(Player p : game.getPlayers()){
             int numHunters = p.getTribe().getCharactersTypeCount(CharacterType.HUNTER);
