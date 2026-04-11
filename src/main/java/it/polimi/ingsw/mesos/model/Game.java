@@ -63,7 +63,6 @@ public class Game {
         int numPlayers = this.players.size();
 
 
-
         // 1. INIZIALIZZAZIONE COMPONENTI
         CreateOfferTile tileCreator = new CreateOfferTile();
         CreateTurnOrderTrack trackCreator = new CreateTurnOrderTrack();
@@ -82,12 +81,12 @@ public class Game {
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
 
 
-        this.board.getTurnOrderTrack().updateOrder(this.players);
-
 
         // 2. INIZIALIZZAZIONE DEI GIOCATORI
         for (int i = 0; i < numPlayers; i++) {
             Player p = this.players.get(i);
+            this.board.getTurnOrderTrack().setPlayerAt(i,p);
+
             // Distribuzione del cibo in base alla posizione
             if (i == 0) {
                 p.addFood(2); // 1° giocatore
