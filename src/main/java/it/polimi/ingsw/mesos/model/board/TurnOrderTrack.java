@@ -20,6 +20,8 @@ public class TurnOrderTrack {
 
     private final List<Player> positions;
     private final int[] slots;
+
+
     /**
      * Constructs a TurnOrderTrack with the given slots.
      *
@@ -87,18 +89,15 @@ public class TurnOrderTrack {
         throw new IllegalStateException("No free slots available"); // no free slots available
     }
     /**
-     * Replaces the current player order with a new order.
-     * Typically called at the end of a round to update the turn order.
-     *
-     * @param newOrder a list of players representing the new turn order
-     * @throws IllegalArgumentException if newOrder size does not match the number of slots
+     * Resets the turn order track by clearing all player positions.
+     * <p>
+     * After calling this method, all slots in the track will be set to {@code null},
+     * making them available for a new turn order assignment.
+     * Typically used at the end of a round before assigning players to new positions.
      */
-    public void updateOrder(List<Player> newOrder) {
-        if (newOrder.size() != positions.size()) {
-            throw new IllegalArgumentException("New order size must match number of slots");
-        }
+    public void resetOrder() {
         for (int i = 0; i < positions.size(); i++) {
-            positions.set(i, newOrder.get(i));
+            positions.set(i, null);
         }
     }
 

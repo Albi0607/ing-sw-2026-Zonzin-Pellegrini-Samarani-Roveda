@@ -35,42 +35,6 @@ public class OfferTile {
         this.minPlayers = minPlayers;
     }
 
-    /**
-     * Executes the effect of this tile for the given player in the context of the game.
-     *
-     * @param player player occupying the tile
-     * @param game the game instance
-     */
-
-    // attualmente prende la prima carta perchè va implementato
-    // il metodo di acquisizione del dato da parte del controller
-    /*
-    public void execute(Player player, Game game) {
-        Board board = game.getBoard();
-
-        // 1. Take cards from the upper row
-        for (int i = 0; i < upperCount; i++) {
-            if (!board.getUpperRow().isEmpty()) {
-                // take card del controller dovrà passare un indice
-                // int i = PlayerController.takeCard()
-                // al metodo successivo passo i
-                Card card = board.takeCardFromUpper(0);
-
-            }
-        }
-
-        // 2. Take cards from the lower row
-        for (int i = 0; i < lowerCount; i++) {
-            if (!board.getLowerRow().isEmpty()) {
-                Card card = board.takeCardFromLower(0);
-
-            }
-        }
-
-        // 3. Add food bonus
-        player.addFood(foodBonus);
-    }
-    */
 
     // 1. Azione automatica (Cibo)
     public void giveFoodBonus(Player p) {
@@ -89,11 +53,9 @@ public class OfferTile {
         host = player;
     }
 
-
     public void reset() {
         host = null;
     }
-
 
     // --- Setters ---
     public void setUpperCount(int upperCount) {
