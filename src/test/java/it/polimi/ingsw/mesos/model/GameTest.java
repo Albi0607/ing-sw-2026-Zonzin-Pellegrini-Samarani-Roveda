@@ -95,7 +95,7 @@ class GameTest {
         game.startGame();
 
         for (int i = 0; i < players.size(); i++) {
-            assertNotNull(game.getBoard().getTurnOrderTrack().getPlayerAt(i));
+            assertNotNull(game.getBoard().getTurnOrderTrack().getPositions().get(i));
         }
 
         // 2. Verifica distribuzione cibo (1° player=2, 2°=3, 3°=3 4°=4)

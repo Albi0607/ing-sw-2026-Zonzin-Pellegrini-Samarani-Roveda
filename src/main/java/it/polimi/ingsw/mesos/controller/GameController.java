@@ -9,9 +9,12 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.Hunter;
 import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.EventState;
+import it.polimi.ingsw.mesos.model.state.GameStateLogic;
+import it.polimi.ingsw.mesos.model.state.ResolvingState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +98,7 @@ public class GameController {
 
         for (int i = 0; i < pendingNicknames.size(); i++) {
             Color color = availableColors[i];
-            players.add(new Player(pendingNicknames.getFirst(), color));
+            players.add(new Player(pendingNicknames.get(i), color));
         }
 
         this.game = new Game(players);
@@ -233,14 +236,14 @@ public class GameController {
                 );
             }
             player.getTribe().addBuilding(building);
-            game.notifyBuildingEffects(TriggerType.ON_PURCHASE, player);
+            game.notifyBuildingEffects(TriggerType.ON_PURCHASE);
 
         } else if (card instanceof CharacterCard character) {
             player.getTribe().addCharacter(character);
             if (character instanceof Hunter hunter) { // gestire il bonus di cibo
-                hunter.onAddedToTribe(player.getTribe(), player);
+                hunter.onAddedToTribe(player);
             }
-            game.notifyBuildingEffects(TriggerType.ON_CHARACTER_ADDED, player);
+            game.notifyBuildingEffects(TriggerType.ON_CHARACTER_ADDED);
         }
     }
 
@@ -353,6 +356,18 @@ public class GameController {
         return tile;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
+    public int getExpectedNumPlayers() {
+        return expectedNumPlayers;
+    }
+
+    public int getPendingPicks() {
+        return pendingPicks;
+    }
 }
+
 
 
