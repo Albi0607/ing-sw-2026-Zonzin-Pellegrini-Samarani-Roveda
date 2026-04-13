@@ -30,6 +30,10 @@ public class ResolvingState implements GameStateLogic {
     private int currentTileIndex = 0;
     private int remainingUpper = 0;
     private int remainingLower = 0;
+
+    private boolean isExtraDrawPhase = false;
+    private int extraQueueIndex = 0;
+    private List<Player> extraDrawQueue;
     /**
      * Determines resolution order (left to right on OfferTrack) and
      * waits for each player to complete their picks.
@@ -47,10 +51,36 @@ public class ResolvingState implements GameStateLogic {
     public void execute(Game g) {
         System.out.println("\n--- [RESOLVING PHASE] Risoluzione delle tessere ---");
         currentTileIndex = 0;
+        isExtraDrawPhase = false;
         moveToNextOccupiedTile(g);
     }
 
+    /**
+     * Advances the resolution flow to the next available action.
+     * <p>
+     * It first checks standard Offer Tiles. If all tiles are processed, it populates
+     * the extra draw queue and switches to the extra draw phase if eligible players
+     * and valid cards are present. Otherwise, it transitions to the {@code EventState}.
+     * </p>
+     *
+     * @param g The main game context.
+     */
+
     private void moveToNextOccupiedTile(Game g) {
+        // 1. GESTIONE FASE EXTRA
+        if (isExtraDrawPhase) {
+            if (extraQueueIndex < extraDrawQueue.size()) {
+                Player p = extraDrawQueue.get(extraQueueIndex);
+                System.out.println("[EXTRA] Tocca a " + p.getNickname() + ". Puoi prendere 1 carta sopra o passare.");
+                return;
+            } else {
+                System.out.println("Fase Extra terminata. Passaggio agli eventi.");
+                g.changeState(new EventState());
+                return;
+            }
+        }
+
+        // 2. GESTIONE TESSERE OFFERTA (Ciclo Standard)
         Board board = g.getBoard();
         List<OfferTile> tiles = board.getTiles();
 
@@ -59,15 +89,11 @@ public class ResolvingState implements GameStateLogic {
             Player p = tile.getHost();
 
             if (p != null) {
-                // 1. Bonus Cibo immediato
                 tile.giveFoodBonus(p);
-
-                // 2. Carichiamo i contatori per le carte
                 this.remainingUpper = tile.getUpperCount();
                 this.remainingLower = tile.getLowerCount();
 
                 System.out.println("Tocca a " + p.getNickname() + " sulla tessera " + tile.getId());
-
 
                 if (remainingUpper == 0 && remainingLower == 0) {
                     currentTileIndex++;
@@ -78,57 +104,85 @@ public class ResolvingState implements GameStateLogic {
             currentTileIndex++;
         }
 
-        // Se arriviamo qui, tutte le tessere sono state analizzate
-        System.out.println("Tutte le tessere risolte. Il round sta per finire.");
-        g.changeState(new EventState());
+        // 3. ATTIVAZIONE FASE EXTRA
+        System.out.println("Tutte le tessere risolte. Controllo poteri extra...");
+
+        boolean cardsAvailable = g.getBoard().getUpperRow().stream()
+                .anyMatch(card -> card.getAsEventCard() == null);
+
+        this.extraDrawQueue = g.getPlayers().stream()
+                .filter(Player::getExtraDraw)
+                .toList();
+
+        if (!extraDrawQueue.isEmpty() && cardsAvailable) {
+            this.isExtraDrawPhase = true;
+            this.extraQueueIndex = 0;
+            moveToNextOccupiedTile(g); // Ricorsione per iniziare il giro extra
+        } else {
+            System.out.println("Nessuna azione extra possibile. Fine round.");
+            g.changeState(new EventState());
+        }
     }
 
-
+    /**
+     * Handles the logic for a player taking a card from the board.
+     * <p>
+     * Validates if the action is allowed (e.g., extra draw restricted to upper row),
+     * calculates building discounts, deducts food cost, and triggers relevant
+     * building or character effects.
+     * </p>
+     *
+     * @param g         The main game context.
+     * @param cardIndex The index of the card within the chosen row.
+     * @param isUpper   True if picking from the upper row, false for the lower row.
+     * @throws IllegalArgumentException if the action violates game rules (e.g., picking an event).
+     */
     public void takeCard(Game g, int cardIndex, boolean isUpper) {
+        if (isExtraDrawPhase && !isUpper) {
+            throw new IllegalArgumentException("Il potere extra permette di pescare solo dalla fila superiore!");
+        }
+
         Board board = g.getBoard();
-        OfferTile tile = board.getTiles().get(currentTileIndex);
-        Player p = tile.getHost();
+        // IMPORTANTE: Se siamo in fase extra, il player non è sulla tessera!
+        Player p = getActivePlayer(g);
+
+        if (p == null) return;
 
         Card card = isUpper ? board.getUpperRow().get(cardIndex) : board.getLowerRow().get(cardIndex);
 
-        // 2. CONTROLLO DEL COSTO
-        int cost = card.getCost();
-        int discount = p.getTribe().getBuildingDiscount();
-
-        // Il costo finale è il costo base meno lo sconto (minimo 0)
-        int finalCost = Math.max(0, cost - discount);
-
-        if (card.getAsEventCard()!=null) {
-            throw new IllegalArgumentException(p.getNickname() + " non puoi prendere una carta EVENTO!");
+        // Controllo Evento
+        if (card.getAsEventCard() != null) {
+            throw new IllegalArgumentException("Non puoi prendere una carta EVENTO!");
         }
 
+        // Controllo Costo
+        int finalCost = Math.max(0, card.getCost() - p.getTribe().getBuildingDiscount());
         if (p.getFood() < finalCost) {
-            // Il giocatore non ha abbastanza cibo: l'azione è VIETATA
-            System.out.println("Azione non permessa! " + p.getNickname() +
-                    " ha solo " + p.getFood() + " cibo, ma la carta costa " + cost);
+            System.out.println("Cibo insufficient e!");
             return;
         }
 
+        // Esecuzione
         if (isUpper) {
             board.takeCardFromUpper(cardIndex);
-            remainingUpper--;
+            if (!isExtraDrawPhase && remainingUpper > 0) remainingUpper--;
         } else {
             board.takeCardFromLower(cardIndex);
-            remainingLower--;
+            if (!isExtraDrawPhase && remainingLower > 0)remainingLower--;
         }
 
-        // 4. Pagamento e aggiunta alla tribù
         p.payFood(finalCost);
         card.addTo(p);
-        if (card instanceof BuildingCard) {
-            g.notifyBuildingEffects(TriggerType.ON_PURCHASE);
-        }else if (card instanceof CharacterCard){
-            g.notifyBuildingEffects(TriggerType.ON_CHARACTER_ADDED);
-        }
-        System.out.println(p.getNickname() + " ha pagato " + finalCost + " cibo e preso la carta.");
 
-        // 5. Se il giocatore ha finito tutte le sue pescate sulla tessera
-        if (remainingUpper == 0 && remainingLower == 0) {
+        // Trigger
+        TriggerType trigger = (card instanceof BuildingCard) ? TriggerType.ON_PURCHASE : TriggerType.ON_CHARACTER_ADDED;
+        g.notifyPlayersBuildingEffects(trigger, p);
+
+        // Avanzamento
+        if (isExtraDrawPhase) {
+            extraQueueIndex++;
+            moveToNextOccupiedTile(g);
+        } else if (remainingUpper == 0 && remainingLower == 0) {
             currentTileIndex++;
             moveToNextOccupiedTile(g);
         }
@@ -140,39 +194,47 @@ public class ResolvingState implements GameStateLogic {
         throw new IllegalStateException("Errore: Non puoi piazzare totem durante la Fase di risoluzione!!!");
     }
 
-
     @Override
     public GameState getStateId() { return GameState.RESOLVING_ACTIONS; }
 
-
-    /**
-     * Restituisce il numero di carte che il giocatore deve ancora
-     * prendere dalla fila superiore per la tessera attuale.
-     */
     public int getRemainingUpper() {
         return remainingUpper;
     }
 
-    /**
-     * Restituisce il numero di carte che il giocatore deve ancora
-     * prendere dalla fila inferiore per la tessera attuale.
-     */
     public int getRemainingLower() {
         return remainingLower;
     }
 
-
     /**
-     * Restituisce il giocatore che "possiede" la tessera attualmente in risoluzione.
-     * Fondamentale per il Main e per il Controller per sapere a chi mostrare i tasti.
-     * * @param g Il contesto del gioco necessario per accedere alla Board.
-     * @return Il Player attivo, o null se tutte le tessere sono state risolte.
+     * Identifies the player currently allowed to perform an action.
+     * * @param g The main game context.
+     * @return The active {@link Player}, or null if the phase is complete.
      */
     public Player getActivePlayer(Game g) {
+        if (isExtraDrawPhase) {
+            if (extraQueueIndex < extraDrawQueue.size()) {
+                return extraDrawQueue.get(extraQueueIndex);
+            }
+            return null;
+        }
+
         List<OfferTile> tiles = g.getBoard().getTiles();
         if (currentTileIndex >= 0 && currentTileIndex < tiles.size()) {
             return tiles.get(currentTileIndex).getHost();
         }
         return null;
+    }
+
+    /**
+     * Allows a player to skip their optional extra draw action.
+     *
+     * @param g The main game context.
+     */
+    public void skipExtraDraw(Game g) {
+        if (isExtraDrawPhase) {
+            System.out.println(extraDrawQueue.get(extraQueueIndex).getNickname() + " ha saltato la pescata extra.");
+            extraQueueIndex++;
+            moveToNextOccupiedTile(g);
+        }
     }
 }

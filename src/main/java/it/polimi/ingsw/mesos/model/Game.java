@@ -63,6 +63,7 @@ public class Game {
         int numPlayers = this.players.size();
 
 
+
         // 1. INIZIALIZZAZIONE COMPONENTI
         CreateOfferTile tileCreator = new CreateOfferTile();
         CreateTurnOrderTrack trackCreator = new CreateTurnOrderTrack();
@@ -81,12 +82,10 @@ public class Game {
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
 
 
-
         // 2. INIZIALIZZAZIONE DEI GIOCATORI
         for (int i = 0; i < numPlayers; i++) {
             Player p = this.players.get(i);
-            this.board.getTurnOrderTrack().setPlayerAt(i,p);
-
+            this.board.getTurnOrderTrack().setPlayerAt(i, p);
             // Distribuzione del cibo in base alla posizione
             if (i == 0) {
                 p.addFood(2); // 1° giocatore
@@ -97,6 +96,8 @@ public class Game {
             }
             System.out.println("Preparato giocatore " + (i+1) + ": " + p.getNickname());
         }
+
+        this.board.getTurnOrderTrack().setEffectsActive(true);//effetti di setPlayerAt attivi da ora in poi
 
         // Fila Inferiore (N+1 carte, gli Eventi saltano sopra)
         int lowerTarget = numPlayers + 1;
@@ -224,15 +225,15 @@ public class Game {
     public void handleEraTransition(Era nextEra) {
         System.out.println("\n--- Transizione all'Era " + nextEra + " ---");
 
-        // 1. Gli edifici dell'era precedente "scendono" accanto alla fila inferiore
-        this.board.shiftBuildingsToLower();
-        System.out.println("- Edifici correnti spostati nella fila inferiore.");
-
         // 2. Se passiamo all'Era III, gli edifici dell'Era I (che erano già sotto) spariscono
         if (nextEra == Era.ERA_III) {
             this.board.clearBuildingsFromLower();
             System.out.println("- Edifici rimossi definitivamente.");
         }
+
+        // 1. Gli edifici dell'era precedente "scendono" accanto alla fila inferiore
+        this.board.shiftBuildingsToLower();
+        System.out.println("- Edifici correnti spostati nella fila inferiore.");
 
         // 3. Aggiorniamo l'era del gioco
         this.currentEra = nextEra;
@@ -287,6 +288,34 @@ public class Game {
         }
     }
 
+
+    /**
+     * Notifies all player's building effects in the game that a specific trigger has occurred.
+     *
+     * This method iterates over every building owned in their tribe.
+     * For each building that has an associated {@link BuildingEffect}, the effect is
+     * executed through the Strategy Pattern by invoking
+     * {@code applyEffect(Player, Game, TriggerType)}.
+     *
+     */
+    public void notifyPlayersBuildingEffects(TriggerType trigger, Player player) {
+
+        if (player == null || trigger == null) {
+            throw new IllegalArgumentException("Player and Trigger type cannot be null");
+        }
+
+
+        Tribe tribe = player.getTribe();
+
+        for (BuildingCard building : tribe.getBuildings()) {
+            BuildingEffect effect = building.getEffect();
+
+            if (effect != null) {
+                effect.applyEffect(player, this, trigger);
+            }
+        }
+    }
+
     /**
      * Determines the winner of the game based on prestige points.
      *
@@ -326,7 +355,13 @@ public class Game {
         return currentState;
     }
 
+    public EventType getCurrentEventType(){return null;}
+
     public void setCurrentRound(int round) {
         this.currentRound = round;
+    }
+
+    public void setCurrentEra(Era era){
+        this.currentEra = era;
     }
 }
