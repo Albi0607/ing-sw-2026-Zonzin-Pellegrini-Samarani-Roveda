@@ -5,11 +5,14 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
+import it.polimi.ingsw.mesos.model.card.Card;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,9 +46,18 @@ public class SetupState implements GameStateLogic {
         int n = g.getPlayers().size();
         int targetSize = n + 4;
 
+        List<Card> lowerBuildings = new ArrayList<>();
+        for (Card c : board.getLowerRow()) {
+            if (c instanceof BuildingCard) {
+                lowerBuildings.add(c);
+            }
+        }
+
         board.clearLowerRow();
 
         board.shiftUpperToLower();
+
+        board.getLowerRow().addAll(lowerBuildings);
 
         board.refillRows(targetSize, g);
         g.setCurrentRound(g.getCurrentRound()+1);
