@@ -21,6 +21,8 @@ public class TurnOrderTrack {
     private final List<Player> positions;
     private final int[] slots;
 
+    private boolean effectsActive = false;
+
 
     /**
      * Constructs a TurnOrderTrack with the given slots.
@@ -61,15 +63,19 @@ public class TurnOrderTrack {
             throw new IllegalStateException("Index not free: " + index);
         }
 
-        int effect = slots[index];
-        if (effect >= 0) {
-            p.addFood(effect);    // add food
-        } else {
-            boolean paid = p.payFood(-effect);
+        if(effectsActive){
+            int effect = slots[index];
+            if (effect >= 0 && p.getFoodOnTotemSlot() == false) {
+                p.addFood(effect);    // add food
+            } else if (effect >= 0 && p.getFoodOnTotemSlot() == true) {
+                p.addFood(effect + 1);
+            } else {
+                boolean paid = p.payFood(-effect);
 
-            if (!paid) {
-                p.updatePrestige(-2);
-                // if the payer do not have enough food have to pay in prestige points
+                if (!paid) {
+                    p.updatePrestige(-2);
+                    // if the payer do not have enough food have to pay in prestige points
+                }
             }
         }
         // update the player's position in the track
@@ -124,5 +130,10 @@ public class TurnOrderTrack {
         throw new IndexOutOfBoundsException("Invalid slot index");
      }
     slots[index] = value;
-}
+    }
+
+    //flag che si attiva dopo lo startGame() per attivare gli effetti della track dopo l'inizio del gioco
+    public void setEffectsActive(boolean active) {
+        this.effectsActive = active;
+    }
 }

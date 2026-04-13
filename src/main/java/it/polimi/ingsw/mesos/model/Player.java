@@ -134,4 +134,12 @@ public class Player {
         return extraDraw;
     }
 
+
+    public void setFood(int food){// da togliere solo per test
+        this.food = food;
+    }
+
+    public void setPrestigePoints(int prestigePoints){// da togliere solo per test
+        this.prestigePoints = prestigePoints;
+    }
 }
