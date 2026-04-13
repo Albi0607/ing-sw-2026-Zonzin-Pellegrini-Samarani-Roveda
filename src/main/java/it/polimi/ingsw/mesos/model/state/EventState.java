@@ -81,7 +81,6 @@ public class EventState implements GameStateLogic {
         for (EventCard e : allEvents) {
             System.out.println("Risoluzione Finale: " + e.getType());
             e.resolve(g);
-            g.notifyBuildingEffects(TriggerType.ON_EVENT);
         }
     }
 
@@ -117,7 +116,6 @@ public class EventState implements GameStateLogic {
             System.out.println("Attivazione Evento: " + event.getType() + " [Era " + event.getEra() + "]");
 
             event.resolve(g);
-            g.notifyBuildingEffects(TriggerType.ON_EVENT);
         }
     }
 

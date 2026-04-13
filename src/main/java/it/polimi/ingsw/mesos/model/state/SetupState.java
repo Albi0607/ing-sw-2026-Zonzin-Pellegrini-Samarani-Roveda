@@ -58,8 +58,6 @@ public class SetupState implements GameStateLogic {
 
             if (playerOnTile != null) {
                 turnOrderTrack.setPlayerAt(nextTrackIndex, playerOnTile);
-                g.notifyBuildingEffects(TriggerType.ON_TURN_ORDER_PLACEMENT);
-
                 nextTrackIndex++;
 
                 tile.reset();
