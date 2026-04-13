@@ -36,11 +36,8 @@ public class PlacingState implements GameStateLogic {
         this.actingOrder = track.getPositions();
 
         // Creiamo una lista di null per svuotare le posizioni fisiche.
-        List<Player> emptyOrder = new java.util.ArrayList<>();
-        for (int i = 0; i < actingOrder.size(); i++) {
-            emptyOrder.add(null);
-        }
-        track.updateOrder(emptyOrder);
+
+        track.resetOrder();
 
         this.activePlayerIndex = 0;
         System.out.println("Tocca a: " + actingOrder.get(0).getNickname());
