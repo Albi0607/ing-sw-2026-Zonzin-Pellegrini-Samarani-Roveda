@@ -47,34 +47,53 @@ public class Board {
     }
 
     /**
-     * Fills the upper row with cards drawn from the provided deck.
-     * The number of cards added is determined by the target size.
+     * Refills the upper row with cards from the tribe deck and manages era transitions.
+     * <p>
+     * This method draws cards from the tribe deck until the upper row reaches the {@code targetSize}
+     * or the deck is empty.
+     * </p>
+     * <p>
+     * Era transitions are detected and triggered in two scenarios:
+     * <ul>
+     * <li><b>During refill:</b> If a drawn card belongs to an era later than the current game era.</li>
+     * <li><b>After refill:</b> If the card remaining on top of the deck belongs to a later era,
+     * simulating the visibility of the next era on the deck's back.</li>
+     * </ul>
+     * </p>
      *
-     * @param targetSize the desired number of cards in the upper row
+     * @param targetSize The total number of tribe cards required in the upper row.
+     * @param g          The current {@link Game} instance used to handle era transitions and state.
      */
     public void refillRows(int targetSize, Game g) {
         if (this.tribeDeck.isEmpty()) return;
 
-
         int tribeCardsDrawn = 0;
-        boolean eraChanged = false;
-        Era newEraDetected = g.getCurrentEra();
 
+        // --- Durante il riempimento ---
         while (tribeCardsDrawn < targetSize && !this.tribeDeck.isEmpty()) {
             TribeCard card = this.tribeDeck.draw();
 
             if (card.getEra().ordinal() > g.getCurrentEra().ordinal()) {
-                eraChanged = true;
-                newEraDetected = card.getEra();
+                System.out.println("Cambio Era rilevato sulla carta appena pescata!");
+                g.handleEraTransition(card.getEra());
             }
 
-            upperRow.add(card);
+
+            upperRow.add(0, card);
             tribeCardsDrawn++;
         }
 
-        // SOLO ORA, se è stato rilevato un cambio, scatta la transizione degli edifici
-        if (eraChanged) {
-            g.handleEraTransition(newEraDetected);
+        //  --- Dopo il riempimento verifichiamo l'era della carta in cima al mazzo ---
+        if (!this.tribeDeck.isEmpty()) {
+            TribeCard nextOnDeck = this.tribeDeck.draw(); // verifichiamo l'era della carta in cima al mazzo
+
+            if (nextOnDeck.getEra().ordinal() > g.getCurrentEra().ordinal()) {
+                System.out.println("Era successiva visibile sul dorso del mazzo (Modo 1)!");
+                g.handleEraTransition(nextOnDeck.getEra());
+            }
+
+            // La rimettiamo a posto in cima al mazzo
+            this.tribeDeck.put(nextOnDeck);
         }
     }
 
@@ -91,7 +110,8 @@ public class Board {
 
     /** Remove all Character and Event cards from lowerRow. */
     public void clearLowerRow() {
-        lowerRow.removeIf(card -> !(card instanceof BuildingCard));
+
+        this.lowerRow.clear();
     }
 
     /** Remove all Building cards from lowerRow (used at Era III start). */
