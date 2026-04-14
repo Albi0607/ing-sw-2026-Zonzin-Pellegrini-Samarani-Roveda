@@ -2,10 +2,11 @@ package it.polimi.ingsw.mesos.model.card.event;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
+import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
 import it.polimi.ingsw.mesos.model.card.character.Artist;
 import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -82,5 +83,55 @@ class CavePaintingEventTest {
         assertEquals(-2,p3.getPrestigePoints());
 
         assertEquals(-2,p4.getPrestigePoints());
+    }
+
+    @Test
+    void testResolveWithBuilding(){
+        Player p1 = new Player("Alberto", Color.BLUE);
+        Player p2 = new Player("Anna", Color.PURPLE);
+        Player p3 = new Player("Luca", Color.WHITE);
+        Player p4 = new Player("Mattia", Color.RED);
+        List<Player> list = new ArrayList<>();
+        list.add(p1);
+        list.add(p2);
+        list.add(p3);
+        list.add(p4);
+
+        Game game = new Game(list);
+
+        Artist artist = new Artist(Era.ERA_III,4);
+
+        CavePaintingEvent cavePaintingEvent = new CavePaintingEvent(Era.ERA_II,2,false,2,3,2,3);
+
+        p1.getTribe().addCharacter(artist);
+        p1.getTribe().addCharacter(artist);
+        p1.getTribe().addCharacter(artist);
+        p1.getTribe().addCharacter(artist);
+
+        p2.getTribe().addCharacter(artist);
+        p2.getTribe().addCharacter(artist);
+        p2.getTribe().addCharacter(artist);
+
+        p3.getTribe().addCharacter(artist);
+        p3.getTribe().addCharacter(artist);
+
+        BuildingCard building = new BuildingCard(Era.ERA_II,5,6,new ResourceBonusEffect(EventType.PAINTING, CharacterType.ARTIST, ResourceType.FOOD,1));
+
+        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
+
+        cavePaintingEvent.resolve(game);
+
+        assertEquals(12,p1.getPrestigePoints());
+        assertEquals(4,p1.getFood());
+
+        assertEquals(9,p2.getPrestigePoints());
+        assertEquals(3,p2.getFood());
+
+        assertEquals(-2,p3.getPrestigePoints());
+        assertEquals(0,p3.getFood());
+
+        assertEquals(-2,p4.getPrestigePoints());
+        assertEquals(0,p4.getFood());
     }
 }

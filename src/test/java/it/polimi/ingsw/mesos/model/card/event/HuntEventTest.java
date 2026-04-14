@@ -2,10 +2,11 @@ package it.polimi.ingsw.mesos.model.card.event;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
+import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
 import it.polimi.ingsw.mesos.model.card.character.Hunter;
 import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -88,4 +89,58 @@ class HuntEventTest {
         assertEquals(0,p4.getFood());
         assertEquals(0,p4.getPrestigePoints());
     }
+
+    @Test
+    void testResolveWithBuilding(){
+        Player p1 = new Player("Alberto", Color.BLUE);
+        Player p2 = new Player("Anna", Color.PURPLE);
+        Player p3 = new Player("Luca", Color.WHITE);
+        Player p4 = new Player("Mattia", Color.RED);
+        List<Player> list = new ArrayList<>();
+        list.add(p1);
+        list.add(p2);
+        list.add(p3);
+        list.add(p4);
+
+        Game game = new Game(list);
+
+        Hunter hunter1 = new Hunter(Era.ERA_I,2,true);
+        Hunter hunter2 = new Hunter(Era.ERA_I,2,false);
+        Hunter hunter3 = new Hunter(Era.ERA_II,3,true);
+        Hunter hunter4 = new Hunter(Era.ERA_II,2,false);
+        Hunter hunter5 = new Hunter(Era.ERA_III,4,true);
+        Hunter hunter6 = new Hunter(Era.ERA_III,3,false);
+        HuntEvent huntEvent = new HuntEvent(Era.ERA_II,2,true,3);
+
+        p1.getTribe().addCharacter(hunter1);
+        p1.getTribe().addCharacter(hunter4);
+        p1.getTribe().addCharacter(hunter6);
+        p1.getTribe().addCharacter(hunter5);
+
+        p2.getTribe().addCharacter(hunter2);
+        p2.getTribe().addCharacter(hunter3);
+
+        p3.getTribe().addCharacter(hunter1);
+
+        BuildingCard building = new BuildingCard(Era.ERA_II,7,2,new ResourceBonusEffect(EventType.HUNT, CharacterType.HUNTER, null,1));
+
+        building.getEffect().applyEffect(p1,game, TriggerType.ON_HUNT_EVENT);
+        building.getEffect().applyEffect(p2,game,TriggerType.ON_HUNT_EVENT);
+
+        huntEvent.resolve(game);
+
+        assertEquals(8,p1.getFood());
+        assertEquals(16,p1.getPrestigePoints());
+
+        assertEquals(4,p2.getFood());
+        assertEquals(8,p2.getPrestigePoints());
+
+        assertEquals(1,p3.getFood());
+        assertEquals(3,p3.getPrestigePoints());
+
+        assertEquals(0,p4.getFood());
+        assertEquals(0,p4.getPrestigePoints());
+
+    }
+
 }
