@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OfferTileTest {
     @Test
@@ -25,5 +23,21 @@ public class OfferTileTest {
         assertFalse(tile.isAvailable());
     }
 
-    //execute
+    @Test
+    void testPlaceTotemInvalidInput() {
+        OfferTile tile = new OfferTile('B', 2);
+        assertThrows(IllegalArgumentException.class, () -> {
+           tile.placeTotem(null);
+        });
+    }
+
+    @Test
+    void testPlaceTotemIllegalState() {
+        OfferTile tile = new OfferTile('B', 2);
+        Player p = new Player("Bob", Color.BLUE);
+        tile.setHost(p); // not available
+        assertThrows(IllegalStateException.class, () -> {
+            tile.placeTotem(p);
+        });
+    }
 }

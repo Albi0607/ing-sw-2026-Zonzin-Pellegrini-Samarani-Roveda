@@ -110,7 +110,6 @@ public class Board {
 
     /** Remove all Character and Event cards from lowerRow. */
     public void clearLowerRow() {
-
         this.lowerRow.clear();
     }
 
