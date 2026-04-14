@@ -64,6 +64,7 @@ public class TurnOrderTrackTest {
         TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
 
         board.setTurnOrderTrack(track); // slots = {1, -1}
+        track.setEffectsActive(true);
 
         Player p = new Player("Anna", Color.BLUE);
 
@@ -79,6 +80,7 @@ public class TurnOrderTrackTest {
         TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
 
         board.setTurnOrderTrack(track); // {1, -1}
+        track.setEffectsActive(true);
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(2);
@@ -96,6 +98,7 @@ public class TurnOrderTrackTest {
         TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
 
         board.setTurnOrderTrack(track); // {1, -1}
+        track.setEffectsActive(true);
 
         Player p = new Player("Anna", Color.BLUE);
         p.addFood(0);
@@ -105,6 +108,24 @@ public class TurnOrderTrackTest {
 
         assertEquals(0, p.getFood()); // the player can't pay --> food remains the same
         assertEquals(3, p.getPrestigePoints()); // the player pay in prestife points
+    }
+
+    @Test
+    void testSetPlayerAtWithFoodOnTotemSlotTrue() {
+        Board board = new Board(2);
+        CreateTurnOrderTrack factory = new CreateTurnOrderTrack();
+        TurnOrderTrack track = factory.initializeTurnOrderTrack(2);
+
+        board.setTurnOrderTrack(track); // {1, -1}
+        track.setEffectsActive(true);
+
+        Player p = new Player("Anna", Color.BLUE);
+        p.addFood(3);
+        p.setFoodOnTotemSlot();
+
+        board.getTurnOrderTrack().setPlayerAt(0, p);
+
+        assertEquals(5, p.getFood());
     }
 
     @Test

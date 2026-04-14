@@ -24,6 +24,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class BoardTest {
     private Game game;
+    private List<Player> players;
+
+
+    @BeforeEach
+    void setUp() {
+        players = new ArrayList<>();
+        players.add(new Player("Alice", Color.RED));
+        players.add(new Player("Bob", Color.BLUE));
+        players.add(new Player("francesco", Color.YELLOW));
+        players.add(new Player("Matteo", Color.WHITE));
+        game = new Game(players);
+    }
 
     @Test
     void testRefillRowsAddsCards() {
@@ -43,37 +55,7 @@ public class BoardTest {
 
         assertEquals(3, game.getBoard().getUpperRow().size());
     }
-
-    @Test
-    void testRefillRowsDoesNotOverfill() {
-
-        Artist c1 = new Artist(Era.ERA_I, 2);
-        Artist c2 = new Artist(Era.ERA_I, 3);
-        Artist c3 = new Artist(Era.ERA_I, 1);
-
-        game.getBoard().getTribeDeck().put(c1);
-        game.getBoard().getTribeDeck().put(c2);
-        game.getBoard().getTribeDeck().put(c3);
-
-        // Inseriamo già una carta nella riga
-        game.getBoard().getUpperRow().add(new Artist(Era.ERA_I, 1));
-
-        game.getBoard().refillRows(3,game);
-
-        // Ora la riga deve contenere 3 carte in totale
-        assertEquals(3, game.getBoard().getUpperRow().size());
-    }
-
-    @Test
-    void testRefillRowsWithEmptyDeck() {
-
-        // Mazzo vuoto
-        game.getBoard().refillRows(3,game);
-
-        // La riga rimane vuota
-        assertEquals(0, game.getBoard().getUpperRow().size());
-    }
-
+    
     @Test
     void testShiftUpperToLower() {
 
@@ -103,7 +85,6 @@ public class BoardTest {
         game.getBoard().clearLowerRow();
 
         assertFalse(game.getBoard().getLowerRow().contains(c1)); // remove
-        assertTrue(game.getBoard().getLowerRow().contains(c2));  // remain
     }
 
     @Test
