@@ -49,7 +49,6 @@ public class EventState implements GameStateLogic {
 
     }
 
-
     public void resolveAllVisibleEvents(Game g){
         Board board = g.getBoard();
         List<EventCard> allEvents = new ArrayList<>();
@@ -63,8 +62,6 @@ public class EventState implements GameStateLogic {
                 .filter(card -> card.getAsEventCard() != null)
                 .map(card -> (EventCard) card)
                 .collect(java.util.stream.Collectors.toList());
-
-
 
         // 1. Prendiamo gli eventi da ENTRAMBE le file
         allEvents.addAll(lr_events);
@@ -114,7 +111,6 @@ public class EventState implements GameStateLogic {
 
         for (EventCard event : eventsToResolve) {
             System.out.println("Attivazione Evento: " + event.getType() + " [Era " + event.getEra() + "]");
-
             event.resolve(g);
         }
     }
