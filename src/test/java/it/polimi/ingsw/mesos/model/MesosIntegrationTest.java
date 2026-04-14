@@ -621,4 +621,42 @@ class MesosIntegrationTest {
         assertEquals(ciboIniziale + 5, sofia.getFood(), "Deve dare 5 cibo per il nuovo set completato");
     }
 
+
+    @Test
+    void skipWhenNotCardsAffordable() {
+        Board board = game.getBoard();
+        board.getLowerRow().clear();
+        board.getUpperRow().clear();
+
+        // 1. SETUP BOARD: Solo una carta costo 5
+        BuildingCard card = new BuildingCard(Era.ERA_I, 5, 0, null);
+        board.getLowerRow().add(card);
+
+        marco.setFood(0);
+
+        // Mettiamo Marco sulla tessera B
+        OfferTile tileB = board.getTile('E');
+        tileB.setHost(marco);
+
+        // 3. SETUP SOFIA: Lei è sulla tessera C
+        OfferTile tileC = board.getTile('F');
+        tileC.setHost(sofia);
+
+        game.changeState(new ResolvingState());
+
+        // --- VERIFICHE ---
+
+        // L'indice della tessera deve essere avanzato oltre la B
+        // Il giocatore attivo ora deve essere SOFIA
+
+        assertTrue(game.getCurrentState() instanceof PlacingState,
+                "Il gioco dovrebbe aver saltato tutto ed essere tornato alla fase di piazzamento del Round 2");
+
+        // Verifichiamo che Marco e Sofia non abbiano effettivamente preso carte
+        assertEquals(0, marco.getTribe().getBuildingsCount() + marco.getTribe().getCharactersCount(),
+                "Marco non dovrebbe aver preso nulla perché è stato saltato");
+        assertEquals(0, sofia.getTribe().getBuildingsCount() + sofia.getTribe().getCharactersCount(),
+                "Sofia non dovrebbe aver preso nulla perché è stata saltata");
+    }
+
 }

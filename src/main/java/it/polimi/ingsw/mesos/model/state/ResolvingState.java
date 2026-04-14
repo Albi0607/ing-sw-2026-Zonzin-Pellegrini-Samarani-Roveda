@@ -89,16 +89,37 @@ public class ResolvingState implements GameStateLogic {
             Player p = tile.getHost();
 
             if (p != null) {
-                tile.giveFoodBonus(p);
-                this.remainingUpper = tile.getUpperCount();
-                this.remainingLower = tile.getLowerCount();
 
-                System.out.println("Tocca a " + p.getNickname() + " sulla tessera " + tile.getId());
+                // Prepariamo i conteggi della tessera
+                int lowerTarget = tile.getLowerCount();
+                int upperTarget = tile.getUpperCount();
 
-                if (remainingUpper == 0 && remainingLower == 0) {
+                int discount = p.getTribe().getBuildingDiscount();
+                int availableFood = p.getFood();
+
+                // Verifichiamo se esiste ALMENO una carta prendibile nelle file richieste
+                boolean canPickLower = (lowerTarget > 0) && board.getLowerRow().stream()
+                        .anyMatch(c -> c.getAsEventCard() == null && Math.max(0, c.getCost() - discount) <= availableFood);
+
+                boolean canPickUpper = (upperTarget > 0) && board.getUpperRow().stream()
+                        .anyMatch(c -> c.getAsEventCard() == null && Math.max(0, c.getCost() - discount) <= availableFood);
+
+                // Se il giocatore ha ancora pescate da fare ma non ci sono carte valide per lui
+                // lo saltiamo e passiamo alla tessera successiva.
+                if ((lowerTarget > 0 && !canPickLower) && (upperTarget > 0 && !canPickUpper) ||
+                        (lowerTarget > 0 && upperTarget == 0 && !canPickLower) ||
+                        (upperTarget > 0 && lowerTarget == 0 && !canPickUpper)) {
+
+                    System.out.println(p.getNickname() + " non ha carte accessibili. Salto alla prossima tessera.");
                     currentTileIndex++;
                     continue;
                 }
+
+                tile.giveFoodBonus(p);
+                this.remainingUpper = upperTarget;
+                this.remainingLower = lowerTarget;
+
+                System.out.println("Tocca a " + p.getNickname() + " sulla tessera " + tile.getId());
                 return;
             }
             currentTileIndex++;
