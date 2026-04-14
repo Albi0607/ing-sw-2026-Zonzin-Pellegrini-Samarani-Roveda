@@ -158,7 +158,7 @@ public class ResolvingState implements GameStateLogic {
         // Controllo Costo
         int finalCost = Math.max(0, card.getCost() - p.getTribe().getBuildingDiscount());
         if (p.getFood() < finalCost) {
-            System.out.println("Cibo insufficient e!");
+            System.out.println("Cibo insufficiente!");
             return;
         }
 

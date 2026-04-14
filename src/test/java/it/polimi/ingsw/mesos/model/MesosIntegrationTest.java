@@ -2,6 +2,7 @@ package it.polimi.ingsw.mesos.model;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
+import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
 import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
@@ -14,6 +15,7 @@ import it.polimi.ingsw.mesos.model.enums.*;
 import it.polimi.ingsw.mesos.model.state.EventState;
 import it.polimi.ingsw.mesos.model.state.PlacingState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
+import it.polimi.ingsw.mesos.model.state.SetupState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,8 +44,6 @@ class MesosIntegrationTest {
         marco = game.getPlayers().get(0);
         sofia = game.getPlayers().get(1);
     }
-
-
 
     @Test
     void testCompletoRoundUno() {
@@ -103,35 +103,76 @@ class MesosIntegrationTest {
             }
         }
 
-        int personaggiInizialiMarco = marco.getTribe().getCharactersCount();
+        int personaggiInizialiActive1 = active1.getTribe().getCharactersCount();
 
-        // Marco deve prendere una carta dalla fila INFERIORE perché è sulla tessera B
-        // Prendiamo la prima carta disponibile (indice 0)
-        rs.takeCard(game, 0, false);
+        // 1. Cerchiamo l'indice della prima carta prendibile nella fila INFERIORE
+        int validIndexLower = -1;
+        for (int i = 0; i < board.getLowerRow().size(); i++) {
+            Card c = board.getLowerRow().get(i);
+
+            if (c.getAsEventCard()==null) {
+                validIndexLower = i;
+                break;
+            }
+        }
+
+        assertTrue(validIndexLower != -1, "Dovrebbe esserci almeno una carta non-evento sotto");
+        int sizePrimaLower = board.getLowerRow().size();
+
+        rs.takeCard(game, validIndexLower, false);
+
+        assertEquals(expectedUpperSize, board.getUpperRow().size(), "La fila superiore non deve cambiare se prendi da sotto");
+        assertEquals(sizePrimaLower - 1, board.getLowerRow().size(), "La carta deve essere rimossa dalla fila dopo la presa");
+
 
         // VERIFICHE:
-        assertEquals(personaggiInizialiMarco + 1, marco.getTribe().getCharactersCount(),
+        assertEquals(personaggiInizialiActive1 + 1, active1.getTribe().getCharactersCount(),
                 "La tribù di Marco dovrebbe essere cresciuta di 1");
 
-        System.out.println("Marco ha preso la carta correttamente. Tribù attuale: " + marco.getTribe().getCharactersCount());
 
         // Ora il turno dovrebbe passare a Sofia (Tessera C)
         Player prossimoGiocatore = rs.getActivePlayer(game);
-        assertEquals(sofia.getNickname(), prossimoGiocatore.getNickname(),
+        assertEquals(active2.getNickname(), prossimoGiocatore.getNickname(),
                 "Dopo Marco, deve toccare a Sofia");
 
+        // 1. Cerchiamo l'indice della prima carta prendibile nella fila SUPERIORE
+        int validIndexUpper = -1;
+        for (int i = 0; i < board.getUpperRow().size(); i++) {
+            Card c = board.getUpperRow().get(i);
 
-        int personaggiInizialiSofia = sofia.getTribe().getCharactersCount();
+            if (c.getAsEventCard()==null) {
+                validIndexUpper = i;
+                break;
+            }
+        }
 
-        // Sofia deve prendere una carta dalla fila superiore perché è sulla tessera C
-        // Prendiamo la prima carta disponibile (indice 0)
-        rs.takeCard(game, 3, true);
+        assertTrue(validIndexUpper != -1, "Dovrebbe esserci almeno una carta non-evento sotto");
 
-        // VERIFICHE:
-        assertEquals(personaggiInizialiSofia + 1, sofia.getTribe().getCharactersCount(),
-                "La tribù di Marco dovrebbe essere cresciuta di 1");
+        Card cardScelta = board.getUpperRow().get(validIndexUpper);
+        int personaggiPrima = active2.getTribe().getCharactersCount();
+        int edificiPrima = active2.getTribe().getBuildingsCount();
 
-        System.out.println("Sofia ha preso la carta correttamente. Tribù attuale: " + sofia.getTribe().getCharactersCount());
+        rs.takeCard(game, validIndexUpper, true);
+
+        if (cardScelta instanceof TribeCard) {
+            assertEquals(personaggiPrima + 1, active2.getTribe().getCharactersCount(), "Personaggio non aggiunto");
+        } else if (cardScelta instanceof BuildingCard) {
+            assertEquals(edificiPrima + 1, active2.getTribe().getBuildingsCount(), "Edificio non aggiunto");
+        }
+
+
+        assertEquals(7, board.getUpperRow().size(), "La board deve essere stata ricaricata per il Round 2");
+
+        assertTrue(game.getCurrentState() instanceof PlacingState, "Il gioco dovrebbe aver cambiato stato dopo l'ultima risoluzione");
+
+        for (OfferTile t : board.getTiles()) {
+            assertTrue(t.isAvailable(), "Tutte le tessere offerta devono essere libere per il round successivo");
+        }
+
+
+        PlacingState nextPlacing = (PlacingState) game.getCurrentState();
+
+        assertEquals(active1, nextPlacing.getActivePlayer());
 
     }
 
@@ -386,9 +427,6 @@ class MesosIntegrationTest {
                 "Il round dovrebbe essere terminato");
     }
 
-
-
-
     @Test
     void notifyBuildingeffect(){
 
@@ -402,7 +440,6 @@ class MesosIntegrationTest {
         ResourceBonusEffect paintingFoodBonus = new ResourceBonusEffect(
                 EventType.PAINTING, CharacterType.ARTIST, ResourceType.FOOD, 1
         );
-
 
         marco.getTribe().addBuilding(new BuildingCard(Era.ERA_I, 0, 0, huntEffect));
         sofia.getTribe().addBuilding(new BuildingCard(Era.ERA_I, 0, 0, paintingFoodBonus));
@@ -421,8 +458,8 @@ class MesosIntegrationTest {
         int puntiPrima = marco.getPrestigePoints();
 
         HuntEvent event = new HuntEvent(Era.ERA_I, 2,false,3);
-        event.resolve(game);
 
+        event.resolve(game);
 
         assertEquals(foodPrima + 4, marco.getFood(), "Marco dovrebbe aver ricevuto 4 Cibo sia per evento che per edificio");
         assertEquals(puntiPrima + 2 + (3*2), marco.getPrestigePoints(), "Marco dovrebbe aver ricevuto 8 Punti Prestigio");
@@ -430,7 +467,6 @@ class MesosIntegrationTest {
         // Sofia parte con 10 Cibo e 10 Punti Prestigio
         sofia.setFood(10);
         sofia.setPrestigePoints(10);
-
 
         CavePaintingEvent cevent = new CavePaintingEvent(Era.ERA_I, 2, false, 1, 2, 3, 2);
         cevent.resolve(game);
@@ -481,6 +517,63 @@ class MesosIntegrationTest {
         game.notifyPlayersBuildingEffects(TriggerType.ON_CHARACTER_ADDED, marco);
 
         assertEquals(foodPrima + 5, marco.getFood(), "Il cibo NON deve aumentare se il set non è di nuovo bilanciato");
+    }
+
+    @Test
+    void EventState() {
+        Board board = game.getBoard();
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        int pp = marco.getPrestigePoints();
+        int food = marco.getFood();
+
+        board.getTurnOrderTrack().setEffectsActive(true);
+
+        board.getTurnOrderTrack().setPlayerAt(0, sofia);
+        board.getTurnOrderTrack().setPlayerAt(1, marco);
+
+        // ---  SETUP MARCO ---
+        ResourceBonusEffect huntEffect = new ResourceBonusEffect(EventType.HUNT, CharacterType.HUNTER, ResourceType.FOOD, 1);
+        marco.getTribe().addBuilding(new BuildingCard(Era.ERA_I, 0, 0, huntEffect));
+
+        marco.getTribe().addCharacter(new Hunter(Era.ERA_I, 2, false));
+        marco.getTribe().addCharacter(new Hunter(Era.ERA_I, 2, false));
+        assertEquals(2, marco.getTribe().getCharacters().size());
+
+        HuntEvent event = new HuntEvent(Era.ERA_I, 2, false, 3);
+        board.getLowerRow().add(event);
+
+        int foodPrima = marco.getFood();
+        int puntiPrima = marco.getPrestigePoints();
+
+
+        // --- SETUP SOFIA ---
+        sofia.setFood(10);
+        sofia.setPrestigePoints(10);
+
+        // Aggiungiamo l'effetto pittura all'edificio di Sofia
+        ResourceBonusEffect paintingFoodBonus = new ResourceBonusEffect(EventType.PAINTING, CharacterType.ARTIST, ResourceType.FOOD, 1);
+        sofia.getTribe().addBuilding(new BuildingCard(Era.ERA_I, 0, 0, paintingFoodBonus));
+
+        // Sofia ha 3 artisti
+        sofia.getTribe().addCharacter(new Artist(Era.ERA_I, 0));
+        sofia.getTribe().addCharacter(new Artist(Era.ERA_I, 0));
+        sofia.getTribe().addCharacter(new Artist(Era.ERA_I, 0));
+
+        CavePaintingEvent cevent = new CavePaintingEvent(Era.ERA_I, 2, false, 1, 2, 3, 2);
+        board.getLowerRow().add(cevent);
+
+        game.changeState(new EventState());
+
+        //marco ha pagato 1 di cibo perchè si trovava sull'ultima casella della turnordertrack
+        //marco dovrebbe prendere 8 punti dato evento caccia + effetto edificio durante l'evento e dovrebbe perdere anche 3 punti causa evento pitture rupestri
+        assertEquals(food + 4 - 1, marco.getFood(), "Marco dovrebbe aver ricevuto 4 Cibo");
+        assertEquals(puntiPrima + 8 - 3, marco.getPrestigePoints(), "Marco dovrebbe aver ricevuto 8 Punti");
+
+
+        assertEquals(13, sofia.getFood(), "Dovrebbe avere 13 cibo (10 base + 3 bonus edificio)");
+        assertEquals(16, sofia.getPrestigePoints(), "Dovrebbe avere 16 punti prestigio");
     }
 
 

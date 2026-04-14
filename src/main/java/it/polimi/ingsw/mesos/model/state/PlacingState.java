@@ -36,7 +36,6 @@ public class PlacingState implements GameStateLogic {
         this.actingOrder = track.getPositions();
 
         // Creiamo una lista di null per svuotare le posizioni fisiche.
-
         track.resetOrder();
 
         this.activePlayerIndex = 0;

@@ -31,7 +31,7 @@ public class EventState implements GameStateLogic {
      */
     @Override
     public void execute(Game g) {
-        resolveLowerRowEvents(g);
+
         System.out.println("\n--- [EVENT PHASE] ---");
 
         if (g.isGameFinished()) {

@@ -88,7 +88,7 @@ public class Board {
             TribeCard nextOnDeck = this.tribeDeck.draw(); // verifichiamo l'era della carta in cima al mazzo
 
             if (nextOnDeck.getEra().ordinal() > g.getCurrentEra().ordinal()) {
-                System.out.println("Era successiva visibile sul dorso del mazzo (Modo 1)!");
+                System.out.println("Era successiva visibile sul dorso del mazzo!");
                 g.handleEraTransition(nextOnDeck.getEra());
             }
 
@@ -205,22 +205,6 @@ public class Board {
         }
 
         return available;
-    }
-
-    public List<EventCard> getEvents() {
-        List<EventCard> events = new ArrayList<>();
-
-        for (Card card : this.lowerRow) {
-            // Chiediamo alla carta di "trasformarsi" in evento
-            EventCard event = card.getAsEventCard();
-
-            // Se non è null, significa che era davvero un EventCard!
-            if (event != null) {
-                events.add(event);
-            }
-        }
-
-        return events;
     }
 
     public Deck<TribeCard> getTribeDeck() {
