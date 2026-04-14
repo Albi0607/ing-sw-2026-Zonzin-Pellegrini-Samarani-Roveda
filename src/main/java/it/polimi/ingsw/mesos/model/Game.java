@@ -247,7 +247,7 @@ public class Game {
             // Controllo Era per debugging e logica
             if (card.getEra() == nextEra) {
                 board.getUpperRow().add(card);
-                System.out.println(" Edificio Era I aggiunto: " + card.getClass().getSimpleName());
+                System.out.println(" Edificio Era " + nextEra + " aggiunto: " + card.getClass().getSimpleName());
             }else{
                 // Se abbiamo pescato un edificio di un' altra era, lo rimettiamo sopra
                 buildingDeck.put(card);
