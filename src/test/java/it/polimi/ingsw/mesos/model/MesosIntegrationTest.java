@@ -133,29 +133,6 @@ class MesosIntegrationTest {
 
         System.out.println("Sofia ha preso la carta correttamente. Tribù attuale: " + sofia.getTribe().getCharactersCount());
 
-        // 1. Recuperiamo l'ultima carta aggiunta alla tribù di Marco
-        TribeCard cartaPresa = marco.getTribe().getCharacters().get(marco.getTribe().getCharacters().size() - 1);
-
-        /*
-
-        CharacterCard hunter = cartaPresa.getAsCharacterCard();
-        assertNotNull(hunter, "La carta presa dovrebbe essere un personaggio");
-        assertEquals(CharacterType.HUNTER, hunter.getCharacterType(), "Marco doveva prendere un Hunter");
-
-        // 3. Verifichiamo la logica dell'icona e del cibo
-        int ciboPrimaDellaPresa = 2; // Valore iniziale di Marco come 1° giocatore
-        boolean haIcona = ((Hunter) hunter).hasIcon(); // Cast a Hunter per vedere l'icona
-
-        if (haIcona) {
-            System.out.println("🏹 L'Hunter ha l'icona! Verifico il bonus cibo...");
-            // Se la tua logica prevede +1 cibo immediato:
-            // assertEquals(ciboPrimaDellaPresa + 1, marco.getFood(), "Marco dovrebbe avere 1 cibo in più grazie all'icona");
-        } else {
-            System.out.println("👤 L'Hunter non ha icone. Il cibo non deve cambiare.");
-            assertEquals(ciboPrimaDellaPresa, marco.getFood(), "Il cibo non dovrebbe essere cambiato");
-        }
-        */
-
     }
 
 
@@ -175,15 +152,15 @@ class MesosIntegrationTest {
         game.getBoard().refillRows(6, game);
 
 
-        // A. L'Era del gioco deve essere cambiata
+        // L'Era del gioco deve essere cambiata
         assertEquals(Era.ERA_II, game.getCurrentEra(), "Il gioco dovrebbe essere passato all'Era II");
 
-        // B. Gli edifici dell'Era I devono essere "scesi" nella fila inferiore
+        // Gli edifici dell'Era I devono essere "scesi" nella fila inferiore
         boolean edificiInLower = game.getBoard().getLowerRow().stream()
                 .anyMatch(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_I);
         assertTrue(edificiInLower, "Gli edifici dell'Era I dovrebbero essere stati spostati nella fila inferiore");
 
-        // C. La fila superiore deve ora contenere gli edifici dell'Era II
+        // La fila superiore deve ora contenere gli edifici dell'Era II
         boolean edificiEra2InUpper = game.getBoard().getUpperRow().stream()
                 .anyMatch(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_II);
         assertTrue(edificiEra2InUpper, "Dovrebbero esserci i nuovi edifici dell'Era II nella fila superiore");
@@ -198,13 +175,6 @@ class MesosIntegrationTest {
                 .filter(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_II)
                 .count();
 
-
-
-        System.out.println("edifici era I " + era1Buildings);
-        System.out.println("edifici era II " + era2Buildings);
-
-
-        System.out.println("Transizione Era I -> Era II verificata con successo!");
     }
 
 
@@ -249,6 +219,116 @@ class MesosIntegrationTest {
         assertEquals(0, countEra1, "ERRORE: Gli edifici di Era I dovrebbero essere stati eliminati!");
         assertTrue(countEra2 > 0, "ERRORE: Gli edifici di Era II dovrebbero essere scesi sotto, non spariti!");
     }
+
+
+    @Test
+    void testMidRefillEraTransition() {
+        Board board = game.getBoard();
+        while (!board.getTribeDeck().isEmpty()) {
+            board.getTribeDeck().draw();
+        }
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        board.getTribeDeck().put(new Hunter(Era.ERA_II, 0, false));
+        board.getTribeDeck().put(new Hunter(Era.ERA_II, 0, false));
+        board.getTribeDeck().put(new Hunter(Era.ERA_II, 0, false));
+        board.getTribeDeck().put(new Hunter(Era.ERA_II, 0, false));
+
+
+        board.getTribeDeck().put(new Hunter(Era.ERA_I, 0, false));
+        board.getTribeDeck().put(new Hunter(Era.ERA_I, 0, false));
+
+        assertEquals(6, board.getTribeDeck().size());
+
+        TribeCard topCard = board.getTribeDeck().draw();
+        assertEquals(Era.ERA_I, topCard.getEra());
+        board.getTribeDeck().put(topCard);
+
+        // Mettiamo un edificio Era I sopra che deve "scendere" a metà refill
+        BuildingCard oldBuilding = new BuildingCard(Era.ERA_I, 0, 0, null);
+        board.getUpperRow().add(oldBuilding);
+
+        // Chiediamo 6 carte
+        board.refillRows(6, game);
+
+        long era1_tribes = board.getUpperRow().stream()
+                .filter(c -> c instanceof TribeCard && c.getEra() == Era.ERA_I)
+                .count();
+
+        long era2_tribes = board.getUpperRow().stream()
+                .filter(c -> c instanceof TribeCard && c.getEra() == Era.ERA_II)
+                .count();
+
+        long era2_buildings = board.getUpperRow().stream()
+                .filter(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_II)
+                .count();
+
+        assertEquals(2, era1_tribes, "Dovrebbero esserci 2 tribù di Era I");
+        assertEquals(4, era2_tribes, "Dovrebbero esserci 4 tribù di Era II");
+        assertEquals(2, era2_buildings, "Dovrebbero esserci i 2 nuovi edifici di Era II");
+
+        // A. L'era deve essere cambiata
+        assertEquals(Era.ERA_II, game.getCurrentEra());
+
+        //L'edificio vecchio deve essere sceso nella LowerRow
+        assertTrue(board.getLowerRow().contains(oldBuilding), "L'edificio Era I deve essere sceso sotto");
+
+        //Devono esserci i nuovi edifici di Era II sopra
+        boolean nuoviEdificiSopra = board.getUpperRow().stream()
+                .anyMatch(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_II);
+        assertTrue(nuoviEdificiSopra, "Gli edifici Era II sono stati aggiunti sopra correttamente");
+
+        //Conteggio totale carte sopra: 6 Tribù + Nuovi Edifici
+        long edificiSopra = board.getUpperRow().stream().filter(c -> c instanceof BuildingCard).count();
+        long tribuSopra = board.getUpperRow().stream().filter(c -> c instanceof TribeCard).count();
+
+        assertEquals(6, tribuSopra, "Devono esserci esattamente 6 tribù sopra");
+        assertEquals(2, edificiSopra, "Devono esserci i nuovi edifici sopra");
+
+    }
+
+
+    @Test
+    void testEraTransitionTriggeredByNextCardOnDeck() {
+        Board board = game.getBoard();
+
+        while (!board.getTribeDeck().isEmpty()) board.getTribeDeck().draw();
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        board.getTribeDeck().put(new Hunter(Era.ERA_II, 0, false));
+
+        // Inseriamo le 6 carte che verranno pescate nel refill (Era I)
+        for (int i = 0; i < 6; i++) {
+            board.getTribeDeck().put(new Hunter(Era.ERA_I, 0, false));
+        }
+
+        assertEquals(7, board.getTribeDeck().size());
+        TribeCard top = board.getTribeDeck().draw();
+        assertEquals(Era.ERA_I, top.getEra(), "La prima pescata deve essere Era I");
+        board.getTribeDeck().put(top);
+
+        BuildingCard edificioVecchio = new BuildingCard(Era.ERA_I, 1, 1, null);
+        board.getUpperRow().add(edificioVecchio);
+
+        // Pescherà le 6 carte Era I.
+        // Finite le pescate, deve guardare la 7a e attivare l'Era II.
+        board.refillRows(6, game);
+
+
+        assertEquals(Era.ERA_II, game.getCurrentEra(),
+                "L'era doveva cambiare perché la carta rimasta sul mazzo è di Era II");
+
+        // Gli edifici di Era I devono essere scesi sotto
+        boolean edificiScesi = board.getLowerRow().stream()
+                .anyMatch(c -> c instanceof BuildingCard && c.getEra() == Era.ERA_I);
+        assertTrue(edificiScesi, "Gli edifici devono scendere anche se il cambio è triggerato dal mazzo");
+
+    }
+
+
+
 
     @Test
     void extraDraw() {
@@ -447,8 +527,5 @@ class MesosIntegrationTest {
         // VERIFICA FINALE: Ora deve aver attivato il bonus (+5)
         assertEquals(ciboIniziale + 5, sofia.getFood(), "Deve dare 5 cibo per il nuovo set completato");
     }
-
-
-
 
 }
