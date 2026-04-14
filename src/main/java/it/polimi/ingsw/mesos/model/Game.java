@@ -62,8 +62,6 @@ public class Game {
 
         int numPlayers = this.players.size();
 
-
-
         // 1. INIZIALIZZAZIONE COMPONENTI
         CreateOfferTile tileCreator = new CreateOfferTile();
         CreateTurnOrderTrack trackCreator = new CreateTurnOrderTrack();
@@ -80,7 +78,6 @@ public class Game {
 
         java.util.Collections.shuffle(this.players);
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
-
 
         // 2. INIZIALIZZAZIONE DEI GIOCATORI
         for (int i = 0; i < numPlayers; i++) {
@@ -120,13 +117,10 @@ public class Game {
             board.getUpperRow().add(board.getTribeDeck().draw());
         }
 
-
         Deck<BuildingCard> buildingDeck = board.getBuildingDeck();
 
         while (!buildingDeck.isEmpty()) {
             BuildingCard card = buildingDeck.draw();
-
-
             // Controllo Era per debugging e logica
             if (card.getEra() == Era.ERA_I) {
                 board.getUpperRow().add(card);
@@ -134,14 +128,13 @@ public class Game {
             }else{
                 // Se abbiamo pescato un edificio dell'Era II, lo rimettiamo sopra
                 buildingDeck.put(card);
-                System.out.println("ℹ️ Trovato edificio " + card.getEra() + ", rimesso nel mazzo. Setup Era I terminato.");
+                System.out.println("Trovato edificio " + card.getEra() + ", rimesso nel mazzo.Setup Era 1 terminato");
                 break; // Usciamo dal ciclo: non ci sono più edifici Era I in cima
             }
 
         }
 
         System.out.println("--- SYSTEM: Round 1 Setup Complete. Ready to Play! ---");
-
 
         if (this.currentState != null) {
             this.currentState.execute(this);
@@ -251,8 +244,8 @@ public class Game {
             }else{
                 // Se abbiamo pescato un edificio di un' altra era, lo rimettiamo sopra
                 buildingDeck.put(card);
-                System.out.println("ℹ Trovato edificio " + card.getEra() + ", rimesso nel mazzo. Setup Era I terminato.");
-                break; // Usciamo dal ciclo: non ci sono più edifici Era I in cima
+                System.out.println("Trovato edificio " + card.getEra());
+                break;
             }
 
         }
@@ -333,8 +326,6 @@ public class Game {
         return currentRound >= MAX_ROUNDS || board.getTribeDeck().isEmpty();
     }
 
-    // --- Getters ---
-
     public List<Player> getPlayers() {
         return new ArrayList<>(players);
     }
@@ -354,8 +345,6 @@ public class Game {
     public GameStateLogic getCurrentState() {
         return currentState;
     }
-
-    public EventType getCurrentEventType(){return null;}
 
     public void setCurrentRound(int round) {
         this.currentRound = round;

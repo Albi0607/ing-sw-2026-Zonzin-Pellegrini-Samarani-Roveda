@@ -22,8 +22,6 @@ import it.polimi.ingsw.mesos.model.enums.TriggerType;
 
 public class FinishedState implements GameStateLogic {
 
-
-
     /**
      * Executes the final scoring and game termination logic.
      *
