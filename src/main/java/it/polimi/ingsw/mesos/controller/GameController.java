@@ -356,6 +356,10 @@ public class GameController {
         return tile;
     }
 
+    // manca un metodo che rispedisce la notifica dal controller al client
+
+    // GETTERS
+
     public Game getGame() {
         return game;
     }
