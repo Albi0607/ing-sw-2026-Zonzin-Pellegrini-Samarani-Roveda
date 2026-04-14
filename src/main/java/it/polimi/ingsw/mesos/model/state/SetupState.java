@@ -61,6 +61,7 @@ public class SetupState implements GameStateLogic {
 
         board.refillRows(targetSize, g);
         g.setCurrentRound(g.getCurrentRound()+1);
+
         int nextTrackIndex = 0;
         List<OfferTile> tiles = board.getTiles();
         TurnOrderTrack turnOrderTrack = board.getTurnOrderTrack();
