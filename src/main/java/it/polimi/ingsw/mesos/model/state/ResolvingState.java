@@ -158,14 +158,18 @@ public class ResolvingState implements GameStateLogic {
      * @param isUpper   True if picking from the upper row, false for the lower row.
      * @throws IllegalArgumentException if the action violates game rules (e.g., picking an event).
      */
-    public void takeCard(Game g, int cardIndex, boolean isUpper) {
+    public void takeCard(Game g, Player p, int cardIndex, boolean isUpper) {
         if (isExtraDrawPhase && !isUpper) {
             throw new IllegalArgumentException("Il potere extra permette di pescare solo dalla fila superiore!");
         }
 
+        if (!p.equals(getActivePlayer(g))) {
+            throw new IllegalStateException("Non è il tuo turno, " + p.getNickname() + "!");
+        }
+
         Board board = g.getBoard();
         // IMPORTANTE: Se siamo in fase extra, il player non è sulla tessera!
-        Player p = getActivePlayer(g);
+        //Player p = getActivePlayer(g);
 
         if (p == null) return;
 
