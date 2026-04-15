@@ -1,3 +1,4 @@
+
 package it.polimi.ingsw.mesos.controller;
 
 import it.polimi.ingsw.mesos.model.Game;
@@ -46,6 +47,7 @@ public class GameController {
     // toglierlo di là.
     // per quanto riguarda il num di giocatori io prenderei direttamente il numero dalla size della
     // lista di pendingNicknames dato che il check viene effettuato e sappiamo essere corretti
+
     public void setNumPlayers(int expectedNumPlayers) {
         if (expectedNumPlayers <= 1 || expectedNumPlayers > 5) {
             throw new IllegalArgumentException("The number of players is not valid!");
@@ -62,6 +64,8 @@ public class GameController {
      * @throws IllegalStateException if the maximum number of players is already reached
      * @throws IllegalArgumentException if the nickname is already used or invalid
      */
+
+
     public void addPlayer(String nickname) {
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
@@ -92,6 +96,7 @@ public class GameController {
      * Creates the game using the collected nicknames.
      * Converts nicknamee into Player objects.
      */
+
     private void createGame() {
         List<Player> players = new ArrayList<>();
         Color[] availableColors = Color.values();
@@ -116,6 +121,7 @@ public class GameController {
     /**
      * Starts the game.
      */
+
     public void startGame() {
         if (game == null) {
             throw new IllegalStateException("Game not created");
@@ -126,6 +132,7 @@ public class GameController {
     /**
      * Ends the latest game.
      */
+
     public void endGame() {
         // capire cosa mettere qui
         //  view.notifyGameEnded(game.getWinner());
@@ -135,6 +142,7 @@ public class GameController {
      * Updates the game board.
      */
     // per come ho scritto la logica sottostante da capire se è necessario questo metodo
+
     public void updateBoard() {
     }
 
@@ -149,6 +157,7 @@ public class GameController {
      * @param nickname player placing the totem
      * @param tileId tile the totem will be positioned
      **/
+
     public void onPlaceTotem(String nickname, char tileId) {
         requireState(GameState.PLACING_TOTEMS);
 
@@ -175,6 +184,8 @@ public class GameController {
      * @param nickname player who have chosen
      * @param cardIndex index of the chosen card from upper row
      */
+    /*
+
     public void onTakeCardFromUpper(String nickname, int cardIndex) {
         requireState(GameState.RESOLVING_ACTIONS);
         requirePicksRemaining();
@@ -194,12 +205,16 @@ public class GameController {
         replaceIfPicksDone(player);
     }
 
+     */
+
     /**
      * Player chooses the card from lower row
      *
      * @param nickname player who have chosen
      * @param cardIndex index of the chosen card from lower row
      */
+    /*
+
     public void onTakeCardFromLower(String nickname, int cardIndex) {
         requireState(GameState.RESOLVING_ACTIONS);
         requirePicksRemaining();
@@ -218,6 +233,18 @@ public class GameController {
         broadcastUpdate();
         replaceIfPicksDone(player);
     }
+     */
+
+    public void onTakeCard(String nickname, int cardIndex, boolean isUpper) {
+
+        requireState(GameState.RESOLVING_ACTIONS);
+        Player player = requirePlayer(nickname);
+
+        game.takeCard(player, cardIndex, isUpper);
+
+        broadcastUpdate();
+
+    }
 
     // Logica privata di avanzamento round
 
@@ -227,6 +254,7 @@ public class GameController {
      * @param card the card chosen by the player
      * @param player the player who has chosen
      */
+
     private void onAddCard(Card card, Player player) {
         if (card instanceof BuildingCard building) {
             int cost = Math.max(0, building.getCost() - player.getTribe().getBuildingDiscount()); // per non andare in negativo
@@ -256,6 +284,7 @@ public class GameController {
      *
      * @param player to replace its totem
      */
+
     private void replaceIfPicksDone(Player player) {
         if (pendingPicks > 0) { return;} // gestire la chiamata superflua subito dopo la pescata
 
@@ -290,6 +319,7 @@ public class GameController {
      * search on the offer track the next player to count its card and then
      * replace its totem into the TurnOrderTrack calling replaceIfPicksDone
      */
+
     private void prepareNextResolver() {
         Board board = game.getBoard();
 
@@ -372,6 +402,8 @@ public class GameController {
         return pendingPicks;
     }
 }
+
+
 
 
 

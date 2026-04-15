@@ -12,6 +12,7 @@ import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.PlacingState;
+import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.model.state.SetupState;
 import jdk.jfr.Event;
 
@@ -307,6 +308,17 @@ public class Game {
                 effect.applyEffect(player, this, trigger);
             }
         }
+    }
+
+
+    public void takeCard(Player p, int cardIndex, boolean isUpper) {
+
+        if (currentState instanceof ResolvingState rs) {
+            rs.takeCard(this, p, cardIndex, isUpper);
+        } else {
+            throw new IllegalStateException("Non puoi pescare carte in questo stato!");
+        }
+
     }
 
     /**
