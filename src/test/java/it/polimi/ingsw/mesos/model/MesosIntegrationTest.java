@@ -7,15 +7,10 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
 import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
 import it.polimi.ingsw.mesos.model.card.character.*;
-import it.polimi.ingsw.mesos.model.card.event.CavePaintingEvent;
-import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.card.event.HuntEvent;
+import it.polimi.ingsw.mesos.model.card.event.*;
 import it.polimi.ingsw.mesos.model.deck.*;
 import it.polimi.ingsw.mesos.model.enums.*;
-import it.polimi.ingsw.mesos.model.state.EventState;
-import it.polimi.ingsw.mesos.model.state.PlacingState;
-import it.polimi.ingsw.mesos.model.state.ResolvingState;
-import it.polimi.ingsw.mesos.model.state.SetupState;
+import it.polimi.ingsw.mesos.model.state.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -428,6 +423,25 @@ class MesosIntegrationTest {
     }
 
     @Test
+    void testSkipExtraDrawTransitions() {
+
+        sofia.setExtraDraw();
+        marco.setExtraDraw();
+
+        game.getBoard().getUpperRow().clear();
+        game.getBoard().getUpperRow().add(new BuildingCard(Era.ERA_I, 1, 0, null));
+
+        ResolvingState rs = new ResolvingState();
+        rs.execute(game);
+
+        Player primo = rs.getActivePlayer(game);
+        rs.skipExtraDraw(game);
+
+        Player secondo = rs.getActivePlayer(game);
+        assertNotEquals(primo, secondo);
+    }
+
+    @Test
     void notifyBuildingeffect(){
 
         ResourceBonusEffect huntEffect = new ResourceBonusEffect(
@@ -657,6 +671,37 @@ class MesosIntegrationTest {
                 "Marco non dovrebbe aver preso nulla perché è stato saltato");
         assertEquals(0, sofia.getTribe().getBuildingsCount() + sofia.getTribe().getCharactersCount(),
                 "Sofia non dovrebbe aver preso nulla perché è stata saltata");
+    }
+
+
+    @Test
+    void gameFinished(){
+
+        game.setCurrentRound(10);
+
+        // Verifichiamo di essere effettivamente all'ultimo round
+        assertEquals(10, game.getCurrentRound(), "Il gioco dovrebbe essere al round 10");
+
+        // 2. SETUP BOARD FINALE
+        Board board = game.getBoard();
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        // Aggiungiamo gli eventi richiesti
+        // Evento Sciamanico (punti in base agli edifici/spiriti)
+        ShamanicRitualEvent shamanic = new ShamanicRitualEvent(Era.ERA_III, 2, true, 0, 0);
+        // Evento Sostentamento (deve essere risolto per ULTIMO)
+        SustenanceEvent sustenance = new SustenanceEvent(Era.ERA_III, 2, true, 0);
+
+        board.getUpperRow().add(shamanic);
+        board.getLowerRow().add(sustenance);
+
+        EventState eventState = new EventState();
+        eventState.execute(game);
+
+        assertTrue(game.getCurrentState() instanceof FinishedState,
+                "Al round 10, dopo gli eventi, il gioco deve passare a FinishedState");
+
     }
 
 }

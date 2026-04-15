@@ -32,8 +32,12 @@ public class PlacingState implements GameStateLogic {
 
         TurnOrderTrack track = g.getBoard().getTurnOrderTrack();
 
-        // 1. Salviamo l'ordine di azione per questo round (chi è attualmente sulla track)
-        this.actingOrder = track.getPositions();
+        // 1. Filtriamo l'ordine: prendiamo solo le posizioni che NON sono null
+        this.actingOrder = track.getPositions().stream()
+                .filter(java.util.Objects::nonNull)
+                .toList();
+
+        System.out.println("DEBUG: actingOrder size = " + this.actingOrder.size());
 
         // Creiamo una lista di null per svuotare le posizioni fisiche.
         track.resetOrder();
@@ -99,6 +103,12 @@ public class PlacingState implements GameStateLogic {
             return null;
         }
         return actingOrder.get(activePlayerIndex);
+    }
+
+
+    //metodo solo per il testing
+    public List<Player> getActingOrder() {
+        return actingOrder;
     }
 
 
