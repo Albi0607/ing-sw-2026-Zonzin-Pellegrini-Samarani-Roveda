@@ -77,7 +77,8 @@ public class Game {
 
         System.out.println("Board initialized with Offer Tiles and Turn Order Track for " + numPlayers + " players.");
 
-        java.util.Collections.shuffle(this.players);
+        //java.util.Collections.shuffle(this.players); commentato solo per test poi scommmentare
+
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
 
         // 2. INIZIALIZZAZIONE DEI GIOCATORI
@@ -313,12 +314,19 @@ public class Game {
 
     public void takeCard(Player p, int cardIndex, boolean isUpper) {
 
-        if (currentState instanceof ResolvingState rs) {
-            rs.takeCard(this, p, cardIndex, isUpper);
+        if (this.currentState != null) {
+            this.currentState.takeCard(this, p, cardIndex, isUpper);
         } else {
-            throw new IllegalStateException("Non puoi pescare carte in questo stato!");
+            throw new IllegalStateException("CRITICAL ERROR: No active state to handle take card action.");
         }
+    }
 
+    public void skipExtraDraw(Player player){
+        if (this.currentState != null) {
+            this.currentState.skipExtraDraw(this);
+        } else {
+            throw new IllegalStateException("CRITICAL ERROR: No active state to skip draw action.");
+        }
     }
 
     /**

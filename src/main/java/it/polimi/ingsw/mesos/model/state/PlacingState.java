@@ -93,6 +93,16 @@ public class PlacingState implements GameStateLogic {
         }
     }
 
+    @Override
+    public void takeCard(Game g, Player p, int cardIndex, boolean isUpper) {
+        throw new IllegalStateException("Errore: Non puoi pescare carte durante la Fase di placing totem!!!");
+    }
+
+    @Override
+    public void skipExtraDraw(Game g) {
+        throw new IllegalStateException("Errore: Non puoi saltare la pesca durante la Fase di placing totem!!!");
+    }
+
 
     @Override
     public GameState getStateId() { return GameState.PLACING_TOTEMS; }

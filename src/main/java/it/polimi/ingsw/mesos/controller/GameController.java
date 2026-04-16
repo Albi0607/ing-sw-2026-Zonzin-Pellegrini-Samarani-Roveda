@@ -164,76 +164,12 @@ public class GameController {
         Player player = requirePlayer(nickname);
         OfferTile tile = requireTile(tileId);
 
-        if (!tile.isAvailable()) {
-            throw new IllegalStateException("Tile '" + tileId + "' is already occupied.");
-        }
-
         game.placeTotemOnOffer(player, tile);
-        broadcastUpdate();
-
-        // Se PlacingState ha piazzato tutte le tile e ha effettutato a RESOLVING_ACTIONS,
-        // calcoliamo quante carte deve prendere il primo giocatore.
-        if (game.getCurrentState().getStateId() == GameState.RESOLVING_ACTIONS) {
-            prepareNextResolver();
-        }
-    }
-
-    /**
-     * Player chooses the card from upper row
-     *
-     * @param nickname player who have chosen
-     * @param cardIndex index of the chosen card from upper row
-     */
-    /*
-
-    public void onTakeCardFromUpper(String nickname, int cardIndex) {
-        requireState(GameState.RESOLVING_ACTIONS);
-        requirePicksRemaining();
-
-        Player player = requirePlayer(nickname);
-        Board board   = game.getBoard();
-
-        if (cardIndex < 0 || cardIndex >= board.getUpperRow().size()) {
-            throw new IndexOutOfBoundsException("Index not valid for upper row: " + cardIndex);
-        }
-
-        Card card = board.takeCardFromUpper(cardIndex);
-        onAddCard(card, player);
-        pendingPicks--;
 
         broadcastUpdate();
-        replaceIfPicksDone(player);
+
     }
 
-     */
-
-    /**
-     * Player chooses the card from lower row
-     *
-     * @param nickname player who have chosen
-     * @param cardIndex index of the chosen card from lower row
-     */
-    /*
-
-    public void onTakeCardFromLower(String nickname, int cardIndex) {
-        requireState(GameState.RESOLVING_ACTIONS);
-        requirePicksRemaining();
-
-        Player player = requirePlayer(nickname);
-        Board board   = game.getBoard();
-
-        if (cardIndex < 0 || cardIndex >= board.getLowerRow().size()) {
-            throw new IndexOutOfBoundsException("Index not valid for lower row: " + cardIndex);
-        }
-
-        Card card = board.takeCardFromLower(cardIndex);
-        onAddCard(card, player);
-        pendingPicks--;
-
-        broadcastUpdate();
-        replaceIfPicksDone(player);
-    }
-     */
 
     public void onTakeCard(String nickname, int cardIndex, boolean isUpper) {
 
@@ -246,99 +182,14 @@ public class GameController {
 
     }
 
-    // Logica privata di avanzamento round
-
-    /**
-     * adds selected card to the tribe of the player and notifies building effects
-     *
-     * @param card the card chosen by the player
-     * @param player the player who has chosen
-     */
-
-    private void onAddCard(Card card, Player player) {
-        if (card instanceof BuildingCard building) {
-            int cost = Math.max(0, building.getCost() - player.getTribe().getBuildingDiscount()); // per non andare in negativo
-            if (!player.payFood(cost)) {
-                throw new IllegalStateException(
-                        "Not enough food to buy this building: " + cost + "food required."
-                );
-            }
-            player.getTribe().addBuilding(building);
-            game.notifyBuildingEffects(TriggerType.ON_PURCHASE);
-
-        } else if (card instanceof CharacterCard character) {
-            player.getTribe().addCharacter(character);
-            if (character instanceof Hunter hunter) { // gestire il bonus di cibo
-                hunter.onAddedToTribe(player);
-            }
-            game.notifyBuildingEffects(TriggerType.ON_CHARACTER_ADDED);
-        }
-    }
-
-    /**
-     * Called when playerr has no pending picks remaining.
-     *
-     * Replace player's tile on the TurnOrderTrack, empty the tile,
-     * then check if there are other player to do card count,
-     * otherwise goes to the EventState.
-     *
-     * @param player to replace its totem
-     */
-
-    private void replaceIfPicksDone(Player player) {
-        if (pendingPicks > 0) { return;} // gestire la chiamata superflua subito dopo la pescata
-
-        Board board = game.getBoard();
-
-        OfferTile tile = board.getTiles().stream()
-                .filter(t -> player.equals(t.getHost()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Player's tile not found"));
-
-        player.addFood(tile.getFoodBonus());
-
-        // Rimetti il totem nella TurnOrderTrack (applica bonus/malus di slot)
-        int slot = board.getTurnOrderTrack().getFirstFreeSlot();
-        board.getTurnOrderTrack().setPlayerAt(slot, player);
-
-        // Libera la tessera per il round successivo
-        tile.reset();
-
+    public void onSkipExtraDraw(String nickname) {
+        requireState(GameState.RESOLVING_ACTIONS);
+        Player player = requirePlayer(nickname);
+        game.skipExtraDraw(player);
         broadcastUpdate();
-
-        // passaggio ad EventState se tutti hanno risolto, altrimenti prossimo conto carte
-        boolean allTilesEmpty = board.getTiles().stream().allMatch(OfferTile::isAvailable);
-        if (allTilesEmpty) {
-            game.changeState(new EventState());
-        } else {
-            prepareNextResolver();
-        }
     }
 
-    /**
-     * search on the offer track the next player to count its card and then
-     * replace its totem into the TurnOrderTrack calling replaceIfPicksDone
-     */
-
-    private void prepareNextResolver() {
-        Board board = game.getBoard();
-
-        OfferTile nextTile = board.getTiles().stream()
-                .filter(t -> !t.isAvailable())
-                .findFirst() // prende la prima delle tile occupate da sinistra
-                .orElse(null);
-
-        // se la prossima tessera è vuota esci (SISTEMARE, da chiarire se per x giocatori le tessere sono sempre occupate))
-        if (nextTile == null) return;
-
-        pendingPicks = nextTile.getUpperCount() + nextTile.getLowerCount();
-
-        // Tessera senza pick (es. tessera A solo-cibo): completa subito
-        if (pendingPicks == 0) {
-            replaceIfPicksDone(nextTile.getHost());
-        }
-        //penso qui la View chiederà al giocatore di scegliere le carte.
-    }
+    // Logica privata di avanzamento round
 
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
     //metodo che dicevamo aggiornare tutte le altre view
@@ -365,11 +216,6 @@ public class GameController {
         }
     }
 
-    private void requirePicksRemaining() {
-        if (pendingPicks <= 0) {
-            throw new IllegalStateException("No pick available for this turn.");
-        }
-    }
 
     private Player requirePlayer(String nickname) {
         return game.getPlayers().stream()
