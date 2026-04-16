@@ -24,6 +24,7 @@ class MesosIntegrationTest {
     private Game game;
     private Player marco;
     private Player sofia;
+    private Player alice;
 
     @BeforeEach
     void setUp() {
@@ -92,7 +93,7 @@ class MesosIntegrationTest {
         for (int i = 0; i < board.getUpperRow().size(); i++) {
             if (board.getUpperRow().get(i).getAsEventCard() != null) {
                 final int eventIndex = i;
-                assertThrows(Exception.class, () -> rs.takeCard(game, eventIndex, true),
+                assertThrows(Exception.class, () -> rs.takeCard(game, resolvingFirst, eventIndex, true),
                         "Il giocatore non deve poter prendere carte evento");
                 break;
             }
@@ -105,7 +106,7 @@ class MesosIntegrationTest {
         for (int i = 0; i < board.getLowerRow().size(); i++) {
             Card c = board.getLowerRow().get(i);
 
-            if (c.getAsEventCard()==null) {
+            if (c.getAsEventCard() == null) {
                 validIndexLower = i;
                 break;
             }
@@ -114,7 +115,7 @@ class MesosIntegrationTest {
         assertTrue(validIndexLower != -1, "Dovrebbe esserci almeno una carta non-evento sotto");
         int sizePrimaLower = board.getLowerRow().size();
 
-        rs.takeCard(game, validIndexLower, false);
+        rs.takeCard(game, active1, validIndexLower, false);
 
         assertEquals(expectedUpperSize, board.getUpperRow().size(), "La fila superiore non deve cambiare se prendi da sotto");
         assertEquals(sizePrimaLower - 1, board.getLowerRow().size(), "La carta deve essere rimossa dalla fila dopo la presa");
@@ -135,7 +136,7 @@ class MesosIntegrationTest {
         for (int i = 0; i < board.getUpperRow().size(); i++) {
             Card c = board.getUpperRow().get(i);
 
-            if (c.getAsEventCard()==null) {
+            if (c.getAsEventCard() == null) {
                 validIndexUpper = i;
                 break;
             }
@@ -147,7 +148,7 @@ class MesosIntegrationTest {
         int personaggiPrima = active2.getTribe().getCharactersCount();
         int edificiPrima = active2.getTribe().getBuildingsCount();
 
-        rs.takeCard(game, validIndexUpper, true);
+        rs.takeCard(game, active2, validIndexUpper, true);
 
         if (cardScelta instanceof TribeCard) {
             assertEquals(personaggiPrima + 1, active2.getTribe().getCharactersCount(), "Personaggio non aggiunto");
@@ -212,7 +213,6 @@ class MesosIntegrationTest {
                 .count();
 
     }
-
 
 
     @Test
@@ -364,8 +364,6 @@ class MesosIntegrationTest {
     }
 
 
-
-
     @Test
     void extraDraw() {
 
@@ -398,17 +396,17 @@ class MesosIntegrationTest {
         game.changeState(state);
 
         assertEquals(sofia, state.getActivePlayer(game));
-        state.takeCard(game, 0, false);
+        state.takeCard(game, sofia, 0, false);
 
         assertEquals(marco, state.getActivePlayer(game), "Deve toccare a Marco (Turno Standard)");
-        state.takeCard(game, 0, true);
+        state.takeCard(game, marco, 0, true);
 
         System.out.println("Marco ha finito il turno standard. Controllo attivazione fase extra...");
 
         assertEquals(marco, state.getActivePlayer(game), "Deve toccare ANCORA a Marco (Potere Extra)");
 
         int cartePrimaExtra = marco.getTribe().getBuildings().size();
-        state.takeCard(game, 0, true);
+        state.takeCard(game, marco, 0, true);
         int marcosTribe = marco.getTribe().getBuildings().size() + marco.getTribe().getCharacters().size();
         int sofiasTribe = sofia.getTribe().getBuildings().size() + sofia.getTribe().getCharacters().size();
 
@@ -442,7 +440,7 @@ class MesosIntegrationTest {
     }
 
     @Test
-    void notifyBuildingeffect(){
+    void notifyBuildingeffect() {
 
         ResourceBonusEffect huntEffect = new ResourceBonusEffect(
                 EventType.HUNT,
@@ -471,12 +469,12 @@ class MesosIntegrationTest {
         int foodPrima = marco.getFood();
         int puntiPrima = marco.getPrestigePoints();
 
-        HuntEvent event = new HuntEvent(Era.ERA_I, 2,false,3);
+        HuntEvent event = new HuntEvent(Era.ERA_I, 2, false, 3);
 
         event.resolve(game);
 
         assertEquals(foodPrima + 4, marco.getFood(), "Marco dovrebbe aver ricevuto 4 Cibo sia per evento che per edificio");
-        assertEquals(puntiPrima + 2 + (3*2), marco.getPrestigePoints(), "Marco dovrebbe aver ricevuto 8 Punti Prestigio");
+        assertEquals(puntiPrima + 2 + (3 * 2), marco.getPrestigePoints(), "Marco dovrebbe aver ricevuto 8 Punti Prestigio");
 
         // Sofia parte con 10 Cibo e 10 Punti Prestigio
         sofia.setFood(10);
@@ -494,7 +492,7 @@ class MesosIntegrationTest {
 
 
     @Test
-    void notifyPlayersBuildingEffect(){
+    void notifyPlayersBuildingEffect() {
 
         ResourceBonusEffect effect = new ResourceBonusEffect(
                 null,
@@ -519,7 +517,7 @@ class MesosIntegrationTest {
 
         int foodPrima = marco.getFood();
 
-        marco.getTribe().addCharacter(new Shaman(Era.ERA_I,0,1));
+        marco.getTribe().addCharacter(new Shaman(Era.ERA_I, 0, 1));
 
         game.notifyPlayersBuildingEffects(TriggerType.ON_CHARACTER_ADDED, marco);
 
@@ -675,7 +673,7 @@ class MesosIntegrationTest {
 
 
     @Test
-    void gameFinished(){
+    void gameFinished() {
 
         game.setCurrentRound(10);
 
@@ -704,4 +702,129 @@ class MesosIntegrationTest {
 
     }
 
+    @Test
+    void testTakeCardCrashScenario() {
+
+        for (Player p : game.getPlayers()) {
+            p.addFood(20);
+        }
+        // 1. SETUP: 1 carta sopra, ma la tessera ne richiederebbe 2
+        Board board = game.getBoard();
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+        board.getLowerRow().add(new BuildingCard(Era.ERA_I, 2, 0, null)); // Unica carta
+
+
+        Player firstPlayer = game.getPlayers().get(0);
+        board.getTile('E').setHost(firstPlayer);
+
+
+        // 2. INIZIALIZZIAMO LO STATO
+        ResolvingState rs = new ResolvingState();
+
+        rs.execute(game);
+
+        assertEquals(0, rs.getRemainingUpper(), "Dovrebbe essere 0 perché la fila sopra è vuota");
+        assertEquals(1, rs.getRemainingLower(), "Dovrebbe essere 1 perché c'è una carta sotto");
+
+
+
+        Player activePlayer = rs.getActivePlayer(game);
+
+        // 3. ESECUZIONE: Prima pescata
+        assertDoesNotThrow(() -> {
+            rs.takeCard(game, activePlayer, 0, false);
+        }, "La prima pescata dovrebbe funzionare per " + activePlayer.getNickname());
+
+
+
+        if (rs.getActivePlayer(game) != null && rs.getActivePlayer(game).equals(alice)) {
+            System.out.println("ATTENZIONE: Il sistema chiede ad Alice una seconda pescata!");
+
+
+            rs.takeCard(game, alice, 0, true);
+        } else {
+            System.out.println("VITTORIA: Il turno è passato correttamente perché non c'erano più carte.");
+        }
+    }
+
+    @Test
+    void testMassiveBoardDrainScenario() {
+        // --- 1. SETUP AMBIENTE ---
+        Board board = game.getBoard();
+
+        marco.setFood(0);
+        sofia.setFood(5);
+
+        // Puliamo la board e mettiamo solo il minimo indispensabile
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        // FILA SOPRA:
+        board.getUpperRow().add(new BuildingCard(Era.ERA_I, 2, 0, null));
+        board.getUpperRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+        board.getUpperRow().add(new Hunter(Era.ERA_I, 2, false));
+
+        // FILA SOTTO: 1
+        //board.getLowerRow().add(new BuildingCard(Era.ERA_I, 5, 0, null));
+        board.getLowerRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+
+
+        assertEquals(3, board.getUpperRow().size());
+        assertEquals(1, board.getLowerRow().size());
+
+        // --- 2. PIAZZAMENTO TESSERE ---
+
+        board.getTile('E').setHost(marco);
+        assertEquals(0, marco.getFood());
+
+        board.getTile('F').setHost(sofia);
+        assertEquals(5, sofia.getFood());
+
+        // --- 3. ESECUZIONE ---
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        while (rs.getActivePlayer(game) != null) {
+            Player active = rs.getActivePlayer(game);
+            if (active == null) break;
+
+            System.out.println("DEBUG: Sta agendo " + active.getNickname());
+
+            // Prova a pescare SOPRA se hai pick e se c'è roba
+            if (rs.getRemainingUpper() > 0) {
+                // Cerchiamo una carta non evento
+                int idx = findValidCard(game.getBoard().getUpperRow(), active);
+                System.out.println("***************************" + idx + "*********************************");
+                if (idx != -1) rs.takeCard(game, active, idx, true);
+                else break; // Se non ci sono carte ma il sistema non ha scalato, evitiamo loop
+            }
+            // Altrimenti prova a pescare SOTTO
+            else if (rs.getRemainingLower() > 0) {
+                int idx = findValidCard(game.getBoard().getLowerRow(), active);
+                if (idx != -1) rs.takeCard(game, active, idx, false);
+                else break;
+            }
+        }
+
+
+        assertEquals(1, marco.getTribe().getCharacters().size());
+        assertEquals(1, sofia.getTribe().getBuildings().size());
+
+        assertNull(rs.getActivePlayer(game), "Il sistema dovrebbe aver terminato il round!");
+    }
+
+    private int findValidCard(List<Card> row, Player p) {
+        int discount = p.getTribe().getBuildingDiscount();
+
+        for (int i = 0; i < row.size(); i++) {
+            Card c = row.get(i);
+
+            // È valida SE non è un evento E SE ha abbastanza cibo per pagarla
+            if (c.getAsEventCard() == null && Math.max(0, c.getCost() - discount) <= p.getFood()) {
+                return i;
+            }
+        }
+        return -1; // Se non c'è nessuna carta che può pagare, restituisce -1
+    }
 }

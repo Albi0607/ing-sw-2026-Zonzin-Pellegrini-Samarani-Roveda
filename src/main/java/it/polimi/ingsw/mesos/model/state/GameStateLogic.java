@@ -66,4 +66,15 @@ public interface GameStateLogic {
                 "Cannot place totem in state: " + getStateId()
         );
     }
+
+
+    default void takeCard(Game g, Player p, int index, boolean upper) {
+        throw new IllegalStateException("cannot take cards in state: " + getStateId());
+    }
+
+
+
+    default void skipExtraDraw(Game g) {
+        throw new IllegalStateException("cannot skipdraw in state: " + getStateId());
+    }
 }
