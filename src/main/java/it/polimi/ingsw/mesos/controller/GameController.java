@@ -1,6 +1,7 @@
 
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
@@ -16,17 +17,22 @@ import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.EventState;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
+import it.polimi.ingsw.mesos.rete.VirtualView;
 
+import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameController {
 
     //istanza del model
     private Game game;
+    //capire come gestire le virtual view per poi usare il protocollo di rete adeguato
+    private Map<String, VirtualView> players;
     //private View view;
     private List<String> pendingNicknames = new ArrayList<>();
-    private int expectedNumPlayers;
+    private int expectedNumPlayers=0;
     private int pendingPicks = 0;
 
     //il controller è associato ad un game unico o gestisce più game simultaneamente
@@ -48,7 +54,13 @@ public class GameController {
     // per quanto riguarda il num di giocatori io prenderei direttamente il numero dalla size della
     // lista di pendingNicknames dato che il check viene effettuato e sappiamo essere corretti
 
-    public void setNumPlayers(int expectedNumPlayers) {
+    //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
+
+    public synchronized void setNumPlayers(int expectedNumPlayers) {
+        if(this.expectedNumPlayers!=0){
+            System.out.println("Numero di player gia settato da un altro giocatore");
+            return;
+        }
         if (expectedNumPlayers <= 1 || expectedNumPlayers > 5) {
             throw new IllegalArgumentException("The number of players is not valid!");
         }
@@ -66,7 +78,7 @@ public class GameController {
      */
 
 
-    public void addPlayer(String nickname) {
+    public synchronized void addPlayer(String nickname, VirtualView view) {
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
         }
@@ -85,6 +97,7 @@ public class GameController {
         }
         // if the current nickname pass all the previous check --> it can be inserts in the list
         pendingNicknames.add(nickname);
+        players.put(nickname,view);
 
         // Automatically create the game when all players are added
         if (pendingNicknames.size() == expectedNumPlayers) {
@@ -187,6 +200,12 @@ public class GameController {
         Player player = requirePlayer(nickname);
         game.skipExtraDraw(player);
         broadcastUpdate();
+    }
+
+    //metodo che restituisce la partita all'ultimo aggiornamento e modifica fatta va completata in maniera intelligente
+    public GameDTO lastGameUpdate(){
+        GameDTO game = new GameDTO();
+        return game;
     }
 
     // Logica privata di avanzamento round

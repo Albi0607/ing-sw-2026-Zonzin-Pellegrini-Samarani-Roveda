@@ -4,18 +4,12 @@ import java.rmi.*;
 
 public interface RemoteMethods extends Remote {
 
+    boolean registerClient(String nickname, CallBack ClientCallBack) throws RemoteException;
+
     boolean placeTotem(String nickname,char position) throws RemoteException;
 
-    boolean takeCardFromUpper(String nickname,int position) throws RemoteException;
+    boolean takeCard(String nickname,int position,boolean isUpper) throws RemoteException;
 
-    boolean takeCardFromLower(String nickname,int position) throws RemoteException;
+    boolean choosePlayers(int numPlayers) throws RemoteException;
 
-    boolean chosePlayers(int numPlayers) throws RemoteException;
-
-    boolean choseNickname(String name) throws RemoteException;
-
-    //forse non servono
-    boolean choseView() throws RemoteException;
-
-    boolean choseNetwork() throws RemoteException;
 }

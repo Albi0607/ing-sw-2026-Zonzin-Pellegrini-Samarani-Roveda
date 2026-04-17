@@ -1,16 +1,19 @@
 package it.polimi.ingsw.mesos.RMI.ClientModel;
 
+import it.polimi.ingsw.mesos.model.enums.CharacterType;
+import it.polimi.ingsw.mesos.model.enums.EventType;
+
 import java.io.Serializable;
 
 public class CardDTO implements Serializable {
 
     public int id;
     //se carta event o carta character o carta edificio
-    public String type;
+    public CardType type;
     //se è una carta evento distingui il tipo
-    public String eventType;
+    public EventType eventType;
     //se è una carta personaggio distingui il tipo
-    public String characterType;
+    public CharacterType characterType;
 
     public int era;
 

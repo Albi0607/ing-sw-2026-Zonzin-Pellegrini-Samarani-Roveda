@@ -11,7 +11,7 @@ public class clientSocket {
     public static void main(String[] args) {
 
         String hostName = "127.0.0.1";
-        int portNumber = 1234;
+        int portNumber = 7777;
         Socket echoSocket = null;
 
         try {
