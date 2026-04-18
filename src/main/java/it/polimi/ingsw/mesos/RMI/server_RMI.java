@@ -1,8 +1,6 @@
 package it.polimi.ingsw.mesos.RMI;
 
-import java.util.*;
 import java.rmi.*;
-import java.rmi.server.*;
 import java.rmi.registry.*;
 
 public class server_RMI {
@@ -18,5 +16,6 @@ public class server_RMI {
                 System.out.println("Waiting for invocations from clients...");
     }
 
-
+    //gestire la disconnessione e la terminazione della partita
+    //gestire la connessione su porta a command line e nome del server non fisso tipo DNS
 }

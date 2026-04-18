@@ -1,6 +1,8 @@
 package it.polimi.ingsw.mesos.RMI.ClientModel;
 
 
+import it.polimi.ingsw.mesos.model.enums.Color;
+
 import java.io.Serializable;
 
 public class PlayerDTO implements Serializable {
@@ -9,6 +11,6 @@ public class PlayerDTO implements Serializable {
     public int food;
     public int prestigePoints;
     public TribeDTO tribe;
-    public String color;
+    public Color color;
 
 }
