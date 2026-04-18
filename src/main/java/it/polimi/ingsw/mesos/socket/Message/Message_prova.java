@@ -22,9 +22,7 @@ public abstract class Message_prova implements Serializable {
     }
 
     /**
-     * (OPZIONALE ma consigliato)
      * Metodo eseguito lato server.
-     * Utile se vuoi usare lo stesso Message anche lato server.
      */
     public void executeServerSide(Object serverController) {
         // default: non fa nulla
