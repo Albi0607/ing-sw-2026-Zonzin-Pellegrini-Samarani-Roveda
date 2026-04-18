@@ -15,6 +15,7 @@ import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.EventState;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
+import it.polimi.ingsw.mesos.model.state.PlacingState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
 
 import java.util.ArrayList;
@@ -246,6 +247,49 @@ public class GameController {
 
     public int getPendingPicks() {
         return pendingPicks;
+    }
+
+    public String getActivePlayerNickname() {
+        if (game == null) return "Sconosciuto";
+
+        GameStateLogic currentState = game.getCurrentState();
+
+        // 1. Se siamo in fase di Risoluzione
+        if (currentState instanceof ResolvingState) {
+            ResolvingState resolvingState = (ResolvingState) currentState;
+            Player activePlayer = resolvingState.getActivePlayer(game);
+            if (activePlayer != null) return activePlayer.getNickname();
+        }
+        // 2. Se siamo in fase di Piazzamento
+        else if (currentState instanceof PlacingState) { // Sostituisci con il nome della tua classe!
+            PlacingState placingState = (PlacingState) currentState;
+
+            // Assumo che tu abbia un metodo simile anche qui!
+            Player activePlayer = placingState.getActivePlayer();
+            if (activePlayer != null) return activePlayer.getNickname();
+        }
+
+        return "Sconosciuto";
+    }
+
+    public Color getPlayerColor(String nickname) {
+        return requirePlayer(nickname).getColor();
+    }
+
+    public int getRemainingUpperPicks() {
+        if (game == null) return 0;
+        if (game.getCurrentState() instanceof ResolvingState) {
+            return ((ResolvingState) game.getCurrentState()).getRemainingUpper();
+        }
+        return 0;
+    }
+
+    public int getRemainingLowerPicks() {
+        if (game == null) return 0;
+        if (game.getCurrentState() instanceof ResolvingState) {
+            return ((ResolvingState) game.getCurrentState()).getRemainingLower();
+        }
+        return 0;
     }
 }
 
