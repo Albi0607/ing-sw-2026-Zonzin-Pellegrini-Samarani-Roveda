@@ -1,14 +1,15 @@
 package it.polimi.ingsw.mesos.RMI;
+import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.rete.Network;
+
 import java.rmi.*;
 import java.rmi.registry.*;
-import java.util.*;
-import javax.naming.*;
 
-public class client_RMI {
+public class client_RMI implements Network {
 
+    RemoteMethods remote;
 
-    public static void main(String[] args)
-            throws NamingException, RemoteException, NotBoundException {
+    public client_RMI() throws RemoteException, NotBoundException{
         Registry registry = LocateRegistry.getRegistry();
         System.out.print("RMI registry bindings: ");
         String[] e = registry.list();
@@ -18,11 +19,49 @@ public class client_RMI {
 
         //va messo nel controller
         String remoteObjectName = "remoteMethods";
-        RemoteMethods remoteMethods = (RemoteMethods) registry.lookup(remoteObjectName);
-
-        //generare un thread per gestire la view e uno per gestire il controller probabilmente
-
+        remote = (RemoteMethods) registry.lookup(remoteObjectName);
     }
+
+
+    @Override
+    public boolean register(String nickname, ClientController controller){
+        try {
+            CallBack cb = new CallBackImplementation(controller);
+            return (remote.registerClient(nickname, cb));
+
+        } catch(RemoteException e){
+            return false;
+        }
+    }
+
+    public boolean placeTotem(String nickname, char position){
+        try {
+            return (remote.placeTotem(nickname, position));
+
+        } catch (RemoteException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean takeCard(String nickname, int position, boolean isUpper){
+        try {
+            return (remote.takeCard(nickname, position, isUpper));
+        } catch (RemoteException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean choosePlayers(int numPlayers){
+        try {
+            return (remote.choosePlayers(numPlayers));
+        } catch (RemoteException e) {
+            return false;
+        }
+    }
+
+}
 
 
     // azioni client
@@ -35,4 +74,3 @@ public class client_RMI {
         // - scegliere tipo di protocollo di rete
     // update generale
 
-}
