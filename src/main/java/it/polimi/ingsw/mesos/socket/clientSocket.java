@@ -1,95 +1,80 @@
 package it.polimi.ingsw.mesos.socket;
 
+import it.polimi.ingsw.mesos.rete.Network;
+import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.socket.Message.*;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.ChoosePlayersMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.PlaceTotemMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.RegisterMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.TakeCardMessage;
+
 import java.io.*;
 import java.net.Socket;
 
-public class clientSocket {
+public class clientSocket implements Network {
 
-    private static PrintWriter out;
-    private static BufferedReader in;
+    private Socket socket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
-    public static void main(String[] args) {
+    private ClientController controller;
 
-        String hostName = "127.0.0.1";
-        int portNumber = 7777;
-        Socket echoSocket = null;
-
+    public clientSocket(String host, int port) {
         try {
-            echoSocket = new Socket(hostName, portNumber);
+            socket = new Socket(host, port);
+
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
+
+            new Thread(this::listenFromServer).start();
+
         } catch (IOException e) {
-            System.err.println(e.toString() + " " + hostName);
-            System.exit(1);
+            e.printStackTrace();
         }
+    }
 
-        BufferedReader stdIn = null;
+    @Override
+    public boolean register(String nickname, ClientController controller) {
+        this.controller = controller;
+        sendMessage(new RegisterMessage(nickname));
+        return true;
+    }
 
+    @Override
+    public boolean placeTotem(String nickname, char position) {
+        sendMessage(new PlaceTotemMessage(nickname, position));
+        return true;
+    }
+
+    @Override
+    public boolean takeCard(String nickname, int position, boolean isUpper) {
+        sendMessage(new TakeCardMessage(nickname, position, isUpper));
+        return true;
+    }
+
+    @Override
+    public boolean choosePlayers(int numPlayers) {
+        sendMessage(new ChoosePlayersMessage(numPlayers));
+        return true;
+    }
+
+    private void sendMessage(Message_prova message) {
         try {
-            out = new PrintWriter(echoSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
-            stdIn = new BufferedReader(new InputStreamReader(System.in));
+            out.writeObject(message);
+            out.flush();
         } catch (IOException e) {
-            System.err.println(e.toString() + " " + hostName);
-            System.exit(1);
+            e.printStackTrace();
         }
+    }
 
-        String userInput;
-
-        while (true) {
-            try {
-                if ((userInput = stdIn.readLine()) == null) break;
-
-                if (userInput.startsWith("/nick")) {
-                    chooseNickname(userInput.split(" ")[1]);
-
-                } else if (userInput.startsWith("/players")) {
-                    chooseNumPlayers(Integer.parseInt(userInput.split(" ")[1]));
-
-                } else if (userInput.startsWith("/totem")) {
-                    placeTotem(Integer.parseInt(userInput.split(" ")[1]));
-
-                } else if (userInput.startsWith("/draw")) {
-                    String[] parts = userInput.split(" ");
-                    drawCard(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-
-                } else if (userInput.startsWith("/buy")) {
-                    buyBuilding(Integer.parseInt(userInput.split(" ")[1]));
-
-                } else {
-                    sendMessage(userInput);
-                }
-
-                System.out.println("echo: " + in.readLine());
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    private void listenFromServer() {
+        try {
+            while (true) {
+                Message_prova message = (Message_prova) in.readObject();
+                message.executeClientSide(controller);
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }
-
-    // ===== METODO BASE =====
-    public static void sendMessage(String msg) {
-        out.println(msg);
-    }
-
-    // ===== AZIONI CLIENT =====
-
-    public static void chooseNickname(String nickname) {
-        sendMessage("NICKNAME " + nickname);
-    }
-
-    public static void chooseNumPlayers(int n) {
-        sendMessage("NUM_PLAYERS " + n);
-    }
-
-    public static void placeTotem(int offerTileIndex) {
-        sendMessage("PLACE_TOTEM " + offerTileIndex);
-    }
-
-    public static void drawCard(int row, int index) {
-        sendMessage("DRAW_CARD " + row + " " + index);
-    }
-
-    public static void buyBuilding(int buildingId) {
-        sendMessage("BUY_BUILDING " + buildingId);
     }
 }
