@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.socket.Message.messageClient;
 
-import it.polimi.ingsw.mesos.socket.Message.Message_prova;
+import it.polimi.ingsw.mesos.socket.Message.Message;
 
-public class RegisterMessage extends Message_prova {
+public class RegisterMessage extends Message {
     private final String nickname;
 
     public RegisterMessage(String nickname) {

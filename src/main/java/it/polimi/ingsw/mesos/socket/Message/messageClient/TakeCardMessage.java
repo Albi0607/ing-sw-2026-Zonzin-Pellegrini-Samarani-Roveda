@@ -1,8 +1,9 @@
 package it.polimi.ingsw.mesos.socket.Message.messageClient;
 
-import it.polimi.ingsw.mesos.socket.Message.Message_prova;
+import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.socket.Message.Message;
 
-public class TakeCardMessage extends Message_prova {
+public class TakeCardMessage extends Message {
     private final String nickname;
     private final int position;
     private final boolean isUpper;
@@ -11,6 +12,11 @@ public class TakeCardMessage extends Message_prova {
         this.nickname = nickname;
         this.position = position;
         this.isUpper = isUpper;
+    }
+
+    @Override
+    public void executeServerSide(GameController controller) {
+        controller.onTakeCard(nickname, position, isUpper);
     }
 
     public String getNickname() { return nickname; }

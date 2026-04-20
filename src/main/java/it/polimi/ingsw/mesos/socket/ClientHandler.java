@@ -1,130 +1,110 @@
 package it.polimi.ingsw.mesos.socket;
 
-import com.google.gson.Gson;
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.socket.Message.Message;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.RegisterMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
+import java.io.*;
 import java.net.Socket;
 
-//serve a gestire socket multipli connessi da diverse macchine al server
-//nel costruttore infatti passi la singola macchina connessa
 public class ClientHandler implements Runnable {
 
-    static final Gson GSON = new Gson();
+    private final Socket clientSocket;
+    private final GameController controller;
 
-    private Socket clientSocket;
-    //private GameController controller;
-    private PrintWriter out;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
     private String nickname;
 
-    public ClientHandler(Socket clientSocket) {
+    private SocketVirtualView virtualView;
+
+
+    public ClientHandler(Socket clientSocket, GameController controller) {
         this.clientSocket = clientSocket;
-       // this.controller = controller;
+        this.controller = controller;
     }
 
     @Override
     public void run() {
-        try{
-            clientLoop(clientSocket/*, controller*/);
+        try {
+            setupStreams();
+            clientLoop();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // serve a leggere tutti i messaggi da un client girandoli al controller
-    public void clientLoop(Socket clientSocket/*, GameController controller*/) throws  IOException {
+    /** inizializza gli stream */
+    private void setupStreams() throws IOException {
+        out = new ObjectOutputStream(clientSocket.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(clientSocket.getInputStream());
+    }
 
-        BufferedReader in = null;
-
+    /**
+     *  Legge messaggi dal client finché la connessione è aperta.
+     *  Il primo messaggio deve essere sempre un RegisterMessage.
+     */
+    private void clientLoop() {
         try {
-            in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
-            this.out = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-// waits for data and reads it in until connection dies
-// readLine() blocks until the server receives
-// a new line from client
-        String line;
-        try {
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-                out.println(line.toUpperCase());
-                //Message msg = GSON.fromJson(line, Message.class);
-                //dispatch(msg, controller);
+            while (true) {
+                Message message = (Message) in.readObject();
+                handleMessage(message);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Client disconnesso: " + nickname);
+        }
+    }
+
+    /**
+     * gestisce i messaggi in arrivo, l'obiettivo è quello di distinguere i messaggi normali
+     * da quelli di registrazione e di errore anche quando non c'è ancora nessuna virtualView
+     */
+    private void handleMessage(Message message) throws IOException {
+        if (message instanceof RegisterMessage reg) {
+            handleRegister(reg);
+            return;
         }
 
-        System.out.println("Client: " + nickname + " disconnected");
-    }
-/*
-    private void dispatch(Message msg, GameController gc) {
-        if (msg == null || msg.action == null) {
-            sendError("Message not valid");
+        if (nickname == null) {
+            // Client non ancora registrato → ignora qualsiasi altro messaggio
+            System.err.println("Messaggio ricevuto prima della registrazione, ignorato.");
             return;
         }
 
         try {
-            switch (msg.action) {
-
-                case "ADD_PLAYER":
-                    this.nickname = msg.nickname;
-                    gc.addPlayer(msg.nickname);
-                    sendAck("Player added: " + msg.nickname);
-                    break;
-
-                case "START_GAME":
-                    gc.startGame();
-                    // onModelChanged() farà il broadcast automaticamente
-                    break;
-
-                case "PLACE_TOTEM":
-                    gc.onPlaceTotem(msg.nickname, msg.tileId.charAt(0));
-                    break;
-
-                case "TAKE_UPPER":
-                    gc.onTakeCardFromUpper(msg.nickname, msg.cardIndex);
-                    break;
-
-                case "TAKE_LOWER":
-                    gc.onTakeCardFromLower(msg.nickname, msg.cardIndex);
-                    break;
-
-                default:
-                    sendError("Azione sconosciuta: " + msg.action);
-            }
-
+            message.executeServerSide(controller);
         } catch (IllegalArgumentException | IllegalStateException | IndexOutOfBoundsException e) {
-            // Errori di logica di gioco → torna solo al client che ha sbagliato
-            sendError(e.getMessage());
+            // Errore di logica di gioco → risponde solo a questo client, non broadcast
+            if (virtualView != null) {
+                virtualView.showMessage(e.getMessage());
+            }
         }
     }
 
-    public void send(Message message) {
-        if (out != null) {
-            out.println(GSON.toJson(message));
-        }
-    }
-    private void sendError(String text) {
-        send(Message.withPayload("ERROR", text));
-    }
-
-    private void sendAck(String text) {
-        send(Message.withPayload("ACK", text));
-    }
-
-    private void close() {
+    /**
+     * Registra il client: crea la SocketVirtualView e la passa al controller.
+     * In caso di errore (es. nickname già usato) risponde con un errore e chiude la connessione.
+     */
+    private void handleRegister(RegisterMessage reg) throws IOException {
         try {
-            clientSocket.close();
-        } catch (IOException ignore) {}
-    }*/
+            this.nickname    = reg.getNickname();
+            this.virtualView = new SocketVirtualView(nickname, out);
+            controller.addPlayer(nickname, virtualView);
+            System.out.println( "Registrato: " + nickname);
+        } catch (Exception e) {
+            System.err.println("Errore registrazione '"
+                    + reg.getNickname() + "': " + e.getMessage());
+            // Manda errore e chiude — il client dovrà riconnettersi
+            try {
+                out.writeObject(new ErrorMessage(e.getMessage()));
+                out.flush();
+            } catch (IOException ignored) {}
+            clientSocket.close(); // motivo del throws nella firma, potrebbe generare un'ecc inaspettata
+        }
+    }
+
 
 }
