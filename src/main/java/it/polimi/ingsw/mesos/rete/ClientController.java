@@ -87,4 +87,8 @@ public class ClientController {
         }
     }
 
+    public void showError(String error) {
+        view.showMessage(error);
+    }
+
 }

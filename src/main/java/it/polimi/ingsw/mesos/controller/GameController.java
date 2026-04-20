@@ -1,9 +1,10 @@
 
 package it.polimi.ingsw.mesos.controller;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.RMI.ClientModel.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
+import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.Card;
@@ -23,20 +24,18 @@ import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class GameController {
 
     //istanza del model
     private Game game;
     //capire come gestire le virtual view per poi usare il protocollo di rete adeguato
-    private Map<String, VirtualView> players;
+    private final Map<String, VirtualView> players = new ConcurrentHashMap<>();
     //private View view;
     private List<String> pendingNicknames = new ArrayList<>();
     private int expectedNumPlayers=0;
-    private int pendingPicks = 0;
-
-    //il controller è associato ad un game unico o gestisce più game simultaneamente
-    // in caso di funzionalità aggiuntiva multiplayer? --> in quel caso private Game dentro costruttore
     public GameController() {
         this.pendingNicknames = new ArrayList<>();
     }
@@ -47,13 +46,6 @@ public class GameController {
      * @param expectedNumPlayers the number of players
      * @throws IllegalArgumentException if maxPlayers is less than or equal to 1 or grater than 5
      */
-
-    // il controller deve passare il numero di giocatori al modello alla creazione del game
-    // questo check è già presente in game nel costruttore, forse più corretto lasciarlo qui e
-    // toglierlo di là.
-    // per quanto riguarda il num di giocatori io prenderei direttamente il numero dalla size della
-    // lista di pendingNicknames dato che il check viene effettuato e sappiamo essere corretti
-
     //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
 
     public synchronized void setNumPlayers(int expectedNumPlayers) {
@@ -77,7 +69,6 @@ public class GameController {
      * @throws IllegalArgumentException if the nickname is already used or invalid
      */
 
-
     public synchronized void addPlayer(String nickname, VirtualView view) {
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
@@ -87,7 +78,7 @@ public class GameController {
             throw new IllegalArgumentException("Nickname cannot be null or empty");
         }
 
-        if (pendingNicknames.size() >= expectedNumPlayers) {
+        if (expectedNumPlayers != 0 & pendingNicknames.size() >= expectedNumPlayers) {
             throw new IllegalStateException("Maximum number of players reached");
         }
 
@@ -129,6 +120,7 @@ public class GameController {
         //for (int i = 0; i < expectedNumPLayer; i++) {
         //  pendingNicknames.remove(i);
         // }
+        broadcastUpdate();
     }
 
     /**
@@ -140,6 +132,7 @@ public class GameController {
             throw new IllegalStateException("Game not created");
         }
         game.startGame();
+        broadcastUpdate();
     }
 
     /**
@@ -149,14 +142,6 @@ public class GameController {
     public void endGame() {
         // capire cosa mettere qui
         //  view.notifyGameEnded(game.getWinner());
-    }
-
-    /**
-     * Updates the game board.
-     */
-    // per come ho scritto la logica sottostante da capire se è necessario questo metodo
-
-    public void updateBoard() {
     }
 
     // AZIONI DEL GIOCATORE
@@ -202,18 +187,77 @@ public class GameController {
         broadcastUpdate();
     }
 
-    //metodo che restituisce la partita all'ultimo aggiornamento e modifica fatta va completata in maniera intelligente
-    public GameDTO lastGameUpdate(){
-        GameDTO game = new GameDTO();
-        return game;
-    }
-
-    // Logica privata di avanzamento round
-
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
     //metodo che dicevamo aggiornare tutte le altre view
     protected void broadcastUpdate() {
-        // TODO: inviare lo stato aggiornato a tutti i client (rete/client)
+        if (game == null) return;
+        GameDTO dto = buildLastGameDTO();
+        for (VirtualView view : players.values()) {
+            view.sendGame(dto);
+        }
+    }
+
+    // metodo che ricostruisce lo stato attuale del gioco valido, per ogni aggiornamento
+    private GameDTO buildLastGameDTO() {
+        GameDTO dto = new GameDTO();
+        dto.currentState         = game.getCurrentState().getStateId();
+        dto.currentRound         = game.getCurrentRound();
+
+        // Era come intero (0=I, 1=II, 2=III)
+        dto.era = game.getCurrentEra() != null ? game.getCurrentEra().ordinal() : 0; // ordinal ritorna l'indice posizione nell'enumerazione
+
+        // Giocatore corrente: per ora il primo con un totem sulla board,
+        // da sistemare per quando PlacingState/ResolvingState essendo che dovrebbe dipendere dallo stato della partita
+        dto.currentPlayerNickname = game.getPlayers().isEmpty() ? null : game.getPlayers().get(0).getNickname();
+
+        // Stato dei giocatori
+        dto.players = game.getPlayers().stream()
+                .map(p -> {
+                    PlayerDTO pdto = new PlayerDTO();
+                    pdto.nickname       = p.getNickname();
+                    pdto.food           = p.getFood();
+                    pdto.prestigePoints = p.getPrestigePoints();
+                    pdto.color          = p.getColor();
+                    pdto.tribe = buildTribeDTO(p.getTribe());
+                    return pdto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        return dto;
+    }
+
+    private TribeDTO buildTribeDTO(Tribe tribe) {
+        TribeDTO dto = new TribeDTO();
+
+        dto.characters = new ArrayList<>();
+        for (int i = 0; i < tribe.getCharacters().size(); i++) {
+            CharacterCard c = tribe.getCharacters().get(i);
+            CardDTO card = new CardDTO();
+            card.id            = i;
+            card.type          = CardType.CHARACHTER_CARD;
+            card.characterType = c.getType();
+            card.era           = c.getEra().ordinal();
+            dto.characters.add(card);
+        }
+
+        dto.buildings = new ArrayList<>();
+        for (int i = 0; i < tribe.getBuildings().size(); i++) {
+            BuildingCard b = tribe.getBuildings().get(i);
+            CardDTO card = new CardDTO();
+            card.id   = i;
+            card.type = CardType.BUILDING_CARD;
+            card.era  = b.getEra().ordinal();
+            dto.buildings.add(card);
+        }
+
+        return dto;
+    }
+
+    //notifica il cambio state agli altri player
+    protected void sendClientStateToAll(ClientState state) {
+        for  (VirtualView view : players.values()) {
+            view.sendClientState(state);
+        }
     }
 
     // Metodi helper — rendono i metodi pubblici leggibili spostando il check
@@ -263,9 +307,6 @@ public class GameController {
         return expectedNumPlayers;
     }
 
-    public int getPendingPicks() {
-        return pendingPicks;
-    }
 }
 
 

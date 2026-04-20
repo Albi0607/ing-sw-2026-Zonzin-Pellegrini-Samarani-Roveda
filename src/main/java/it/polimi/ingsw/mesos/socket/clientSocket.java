@@ -24,6 +24,7 @@ public class clientSocket implements Network {
             socket = new Socket(host, port);
 
             out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
             in = new ObjectInputStream(socket.getInputStream());
 
             new Thread(this::listenFromServer).start();
@@ -58,7 +59,7 @@ public class clientSocket implements Network {
         return true;
     }
 
-    private void sendMessage(Message_prova message) {
+    private void sendMessage(Message message) {
         try {
             out.writeObject(message);
             out.flush();
@@ -70,7 +71,7 @@ public class clientSocket implements Network {
     private void listenFromServer() {
         try {
             while (true) {
-                Message_prova message = (Message_prova) in.readObject();
+                Message message = (Message) in.readObject();
                 message.executeClientSide(controller);
             }
         } catch (IOException | ClassNotFoundException e) {
