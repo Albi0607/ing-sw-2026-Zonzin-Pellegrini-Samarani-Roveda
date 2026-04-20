@@ -1,49 +1,63 @@
 package it.polimi.ingsw.mesos.socket;
 
+import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.model.Game;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-
-import static it.polimi.ingsw.mesos.socket.ClientHandler.GSON;
-
+import java.util.List;
 
 public class serverSocket {
 
-    static int portNumber = 7777;
-    static ArrayList<ClientHandler> clients = new ArrayList<>();
+    private final int portNumber;
+    private final GameController controller;
+    private final List<ClientHandler> clients = new ArrayList<>();
+
     //potrebbe servire non mi è ancora chiaro se il server deve in qualche modo usare questa lista per iterare/osservare i client (es. gestione disconnessioni)
 
+    public serverSocket(int portNumber) {
+        this.portNumber = portNumber;
+        this.controller = new GameController();
+
+    }
     public static void main(String[] args) {
-        System.out.println("Server started!");
-        ServerSocket ss = null;
-        try {
-            ss = new ServerSocket(portNumber);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println("Listening on port " + portNumber);
-        //loop infinito in accettazione di connessioni
-        while (true) {
-
-            Socket clientSocket = null;
-
+        int portNumber = 1234;
+        if (args.length > 0) {
             try {
-                clientSocket = ss.accept(); //bloccante! se fate partire il programma, rimane inchiodato qua finchè non gli arriva una richiesta
-            } catch (IOException e) {
+                portNumber = Integer.parseInt(args[0]);
+            } catch (NumberFormatException e) {
                 throw new RuntimeException(e);
             }
-
-            System.out.println("Accepted connection from " + clientSocket.getInetAddress().getHostAddress());
-            ClientHandler clientHandler = new ClientHandler(clientSocket);
-            clients.add(clientHandler);
-            Thread t = new Thread(clientHandler);
-            t.start();
         }
+        new serverSocket(portNumber).start();
+    }
 
+    public void start() {
+        System.out.println("Starting Socket server on port: " + portNumber + "...");
+
+        // ricorda: notazione confusionaria, esiste serverSocket di tipo ServerSocket e serverSocket l'attuale classe, due cose diverse
+        try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
+            System.out.println("Listening. Waiting for players...");
+
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("New connection from: "
+                        + clientSocket.getInetAddress().getHostAddress());
+
+                ClientHandler handler = new ClientHandler(clientSocket, controller);
+                clients.add(handler);
+
+                Thread thread = new Thread(handler);
+                thread.setDaemon(true); // il thread non blocca la JVM in chiusura, al contrario avrebbe dovuto aspettare che le connessioni finissero prima di potersi chiudere
+                thread.setName("client-" + clientSocket.getInetAddress().getHostAddress());
+                thread.start();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Fatal error: " + e.getMessage());
+        }
     }
 
     //parte di chiusura, da caoire se serve con il loop
