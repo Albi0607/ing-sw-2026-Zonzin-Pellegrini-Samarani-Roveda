@@ -88,7 +88,6 @@ public class CLIPrinter {
             if (c.type != null) {
                 switch (c.type) {
                     case CHARACHTER_CARD:
-
                         String charName = (c.characterType != null) ? c.characterType.name() : "Sconosciuto";
                         System.out.print(ANSI_CYAN + charName + ANSI_RESET + "  ");
                         break;
