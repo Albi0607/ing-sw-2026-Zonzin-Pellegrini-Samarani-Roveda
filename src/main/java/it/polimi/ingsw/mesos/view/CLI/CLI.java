@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.controller.GameController;
@@ -10,14 +11,14 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.util.Scanner;
 
 public class CLI implements View {
-    private final GameController controller;
+    private final ClientController controller;
     private final Scanner scanner;
     private String myNickname;
 
     private GameDTO currentGameState;
     private ClientState currentClientState;
 
-    public CLI(GameController controller) {
+    public CLI(ClientController controller) {
         this.controller = controller;
         this.scanner = new Scanner(System.in);
     }
@@ -65,10 +66,6 @@ public class CLI implements View {
             @Override public String getNickname() { return myNickname; }
         };
 
-        controller.setNumPlayers(2);
-        controller.addPlayer(myNickname, mockView);
-        controller.addPlayer("Bot_AI", mockView);
-        controller.startGame();
     }
 
     private void drawUI() {
@@ -116,7 +113,7 @@ public class CLI implements View {
         }
 
         try {
-            controller.onPlaceTotem(myNickname, input.charAt(0));
+            controller.placeTotem(input.charAt(0));
 
         } catch (Exception e) {
             showMessage("Mossa non valida: " + e.getMessage());
@@ -137,7 +134,7 @@ public class CLI implements View {
 
         try {
             int cardIndex = Integer.parseInt(input) - 1;
-            controller.onTakeCard(myNickname, cardIndex, isUpper);
+            controller.takeCard(cardIndex, isUpper);
         } catch (Exception e) {
             showMessage("Errore: " + e.getMessage());
             handleResolution();
