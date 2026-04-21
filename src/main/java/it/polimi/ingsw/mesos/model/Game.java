@@ -77,7 +77,7 @@ public class Game {
 
         System.out.println("Board initialized with Offer Tiles and Turn Order Track for " + numPlayers + " players.");
 
-        //java.util.Collections.shuffle(this.players); commentato solo per test poi scommmentare
+        java.util.Collections.shuffle(this.players);
 
         System.out.println("Ordine di turno iniziale stabilito casualmente.");
 
