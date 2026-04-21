@@ -1,12 +1,12 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
-import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.util.Scanner;
 
@@ -18,135 +18,162 @@ public class CLI implements View {
     private GameDTO currentGameState;
     private ClientState currentClientState;
 
+    private volatile boolean actionSent = false;
+
     public CLI() {
         this.scanner = new Scanner(System.in);
     }
 
-    public void start() {
-        CLIPrinter.clearScreen();
-        System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
-
-        setupGame();
-    }
 
     @Override
     public void showLastUpdate(GameDTO game) {
-
         this.currentGameState = game;
-
+        this.actionSent = false;
         drawUI();
-
-        handleTurn();
     }
 
     @Override
     public void showClientStateUpdate(ClientState state) {
-
         this.currentClientState = state;
 
     }
 
     @Override
     public void showMessage(String message) {
-        // Questo è perfetto per gli errori ("Cibo insufficiente!")
         System.out.println(CLIPrinter.ANSI_RED + "🔔 NOTIFICA: " + message + CLIPrinter.ANSI_RESET);
-
-        // Siccome c'è stato un errore, ricarichiamo la richiesta di input
-        handleTurn();
+        this.actionSent = false; // Se la mossa era sbagliata, ci permette di riprovare
     }
 
+    public void start() {
+        CLIPrinter.clearScreen();
+        System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
+
+        chooseNetwork();
+        setupGame();
+
+        while (true) {
+            if (currentClientState == ClientState.CHOOSE_PLAYERS) {
+                askForPlayers();
+            }
+            else if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
+                if (currentGameState.currentState == GameState.FINISHED) {
+                    if (!actionSent) {
+                        CLIPrinter.printGameOver(currentGameState);
+                        actionSent = true;
+                    }
+                }
+                else{
+                    if (isMyTurn()) {
+                        if (!actionSent) {
+                            handleTurn();
+                        } else {
+
+                            System.out.print("\r⏳ Mossa inviata, elaborazione in corso...");
+                        }
+                    }
+                    else {
+
+                        String activePlayer = currentGameState.currentPlayerNickname;
+
+                        System.out.print("\r⌛ In attesa che " + activePlayer + " faccia la sua mossa...   ");
+                        System.out.flush();
+                    }
+                }
+            }
+
+            // Pausa
+            try { Thread.sleep(200); } catch (InterruptedException e) {}
+        }
+    }
+
+    private void chooseNetwork() {
+        System.out.println("\nScegli il tipo di connessione:");
+        System.out.println("1. RMI");
+        System.out.println("2. Socket");
+        System.out.print("Scelta (1 o 2): ");
+
+        String choice = scanner.nextLine().trim();
+        Network network = null;
+
+        if (choice.equals("1")) {
+            System.out.println("Connessione RMI in corso (su localhost)...");
+            try {
+                network = new client_RMI();
+            } catch (Exception e) {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Errore RMI: " + e.getMessage() + CLIPrinter.ANSI_RESET);
+                chooseNetwork();
+                return;
+            }
+        } else if (choice.equals("2")) {
+            System.out.println("Connessione Socket in corso...");
+            //TODO implementazione socket
+        } else {
+            chooseNetwork();
+            return;
+        }
+
+        this.controller = new ClientController(this, network);
+    }
 
     private void setupGame() {
-        /*
-        VirtualView mockView = new VirtualView() {
-            @Override public void sendGame(GameDTO gameDTO) { showLastUpdate(gameDTO); }
-            @Override public void sendClientState(ClientState clientState) { showClientStateUpdate(clientState); }
-            @Override public void showMessage(String message) { CLI.this.showMessage(message); }
-            @Override public String getNickname() { return myNickname; }
-        };
-         */
-
+        System.out.print("\nInserisci il tuo nickname: ");
+        this.myNickname = scanner.nextLine().trim();
+        controller.register(myNickname);
+        System.out.println(CLIPrinter.ANSI_YELLOW + "In attesa degli altri giocatori o di comunicazioni dal Server..." + CLIPrinter.ANSI_RESET);
     }
 
     private void drawUI() {
+        if (currentGameState == null) return;
         CLIPrinter.clearScreen();
-
         CLIPrinter.printHeader(currentGameState, false);
         CLIPrinter.printBoard(currentGameState);
         CLIPrinter.printAllPlayersStatus(currentGameState);
-
         System.out.println("Fase attuale: " + CLIPrinter.ANSI_GREEN + currentGameState.currentState + CLIPrinter.ANSI_RESET + "\n");
     }
 
+    private boolean isMyTurn() {
+        return currentGameState.currentPlayerNickname != null &&
+                currentGameState.currentPlayerNickname.equals(myNickname);
+    }
+
+    private void askForPlayers() {
+        System.out.print(CLIPrinter.ANSI_CYAN + "Sei il primo giocatore! Scegli il numero di giocatori (2-5): " + CLIPrinter.ANSI_RESET);
+        try {
+            int num = Integer.parseInt(scanner.nextLine().trim());
+
+            currentClientState = ClientState.WAITING_CONNECTION;
+            controller.choosePlayer(num);
+        } catch (NumberFormatException e) {
+            System.out.println(CLIPrinter.ANSI_RED + "Inserisci un numero valido!" + CLIPrinter.ANSI_RESET);
+        }
+    }
+
     private void handleTurn() {
+        System.out.println(CLIPrinter.ANSI_CYAN + " TOCCA A TE! " + CLIPrinter.ANSI_RESET);
 
-        if (currentGameState.currentState == GameState.FINISHED) {
-            CLIPrinter.printGameOver(currentGameState);
-            return;
-        }
+        if (currentGameState.currentState == GameState.PLACING_TOTEMS) {
+            System.out.print("Scegli la tessera per il totem (A, B, C, D, E, F): ");
+            String input = scanner.nextLine().trim().toUpperCase();
 
-        if (currentGameState.currentPlayerNickname != null && currentGameState.currentPlayerNickname.equals(myNickname)) {
-
-            if (currentGameState.currentState == GameState.PLACING_TOTEMS) {
-                handlePlacement();
-            } else if (currentGameState.currentState == GameState.RESOLVING_ACTIONS) {
-                handleResolution();
+            if (input.isEmpty() || input.length() != 1) {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Lettera non valida!" + CLIPrinter.ANSI_RESET);
+            } else {
+                actionSent = true;
+                controller.placeTotem(input.charAt(0));
             }
-
-        } else {
-
-            System.out.println("In attesa del turno di " + CLIPrinter.ANSI_CYAN + currentGameState.currentPlayerNickname + CLIPrinter.ANSI_RESET + "...");
         }
-    }
+        else if (currentGameState.currentState == GameState.RESOLVING_ACTIONS) {
+            System.out.println("Azione: Pesca dalla fila " + CLIPrinter.ANSI_YELLOW + "SUPERIORE (↑)" + CLIPrinter.ANSI_RESET);
+            System.out.print("Digita il NUMERO della carta: ");
+            String input = scanner.nextLine().trim();
 
-    private void handlePlacement() {
-        System.out.println("Tocca a: " + CLIPrinter.ANSI_CYAN + myNickname + CLIPrinter.ANSI_RESET);
-        System.out.print("Scegli la tessera per il totem (A, B, C, D, E, F): ");
-
-        String input = scanner.nextLine().trim().toUpperCase();
-
-        if (input.isEmpty() || input.length() != 1) {
-            System.out.println(CLIPrinter.ANSI_RED + "❌ Inserisci una singola lettera!" + CLIPrinter.ANSI_RESET);
-
-            handlePlacement();
-            return;
+            try {
+                int cardIndex = Integer.parseInt(input) - 1;
+                actionSent = true;
+                controller.takeCard(cardIndex, true);
+            } catch (NumberFormatException e) {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Numero non valido!" + CLIPrinter.ANSI_RESET);
+            }
         }
-
-        try {
-            controller.placeTotem(input.charAt(0));
-
-        } catch (Exception e) {
-            showMessage("Mossa non valida: " + e.getMessage());
-            handlePlacement();
-        }
-    }
-
-    private void handleResolution() {
-
-        System.out.println("Tocca a: " + CLIPrinter.ANSI_CYAN + myNickname + CLIPrinter.ANSI_RESET);
-
-
-        boolean isUpper = true;
-        System.out.println("Azione: Pesca dalla fila " + CLIPrinter.ANSI_YELLOW + "SUPERIORE (↑)" + CLIPrinter.ANSI_RESET);
-
-        System.out.print("Digita il NUMERO della carta: ");
-        String input = scanner.nextLine().trim();
-
-        try {
-            int cardIndex = Integer.parseInt(input) - 1;
-            controller.takeCard(cardIndex, isUpper);
-        } catch (Exception e) {
-            showMessage("Errore: " + e.getMessage());
-            handleResolution();
-        }
-    }
-
-    private void attendiInvio() {
-        System.out.print(CLIPrinter.ANSI_YELLOW + "\nPremi INVIO per continuare..." + CLIPrinter.ANSI_RESET);
-        scanner.nextLine();
-    }
-
-    public void setClientController(ClientController controller){
-        this.controller = controller;
     }
 }
