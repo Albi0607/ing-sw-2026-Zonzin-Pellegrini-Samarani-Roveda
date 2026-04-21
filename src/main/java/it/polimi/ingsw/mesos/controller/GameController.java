@@ -4,9 +4,12 @@ package it.polimi.ingsw.mesos.controller;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.Tribe;
+import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
+import it.polimi.ingsw.mesos.model.card.event.EventCard;
 import it.polimi.ingsw.mesos.model.enums.Color;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
@@ -39,14 +42,35 @@ public class GameController {
     //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
 
     public synchronized void setNumPlayers(int expectedNumPlayers) {
-        if(this.expectedNumPlayers!=0){
+        if(this.expectedNumPlayers != 0){
             System.out.println("Numero di player gia settato da un altro giocatore");
             return;
         }
         if (expectedNumPlayers <= 1 || expectedNumPlayers > 5) {
             throw new IllegalArgumentException("The number of players is not valid!");
         }
+
         this.expectedNumPlayers = expectedNumPlayers;
+
+        if (pendingNicknames.size() == this.expectedNumPlayers) {
+
+            createGame();
+            game.startGame();
+
+            new Thread(() -> {
+                for (VirtualView v : players.values()) {
+                    v.sendClientState(ClientState.IN_GAME);
+                }
+                broadcastUpdate();
+            }).start();
+
+        } else {
+
+            for (VirtualView view : players.values()) {
+                view.sendClientState(ClientState.WAITING_CONNECTION);
+                view.showMessage("Partita impostata a " + expectedNumPlayers + " giocatori. In attesa degli sfidanti...");
+            }
+        }
     }
 
     /**
@@ -68,7 +92,7 @@ public class GameController {
             throw new IllegalArgumentException("Nickname cannot be null or empty");
         }
 
-        if (expectedNumPlayers != 0 & pendingNicknames.size() >= expectedNumPlayers) {
+        if (expectedNumPlayers != 0 && pendingNicknames.size() >= expectedNumPlayers) {
             throw new IllegalStateException("Maximum number of players reached");
         }
 
@@ -76,13 +100,33 @@ public class GameController {
         if (pendingNicknames.contains(nickname)) {
             throw new IllegalArgumentException("Nickname already in use");
         }
-        // if the current nickname pass all the previous check --> it can be inserts in the list
+
         pendingNicknames.add(nickname);
         players.put(nickname,view);
 
-        // Automatically create the game when all players are added
-        if (pendingNicknames.size() == expectedNumPlayers) {
+
+        if (expectedNumPlayers == 0 && pendingNicknames.size() == 1) {
+            // È il primissimo giocatore a entrare! Gli chiediamo di scegliere i posti.
+            view.sendClientState(ClientState.CHOOSE_PLAYERS);
+        }
+        else if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
+            // La stanza è piena. Creiamo la partita...
             createGame();
+
+            game.startGame();
+
+            // Usiamo un Thread per sbloccare i giocatori e mandare la prima plancia
+            new Thread(() -> {
+                for (VirtualView v : players.values()) {
+                    v.sendClientState(ClientState.IN_GAME);
+                }
+
+                broadcastUpdate();
+            }).start();
+        }
+        else {
+            // È entrato un giocatore, ma la stanza non è ancora piena.
+            view.sendClientState(ClientState.WAITING_CONNECTION);
         }
     }
 
@@ -110,7 +154,7 @@ public class GameController {
         //for (int i = 0; i < expectedNumPLayer; i++) {
         //  pendingNicknames.remove(i);
         // }
-        broadcastUpdate();
+        //broadcastUpdate();
     }
 
     /**
@@ -206,9 +250,11 @@ public class GameController {
         // Era come intero (0=I, 1=II, 2=III)
         dto.era = game.getCurrentEra() != null ? game.getCurrentEra().ordinal() : 0; // ordinal ritorna l'indice posizione nell'enumerazione
 
+        dto.board = buildBoardDTO(game.getBoard());
+
         // Giocatore corrente: per ora il primo con un totem sulla board,
         // da sistemare per quando PlacingState/ResolvingState essendo che dovrebbe dipendere dallo stato della partita
-        dto.currentPlayerNickname = game.getPlayers().isEmpty() ? null : game.getPlayers().get(0).getNickname();
+        dto.currentPlayerNickname = game.getCurrentPlayerNickname();
 
         // Stato dei giocatori
         dto.players = game.getPlayers().stream()
@@ -222,6 +268,37 @@ public class GameController {
                     return pdto;
                 })
                 .collect(java.util.stream.Collectors.toList());
+
+        return dto;
+    }
+
+    private BoardDTO buildBoardDTO(Board board) {
+        BoardDTO dto = new BoardDTO();
+
+        dto.upperRow = board.getUpperRow().stream()
+                .map(this::buildCardDTO)
+                .collect(java.util.stream.Collectors.toList());
+
+        dto.lowerRow = board.getLowerRow().stream()
+                .map(this::buildCardDTO)
+                .collect(java.util.stream.Collectors.toList());
+
+        return dto;
+    }
+
+    private CardDTO buildCardDTO(Card c) {
+        CardDTO dto = new CardDTO();
+        dto.era = c.getEra() != null ? c.getEra().ordinal() : 0;
+
+        if (c instanceof CharacterCard charCard) {
+            dto.type = CardType.CHARACHTER_CARD;
+            dto.characterType = charCard.getType();
+        } else if (c instanceof EventCard eventCard) {
+            dto.type = CardType.EVENT_CARD;
+            dto.eventType = eventCard.getType();
+        } else if (c instanceof BuildingCard) {
+            dto.type = CardType.BUILDING_CARD;
+        }
 
         return dto;
     }

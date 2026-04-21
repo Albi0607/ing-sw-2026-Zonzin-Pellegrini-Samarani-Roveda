@@ -329,6 +329,14 @@ public class Game {
         }
     }
 
+    public String getCurrentPlayerNickname() {
+        if (this.currentState != null) {
+            // Chiediamo allo stato chi è il giocatore di turno
+            return this.currentState.getCurrentPlayer(this).getNickname();
+        }
+        return null;
+    }
+
     /**
      * Determines the winner of the game based on prestige points.
      *

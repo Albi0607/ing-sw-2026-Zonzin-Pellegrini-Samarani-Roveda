@@ -13,7 +13,7 @@ public class ClientController {
     private GameDTO game;
     private ClientState clientState;
 
-    ClientController(View view, Network network){
+    public ClientController(View view, Network network){
         this.view = view;
         this.network = network;
         this.clientState=ClientState.WAITING_CONNECTION;
@@ -36,6 +36,8 @@ public class ClientController {
             if (network.register(nickname, this)) {
                 this.nickname = nickname;
                 System.out.println("Registrazione avvenuta correttamente");
+            }else{
+                System.out.println("ERRORE di registrazione ");//aggiunto questo else
             }
         }
         else{
@@ -51,6 +53,7 @@ public class ClientController {
             }
             else{
                 System.out.println("Errore piazzamento totem");
+                view.showMessage("Tessera occupata o mossa non valida! Riprova."); // aggiunto per gestire l'errore di piazzamento tessera
             }
         }
         else{

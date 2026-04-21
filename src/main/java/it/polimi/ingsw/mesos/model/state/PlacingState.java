@@ -107,6 +107,12 @@ public class PlacingState implements GameStateLogic {
     @Override
     public GameState getStateId() { return GameState.PLACING_TOTEMS; }
 
+    @Override
+    public Player getCurrentPlayer(Game g) {
+        // actingOrder è la lista dei giocatori ordinata per il piazzamento
+        return actingOrder.get(activePlayerIndex);
+    }
+
 
     public Player getActivePlayer() {
         if (actingOrder == null || activePlayerIndex >= actingOrder.size()) {
@@ -114,7 +120,6 @@ public class PlacingState implements GameStateLogic {
         }
         return actingOrder.get(activePlayerIndex);
     }
-
 
     //metodo solo per il testing
     public List<Player> getActingOrder() {
