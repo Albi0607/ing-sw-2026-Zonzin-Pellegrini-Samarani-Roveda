@@ -171,12 +171,21 @@ public class GameController {
 
     public void onTakeCard(String nickname, int cardIndex, boolean isUpper) {
 
-        requireState(GameState.RESOLVING_ACTIONS);
-        Player player = requirePlayer(nickname);
+        try {
+            requireState(GameState.RESOLVING_ACTIONS);
+            Player player = requirePlayer(nickname);
 
-        game.takeCard(player, cardIndex, isUpper);
+            game.takeCard(player, cardIndex, isUpper);
 
-        broadcastUpdate();
+            broadcastUpdate();
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+
+            VirtualView view = players.get(nickname);
+            if (view != null) {
+                view.showMessage("Mossa non valida: " + e.getMessage());
+            }
+        }
 
     }
 

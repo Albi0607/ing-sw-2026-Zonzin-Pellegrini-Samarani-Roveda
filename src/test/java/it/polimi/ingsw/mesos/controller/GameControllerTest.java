@@ -1,5 +1,7 @@
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
@@ -7,6 +9,7 @@ import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.PlacingState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
+import it.polimi.ingsw.mesos.rete.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,11 +20,18 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameControllerTest {
 
     private GameController controller;
+    private VirtualView mockView;
 
     @BeforeEach
     void setUp() {
 
         controller = new GameController();
+        mockView = new VirtualView() {
+            @Override public void sendGame(GameDTO gameDTO) {}
+            @Override public void sendClientState(ClientState clientState) {}
+            @Override public void showMessage(String message) {}
+            @Override public String getNickname() { return "Test"; }
+        };
 
     }
 
@@ -29,9 +39,9 @@ class GameControllerTest {
     void testSimulazionePrimoRoundCompleto() {
 
         controller.setNumPlayers(3);
-        controller.addPlayer("Alice");
-        controller.addPlayer("Bob");
-        controller.addPlayer("Carlo");
+        controller.addPlayer("Alice", mockView);
+        controller.addPlayer("Bob", mockView);
+        controller.addPlayer("Carlo", mockView);
 
         controller.startGame();
 
@@ -111,25 +121,25 @@ class GameControllerTest {
         controller.setNumPlayers(3);
 
         // Aggiunta giocatori con nomi non validi
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer(""),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("", mockView),
                 "Il controller deve rifiutare stringhe vuote");
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer(null),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer(null, mockView),
                 "Il controller deve rifiutare nomi null");
 
         // Aggiunta corretta
-        controller.addPlayer("Marco");
-        controller.addPlayer("Sofia");
+        controller.addPlayer("Marco", mockView);
+        controller.addPlayer("Sofia", mockView);
 
         // Duplicati
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("Marco"),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("Marco", mockView),
                 "Il controller deve rifiutare nomi duplicati");
 
         // Ultimo giocatore (innesca la creazione automatica)
-        controller.addPlayer("Alice");
+        controller.addPlayer("Alice", mockView);
         assertNotNull(controller.getGame(), "Il gioco deve essere stato istanziato automaticamente");
 
         // Limite massimo superato
-        assertThrows(IllegalStateException.class, () -> controller.addPlayer("Bob"),
+        assertThrows(IllegalStateException.class, () -> controller.addPlayer("Bob", mockView),
                 "Il controller deve bloccare aggiunte a gioco già creato");
 
 
