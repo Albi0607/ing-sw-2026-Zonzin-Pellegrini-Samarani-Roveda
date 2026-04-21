@@ -11,15 +11,14 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.util.Scanner;
 
 public class CLI implements View {
-    private final ClientController controller;
+    private ClientController controller;
     private final Scanner scanner;
     private String myNickname;
 
     private GameDTO currentGameState;
     private ClientState currentClientState;
 
-    public CLI(ClientController controller) {
-        this.controller = controller;
+    public CLI() {
         this.scanner = new Scanner(System.in);
     }
 
@@ -55,16 +54,17 @@ public class CLI implements View {
         // Siccome c'è stato un errore, ricarichiamo la richiesta di input
         handleTurn();
     }
-    private void setupGame() {
-        System.out.print("Inserisci il tuo nickname: ");
-        this.myNickname = scanner.nextLine().trim();
 
+
+    private void setupGame() {
+        /*
         VirtualView mockView = new VirtualView() {
             @Override public void sendGame(GameDTO gameDTO) { showLastUpdate(gameDTO); }
             @Override public void sendClientState(ClientState clientState) { showClientStateUpdate(clientState); }
             @Override public void showMessage(String message) { CLI.this.showMessage(message); }
             @Override public String getNickname() { return myNickname; }
         };
+         */
 
     }
 
@@ -144,5 +144,9 @@ public class CLI implements View {
     private void attendiInvio() {
         System.out.print(CLIPrinter.ANSI_YELLOW + "\nPremi INVIO per continuare..." + CLIPrinter.ANSI_RESET);
         scanner.nextLine();
+    }
+
+    public void setClientController(ClientController controller){
+        this.controller = controller;
     }
 }
