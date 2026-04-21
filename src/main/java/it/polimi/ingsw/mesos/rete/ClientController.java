@@ -13,7 +13,7 @@ public class ClientController {
     private GameDTO game;
     private ClientState clientState;
 
-    ClientController(View view, Network network){
+    public ClientController(View view, Network network){
         this.view = view;
         this.network = network;
         this.clientState=ClientState.WAITING_CONNECTION;
@@ -35,11 +35,11 @@ public class ClientController {
         if(clientState==ClientState.WAITING_CONNECTION) {
             if (network.register(nickname, this)) {
                 this.nickname = nickname;
-                System.out.println("Registrazione avvenuta correttamente");
+                view.showMessage("Registrazione avvenuta correttamente");
             }
         }
         else{
-            System.out.println("Errore nella registrazione");
+            view.showMessage("Errore nella registrazione");
         }
 
     }
@@ -47,14 +47,14 @@ public class ClientController {
     public void placeTotem(char position){
         if(game!=null&&game.currentState== GameState.PLACING_TOTEMS&&game.currentPlayerNickname.equals(nickname)&&clientState==ClientState.IN_GAME) {
             if(network.placeTotem(nickname, position)){
-                System.out.println("Totem piazzato correttamente");
+                view.showMessage("Totem piazzato correttamente");
             }
             else{
-                System.out.println("Errore piazzamento totem");
+                view.showMessage("Errore piazzamento totem");
             }
         }
         else{
-            System.out.println("Non puoi piazzare il totem poiché non tocca a te");
+            view.showMessage("Non puoi piazzare il totem poiché non tocca a te");
         }
 
     }
@@ -62,28 +62,28 @@ public class ClientController {
     public void takeCard(int position,boolean isUpper){
         if(game!=null&&game.currentState== GameState.RESOLVING_ACTIONS&&game.currentPlayerNickname.equals(nickname)&&clientState==ClientState.IN_GAME) {
             if(network.takeCard(nickname,position,isUpper)){
-                System.out.println("Carta presa correttamente");
+                view.showMessage("Carta presa correttamente");
             }
             else{
-                System.out.println("Errore nel prendere la carta");
+                view.showMessage("Errore nel prendere la carta");
             }
         }
         else{
-            System.out.println("Non puoi prendere la carta poiché non tocca a te");
+            view.showMessage("Non puoi prendere la carta poiché non tocca a te");
         }
     }
 
     public void choosePlayer(int numPlayers){
         if(clientState==ClientState.CHOOSE_PLAYERS) {
             if(network.choosePlayers(numPlayers)){
-                System.out.println("Numero di giocatori scelto correttamente");
+                view.showMessage("Numero di giocatori scelto correttamente");
             }
             else{
-                System.out.println("Numero di giocatori non scelto");
+                view.showMessage("Numero di giocatori non scelto");
             }
         }
         else{
-            System.out.println("Non puoi scegliere il numero di giocatori perché non tocca a te");
+            view.showMessage("Non puoi scegliere il numero di giocatori perché non tocca a te");
         }
     }
 

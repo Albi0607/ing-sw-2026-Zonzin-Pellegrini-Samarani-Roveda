@@ -83,6 +83,7 @@ public class GameController {
         // Automatically create the game when all players are added
         if (pendingNicknames.size() == expectedNumPlayers) {
             createGame();
+            startGame();
         }
     }
 
