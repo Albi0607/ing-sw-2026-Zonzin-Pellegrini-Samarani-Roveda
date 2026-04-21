@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.rete;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 
 public interface View {
 

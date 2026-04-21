@@ -1,8 +1,7 @@
 package it.polimi.ingsw.mesos.RMI;
 
-import com.sun.jdi.VirtualMachine;
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.RemoteException;

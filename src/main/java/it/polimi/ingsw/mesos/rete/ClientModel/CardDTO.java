@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.RMI.ClientModel;
+package it.polimi.ingsw.mesos.rete.ClientModel;
 
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.EventType;

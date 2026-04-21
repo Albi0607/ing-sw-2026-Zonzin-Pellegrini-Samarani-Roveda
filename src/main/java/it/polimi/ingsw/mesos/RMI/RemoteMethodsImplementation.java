@@ -1,22 +1,18 @@
 package it.polimi.ingsw.mesos.RMI;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
 import java.rmi.server.*;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RemoteMethodsImplementation extends UnicastRemoteObject implements RemoteMethods {
 
     private final GameController controller;
 
 
-    public RemoteMethodsImplementation() throws RemoteException {
-        this.controller = new GameController();
+    public RemoteMethodsImplementation(GameController controller) throws RemoteException {
+        this.controller = controller;
     }
 
 
@@ -68,19 +64,5 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         }
         return true;
     }
-
-    //deve essere fatto dal gameController a tutte le virtual view ed andare direttamente in ClientCallBack
-    /*
-    //aggiornamento della view di tutti i client
-    private void broadcast(GameDTO game) {
-        for (VirtualView view : clients.values()) {
-            try {
-                view.sendGame(game);
-            } catch (Exception e) {
-                System.out.println("Errore nell'aggiornamento del broadcast update al client");
-            }
-        }
-    }
-    */
 
 }

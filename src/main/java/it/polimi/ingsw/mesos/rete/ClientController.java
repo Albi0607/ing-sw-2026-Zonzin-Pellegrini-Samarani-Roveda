@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.rete;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 
 public class ClientController {
@@ -86,6 +86,13 @@ public class ClientController {
             System.out.println("Non puoi scegliere il numero di giocatori perché non tocca a te");
         }
     }
+
+    //aggiungere il metodo per fare una pescata extra
+
+
+     public void showMessage(String message){
+        view.showMessage(message);
+     }
 
     public void showError(String error) {
         view.showMessage(error);

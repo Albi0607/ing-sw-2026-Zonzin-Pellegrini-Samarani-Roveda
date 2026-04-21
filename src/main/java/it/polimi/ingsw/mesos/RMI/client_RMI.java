@@ -17,7 +17,6 @@ public class client_RMI implements Network {
             System.out.println(e[i]);
         }
 
-        //va messo nel controller
         String remoteObjectName = "remoteMethods";
         remote = (RemoteMethods) registry.lookup(remoteObjectName);
     }
@@ -62,15 +61,4 @@ public class client_RMI implements Network {
     }
 
 }
-
-
-    // azioni client
-        // - scegliere su quale offerTile posizionare il totem
-        // - pescare una carta
-        // - comprare un edificio
-        // - scegliere il numero di giocatore iniziale
-        // - inserire il nickname
-        // - scegliere tipo di view
-        // - scegliere tipo di protocollo di rete
-    // update generale
 
