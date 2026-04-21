@@ -1,31 +1,21 @@
 
 package it.polimi.ingsw.mesos.controller;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.Tribe;
-import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
-import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
-import it.polimi.ingsw.mesos.model.card.character.Hunter;
 import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.EventType;
 import it.polimi.ingsw.mesos.model.enums.GameState;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
-import it.polimi.ingsw.mesos.model.state.EventState;
-import it.polimi.ingsw.mesos.model.state.GameStateLogic;
-import it.polimi.ingsw.mesos.model.state.ResolvingState;
+import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
-import javax.swing.text.View;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class GameController {
 
@@ -198,6 +188,7 @@ public class GameController {
 
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
     //metodo che dicevamo aggiornare tutte le altre view
+    //capire cosa fare quando cade la rete
     protected void broadcastUpdate() {
         if (game == null) return;
         GameDTO dto = buildLastGameDTO();

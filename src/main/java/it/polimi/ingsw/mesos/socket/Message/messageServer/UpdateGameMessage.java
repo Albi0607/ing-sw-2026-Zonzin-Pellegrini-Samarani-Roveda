@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.socket.Message.messageServer;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.Message;
 

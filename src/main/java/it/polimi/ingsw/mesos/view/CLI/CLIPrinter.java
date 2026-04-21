@@ -1,21 +1,11 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.CardDTO;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.RMI.ClientModel.PlayerDTO;
-import it.polimi.ingsw.mesos.model.Game;
-import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.board.Board;
-import it.polimi.ingsw.mesos.model.board.OfferTile;
-import it.polimi.ingsw.mesos.model.card.Card;
-import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
-import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
-import it.polimi.ingsw.mesos.model.card.character.Hunter;
-import it.polimi.ingsw.mesos.model.card.event.EventCard;
+import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Color;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

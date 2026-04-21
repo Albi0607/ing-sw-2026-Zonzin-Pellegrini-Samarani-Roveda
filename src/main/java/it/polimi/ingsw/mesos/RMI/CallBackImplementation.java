@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.RMI;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientController;
 
 import java.rmi.RemoteException;
@@ -28,7 +28,7 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
 
     //da rivedere forse meglio chiamare un metodo all'interno del controller
     @Override
-    public void showMessage(String message){
-        System.out.println("Messaggio inoltrato dal server: "+ message);
+    public void showMessage(String message) throws RemoteException{
+        cController.showMessage(message);
     }
 }
