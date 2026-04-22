@@ -63,6 +63,7 @@ public class ClientController {
     }
 
     public void takeCard(int position,boolean isUpper){
+        /*
         if(game!=null&&game.currentState== GameState.RESOLVING_ACTIONS&&game.currentPlayerNickname.equals(nickname)&&clientState==ClientState.IN_GAME) {
             if(network.takeCard(nickname,position,isUpper)){
                 System.out.println("Carta presa correttamente");
@@ -74,6 +75,15 @@ public class ClientController {
         }
         else{
             System.out.println("Non puoi prendere la carta poiché non tocca a te");
+        }
+         */
+
+        if (game != null && game.currentState == GameState.RESOLVING_ACTIONS && game.currentPlayerNickname.equals(nickname) && clientState == ClientState.IN_GAME) {
+
+            network.takeCard(nickname, position, isUpper);
+
+        } else {
+            System.out.println("Non puoi prendere la carta poiché non tocca a te o non è la fase corretta");
         }
     }
 

@@ -176,6 +176,13 @@ public class ResolvingState implements GameStateLogic {
         Board board = g.getBoard();
         if (p == null) return;
 
+        int maxIndex = isUpper ? board.getUpperRow().size() : board.getLowerRow().size();
+
+
+        if (cardIndex < 0 || cardIndex >= maxIndex) {
+            throw new IllegalArgumentException("Numero carta non valido! Scegli un numero tra 1 e " + maxIndex);
+        }
+
         Card card = isUpper ? board.getUpperRow().get(cardIndex) : board.getLowerRow().get(cardIndex);
 
         if (card.getAsEventCard() != null) {
@@ -184,8 +191,12 @@ public class ResolvingState implements GameStateLogic {
 
         int finalCost = Math.max(0, card.getCost() - p.getTribe().getBuildingDiscount());
         if (p.getFood() < finalCost) {
+
             System.out.println("Cibo insufficiente!");
-            return; // Se il cibo è poco, esce senza scalare il pick (aspetta un'altra mossa valida)
+
+            //return; // Se il cibo è poco, esce senza scalare il pick (aspetta un'altra mossa valida)
+
+            throw new IllegalStateException("Non hai abbastanza cibo per prendere questo edificio!");
         }
 
         if (isUpper) {
