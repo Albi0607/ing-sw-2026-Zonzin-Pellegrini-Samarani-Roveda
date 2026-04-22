@@ -1,5 +1,6 @@
 [
   {
+    "id": "EV_01",
     "type": "HUNT",
     "era": "ERA_I",
     "playersRequired": 2,
@@ -7,6 +8,7 @@
     "gainPoints": 1
   },
   {
+    "id": "EV_02",
     "type": "SUSTENANCE",
     "era": "ERA_I",
     "playersRequired": 2,
@@ -14,6 +16,7 @@
     "losePoints": 1
   },
   {
+    "id": "EV_03",
     "type": "SHAMAN_RITUAL",
     "era": "ERA_I",
     "playersRequired": 2,
@@ -22,6 +25,7 @@
     "losePoints": 3
   },
   {
+    "id": "EV_04",
     "type": "PAINTING",
     "era": "ERA_I",
     "playersRequired": 2,
@@ -32,6 +36,7 @@
     "losePoints": 2
   },
   {
+    "id": "EV_05",
     "type": "HUNT",
     "era": "ERA_II",
     "playersRequired": 2,
@@ -39,6 +44,7 @@
     "gainPoints": 2
   },
   {
+    "id": "EV_06",
     "type": "SUSTENANCE",
     "era": "ERA_II",
     "playersRequired": 2,
@@ -46,6 +52,7 @@
     "losePoints": 2
   },
   {
+    "id": "EV_07",
     "type": "SHAMAN_RITUAL",
     "era": "ERA_II",
     "playersRequired": 2,
@@ -54,6 +61,7 @@
     "losePoints": 5
   },
   {
+    "id": "EV_08",
     "type": "PAINTING",
     "era": "ERA_II",
     "playersRequired": 2,
@@ -64,6 +72,7 @@
     "losePoints": 2
   },
   {
+    "id": "EV_09",
     "type": "HUNT",
     "era": "ERA_III",
     "playersRequired": 2,
@@ -71,6 +80,7 @@
     "gainPoints": 3
   },
   {
+    "id": "EV_10",
     "type": "PAINTING",
     "era": "ERA_III",
     "playersRequired": 2,
@@ -81,6 +91,7 @@
     "losePoints": 3
   },
   {
+    "id": "EV_11",
     "type": "SUSTENANCE",
     "era": "ERA_III",
     "playersRequired": 2,
@@ -88,6 +99,7 @@
     "losePoints": 3
   },
   {
+    "id": "EV_12",
     "type": "SHAMAN_RITUAL",
     "era": "ERA_III",
     "playersRequired": 2,

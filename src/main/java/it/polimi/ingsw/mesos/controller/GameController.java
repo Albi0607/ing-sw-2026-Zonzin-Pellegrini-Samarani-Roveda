@@ -305,18 +305,7 @@ public class GameController {
 
     private CardDTO buildCardDTO(Card c) {
         CardDTO dto = new CardDTO();
-        dto.era = c.getEra() != null ? c.getEra().ordinal() : 0;
-
-        if (c instanceof CharacterCard charCard) {
-            dto.type = CardType.CHARACHTER_CARD;
-            dto.characterType = charCard.getType();
-        } else if (c instanceof EventCard eventCard) {
-            dto.type = CardType.EVENT_CARD;
-            dto.eventType = eventCard.getType();
-        } else if (c instanceof BuildingCard) {
-            dto.type = CardType.BUILDING_CARD;
-        }
-
+        dto.id = c.getId();
         return dto;
     }
 
@@ -324,23 +313,17 @@ public class GameController {
         TribeDTO dto = new TribeDTO();
 
         dto.characters = new ArrayList<>();
-        for (int i = 0; i < tribe.getCharacters().size(); i++) {
-            CharacterCard c = tribe.getCharacters().get(i);
+
+        for (CharacterCard c : tribe.getCharacters()) {
             CardDTO card = new CardDTO();
-            card.id            = i;
-            card.type          = CardType.CHARACHTER_CARD;
-            card.characterType = c.getType();
-            card.era           = c.getEra().ordinal();
+            card.id = c.getId();
             dto.characters.add(card);
         }
 
         dto.buildings = new ArrayList<>();
-        for (int i = 0; i < tribe.getBuildings().size(); i++) {
-            BuildingCard b = tribe.getBuildings().get(i);
+        for (BuildingCard b : tribe.getBuildings()) {
             CardDTO card = new CardDTO();
-            card.id   = i;
-            card.type = CardType.BUILDING_CARD;
-            card.era  = b.getEra().ordinal();
+            card.id = b.getId();
             dto.buildings.add(card);
         }
 

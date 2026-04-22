@@ -1,5 +1,9 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
+import it.polimi.ingsw.mesos.model.deck.CardRegistry;
+import it.polimi.ingsw.mesos.model.deck.CharacterCardJson;
+import it.polimi.ingsw.mesos.model.deck.EventCardJson;
 import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
@@ -85,24 +89,28 @@ public class CLIPrinter {
             CardDTO c = row.get(i);
             System.out.print("(" + (i + 1) + ") ");
 
-            if (c.type != null) {
-                switch (c.type) {
-                    case CHARACHTER_CARD:
-                        String charName = (c.characterType != null) ? c.characterType.name() : "Sconosciuto";
-                        System.out.print(ANSI_CYAN + charName + ANSI_RESET + "  ");
-                        break;
-                    case EVENT_CARD:
 
-                        String eventName = (c.eventType != null) ? c.eventType.name() : "Evento";
-                        System.out.print(ANSI_RED + "⚡ " + eventName + ANSI_RESET + "  ");
-                        break;
-                    case BUILDING_CARD:
-                        //sistemare il costo
-                        System.out.print(ANSI_YELLOW + "[Edificio - Costo N/A]" + ANSI_RESET + "  ");
-                        break;
+            Object cardInfo = CardRegistry.getCardInfo(c.id);
+
+            if (cardInfo != null) {
+
+                if (cardInfo instanceof CharacterCardJson charJson) {
+
+                    String charName = (charJson.type != null) ? charJson.type.name() : "Sconosciuto";
+                    System.out.print(ANSI_CYAN + charName + ANSI_RESET + "  ");
+
+                } else if (cardInfo instanceof EventCardJson eventJson) {
+
+                    String eventName = (eventJson.type != null) ? eventJson.type.name() : "Evento";
+                    System.out.print(ANSI_RED + "⚡ " + eventName + ANSI_RESET + "  ");
+
+                } else if (cardInfo instanceof BuildingCardJson buildJson) {
+
+                    System.out.print(ANSI_YELLOW + "[Edificio - Costo: " + buildJson.cost + "]" + ANSI_RESET + "  ");
+
                 }
             } else {
-                System.out.print("[Carta Sconosciuta]  ");
+                System.out.print("[Carta Sconosciuta (ID: " + c.id + ")]  ");
             }
         }
         System.out.println();
@@ -120,15 +128,18 @@ public class CLIPrinter {
 
             String temp = "Nessuno";
 
-            //sistemare questa parte per stampare la tribu del giocatore
             if (p.tribe != null && p.tribe.characters != null) {
-                Map<CharacterType, Long> charGroups = p.tribe.characters.stream()
-                        .filter(c -> c.characterType != null)
-                        .collect(Collectors.groupingBy(c -> c.characterType, Collectors.counting()));
+                // Recuperiamo i tipi di personaggio dal Registry usando l'ID
+                Map<String, Long> charGroups = p.tribe.characters.stream()
+                        .map(c -> CardRegistry.getCardInfo(c.id))
+                        .filter(info -> info instanceof CharacterCardJson)
+                        .map(info -> (CharacterCardJson) info)
+                        .filter(charJson -> charJson.type != null)
+                        .collect(Collectors.groupingBy(charJson -> charJson.type.name(), Collectors.counting()));
 
                 if (!charGroups.isEmpty()) {
                     temp = charGroups.entrySet().stream()
-                            .map(e -> e.getKey().name() + ": " + e.getValue())
+                            .map(e -> e.getKey() + ": " + e.getValue())
                             .collect(Collectors.joining(", "));
                 }
             }
