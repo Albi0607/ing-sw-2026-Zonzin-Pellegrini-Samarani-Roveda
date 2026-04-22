@@ -250,6 +250,7 @@ public class ResolvingState implements GameStateLogic {
      * * @param g The main game context.
      * @return The active {@link Player}, or null if the phase is complete.
      */
+    @Override
     public Player getActivePlayer(Game g) {
         if (isExtraDrawPhase) {
             if (extraQueueIndex < extraDrawQueue.size()) {
@@ -260,6 +261,7 @@ public class ResolvingState implements GameStateLogic {
 
         List<OfferTile> tiles = g.getBoard().getTiles();
         if (currentTileIndex >= 0 && currentTileIndex < tiles.size()) {
+            System.out.println(" primo indice della prima tessera su cui è piazzato il primo totem "+ currentTileIndex);
             return tiles.get(currentTileIndex).getHost();
         }
         return null;
@@ -278,4 +280,23 @@ public class ResolvingState implements GameStateLogic {
             moveToNextOccupiedTile(g);
         }
     }
+
+    @Override
+    public boolean isNextUpper(Game g) {
+        // Se siamo nella fase speciale "Extra Draw", la regola dice che si pesca solo da sopra!
+        if (isExtraDrawPhase) {
+            return true;
+        }
+
+        // Regola base: diamo priorità alle pescate superiori.
+        // Se al giocatore ne resta almeno una, deve pescare sopra.
+        if (remainingUpper > 0) {
+            return true;
+        }
+        // Altrimenti, se quelle superiori sono finite (o erano 0 fin dall'inizio), pesca sotto.
+        else {
+            return false;
+        }
+    }
+
 }
