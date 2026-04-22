@@ -66,10 +66,13 @@ public class SetupState implements GameStateLogic {
         List<OfferTile> tiles = board.getTiles();
         TurnOrderTrack turnOrderTrack = board.getTurnOrderTrack();
 
+        turnOrderTrack.resetOrder();
+
         for (OfferTile tile : tiles) {
             Player playerOnTile = tile.getHost();
 
             if (playerOnTile != null) {
+                System.out.println("DEBUG: Trovato " + playerOnTile.getNickname() + " sulla tessera " + tile.getId());
                 turnOrderTrack.setPlayerAt(nextTrackIndex, playerOnTile);
                 nextTrackIndex++;
 

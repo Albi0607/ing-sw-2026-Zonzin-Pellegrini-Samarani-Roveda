@@ -40,9 +40,10 @@ public class PlacingState implements GameStateLogic {
         System.out.println("DEBUG: actingOrder size = " + this.actingOrder.size());
 
         // Creiamo una lista di null per svuotare le posizioni fisiche.
-        track.resetOrder();
+        //track.resetOrder();
 
         this.activePlayerIndex = 0;
+
         System.out.println("Tocca a: " + actingOrder.get(0).getNickname());
     }
 
@@ -81,6 +82,8 @@ public class PlacingState implements GameStateLogic {
         // NON chiamiamo track.setPlayerAt qui, perché il ritorno sulla track avviene a fine round.
         t.placeTotem(p);
         System.out.println(p.getNickname() + " ha piazzato il totem sulla tessera " + t.getId());
+
+        g.getBoard().getTurnOrderTrack().removePlayer(p); //aggiunto questo metodo
 
         activePlayerIndex++;
 
