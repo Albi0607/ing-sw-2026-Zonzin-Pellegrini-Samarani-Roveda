@@ -143,13 +143,16 @@ class GameControllerTest {
                 "Il controller deve bloccare aggiunte a gioco già creato");
 
 
-        // --- 2. TEST DELLE BARRIERE DI STATO ---
 
         // Il gioco è appena stato creato ed è in PLACING_TOTEMS.
         // Proviamo a fare un'azione che richiede RESOLVING_ACTIONS (pescare una carta).
-        // Il controller DEVE bloccarci per lo stato scorretto!
-        assertThrows(IllegalStateException.class, () -> controller.onTakeCard("Marco", 0, true),
-                "Azione bloccata: il gioco è in fase di piazzamento, non si può pescare!");
+        // Il controller DEVE bloccarci per lo stato scorretto
+        controller.onTakeCard("Marco", 0, true);
+
+        // Verifichiamo che l'azione sia stata effettivamente ignorata e che
+        // il gioco sia RIMASTO saldo nella fase di piazzamento!
+        assertEquals(GameState.PLACING_TOTEMS, controller.getGame().getCurrentState().getStateId(),
+                "L'azione di pescata doveva essere ignorata dal controller");
 
         // Avvio del gioco (se fa setup aggiuntivi della board)
         controller.startGame();
@@ -159,16 +162,26 @@ class GameControllerTest {
         // --- 3. TEST FASE DI PIAZZAMENTO (PLACING_TOTEMS) ---
 
         // Azione sbagliata nello stato corrente
-        assertThrows(IllegalStateException.class, () -> controller.onTakeCard("Marco", 0, true),
-                "Non si possono pescare carte durante il piazzamento");
+        controller.onTakeCard("Marco", 0, true);
 
-        // Giocatore inesistente
-        assertThrows(IllegalArgumentException.class, () -> controller.onPlaceTotem("GiocatoreFantasma", 'A'),
-                "Il controller deve respingere giocatori non registrati");
+        // Verifichiamo che il gioco non sia andato avanti, e che Marco non abbia pescato nulla!
+        assertEquals(GameState.PLACING_TOTEMS, controller.getGame().getCurrentState().getStateId(),
+                "Il controller deve ignorare la pescata durante il piazzamento");
+
+        // Il controller deve respingere giocatori non registrati restituendo FALSE
+        boolean esito1 = controller.onPlaceTotem("GiocatoreFantasma", 'A');
+        assertFalse(esito1, "Il controller deve respingere giocatori non registrati ritornando false");
+
+        // Il controller deve respingere tessere inesistenti restituendo FALSE
+        boolean esito2 = controller.onPlaceTotem("Marco", 'Z');
+        assertFalse(esito2, "Il controller deve respingere tessere non valide ritornando false");
+
+        boolean resultFakePlayer = controller.onPlaceTotem("GiocatoreFantasma", 'A');
+        assertFalse(resultFakePlayer, "Il controller deve respingere giocatori non registrati (restituendo false)");
 
         // Tessera inesistente
-        assertThrows(IllegalArgumentException.class, () -> controller.onPlaceTotem("Marco", 'Z'),
-                "Il controller deve respingere tessere non valide");
+        boolean resultFakeTile = controller.onPlaceTotem("Marco", 'Z');
+        assertFalse(resultFakeTile, "Il controller deve respingere tessere non valide (restituendo false)");
 
         // Esecuzione di piazzamenti legali in modo dinamico (ignora l'ordine casuale)
         List<Player> turnOrder = controller.getGame().getPlayers(); // O la TurnOrderTrack se accessibile
@@ -188,8 +201,8 @@ class GameControllerTest {
         assertEquals(GameState.RESOLVING_ACTIONS, controller.getGame().getCurrentState().getStateId());
 
         // Azione sbagliata nel nuovo stato
-        assertThrows(IllegalStateException.class, () -> controller.onPlaceTotem("Marco", 'A'),
-                "Non si possono piazzare totem durante la risoluzione");
+        boolean esitoPiazzamentoRitardato = controller.onPlaceTotem("Marco", 'A');
+        assertFalse(esitoPiazzamentoRitardato, "Non si possono piazzare totem durante la risoluzione (deve ritornare false)");
 
 
 
