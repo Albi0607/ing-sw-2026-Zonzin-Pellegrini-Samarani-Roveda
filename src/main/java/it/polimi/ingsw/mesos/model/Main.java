@@ -46,7 +46,7 @@ public class Main {
 
             // --- GESTIONE STATO: PLACING (Piazzamento Totem) ---
             if (currentState instanceof PlacingState ps) {
-                Player p = ps.getActivePlayer();
+                Player p = ps.getActivePlayer(game);
 
                 // Stampa situazione giocatore
                 stampaStatusGiocatore(p);
