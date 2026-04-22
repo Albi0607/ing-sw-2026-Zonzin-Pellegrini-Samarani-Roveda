@@ -104,6 +104,15 @@ public class TurnOrderTrack {
         }
     }
 
+    public void removePlayer(Player p) { //aggiunto qeusto metodo per eliminare i player dalla turn orderatrack ogni volta ch epiazzano un totem sulla tessera offerta
+        for (int i = 0; i < positions.size(); i++) {
+            if (p.equals(positions.get(i))) {
+                positions.set(i, null); // Libera solo il posto di QUESTO giocatore
+                return;
+            }
+        }
+    }
+
     // --- Getters ---
 
     public Player getPlayerAt(int index) {

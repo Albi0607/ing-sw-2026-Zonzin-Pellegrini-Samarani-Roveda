@@ -18,6 +18,7 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameController {
@@ -299,6 +300,42 @@ public class GameController {
         dto.lowerRow = board.getLowerRow().stream()
                 .map(this::buildCardDTO)
                 .collect(java.util.stream.Collectors.toList());
+
+        dto.offerTiles = new ArrayList<>();
+        for (OfferTile tile : board.getTiles()) { // Assumo tu abbia un getOfferTiles()
+            OfferTileDTO tileDto = new OfferTileDTO();
+            tileDto.id = String.valueOf(tile.getId()); // "A", "B", ecc...
+
+            if (tile.getHost() != null) {
+                tileDto.occupantNickname = tile.getHost().getNickname();
+                tileDto.occupantColor = tile.getHost().getColor();
+            }
+            dto.offerTiles.add(tileDto);
+        }
+
+        dto.turnOrderSlots = new ArrayList<>();
+
+
+        int[] modifiers = board.getTurnOrderTrack().getSlots();
+        List<Player> positions = board.getTurnOrderTrack().getPositions();
+
+        System.out.println("DEBUG DTO: Numero giocatori nella track: " +
+                positions.stream().filter(Objects::nonNull).count());
+
+        for (int i = 0; i < positions.size(); i++) {
+            TurnOrderSlotDTO slotDto = new TurnOrderSlotDTO();
+            Player p = positions.get(i);
+
+            if (p != null) {
+                slotDto.occupantNickname = p.getNickname();
+                slotDto.occupantColor = p.getColor();
+            }
+
+            // Passiamo il numero intero così com'è!
+            slotDto.modifier = (i < modifiers.length) ? modifiers[i] : 0;
+
+            dto.turnOrderSlots.add(slotDto);
+        }
 
         return dto;
     }

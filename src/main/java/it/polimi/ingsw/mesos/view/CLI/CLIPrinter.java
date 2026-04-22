@@ -4,9 +4,7 @@ import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
 import it.polimi.ingsw.mesos.model.deck.CardRegistry;
 import it.polimi.ingsw.mesos.model.deck.CharacterCardJson;
 import it.polimi.ingsw.mesos.model.deck.EventCardJson;
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.model.enums.Color;
 
@@ -23,6 +21,7 @@ public class CLIPrinter {
     public static final String ANSI_WHITE = "\u001B[37m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_GRAY = "\u001B[90m";
 
     public static String getPlayerColorANSI(Color color) {
         if (color == null) return ANSI_WHITE;
@@ -71,8 +70,7 @@ public class CLIPrinter {
         //SISTEMARE uqesta parte per stampare tutta la plancia
 
         System.out.println("\n" + ANSI_BOLD + "[ PLANCIA CENTRALE ]" + ANSI_RESET);
-        System.out.println(ANSI_RED + "⚠️ Impossibile stampare le Tessere Offerta e l'Ordine di Turno." + ANSI_RESET);
-        System.out.println(ANSI_RED + "I dati mancano nel BoardDTO inviato dal Server!" + ANSI_RESET);
+        printPlanciaCentrale(gameDTO.board, gameDTO);
 
         System.out.println("\n" + ANSI_BOLD + "[ FILA INFERIORE ]" + ANSI_RESET);
         printCardRow(gameDTO.board.lowerRow);
@@ -166,5 +164,76 @@ public class CLIPrinter {
                         (i + 1), getPlayerColorANSI(p.color), p.nickname, ANSI_RESET, p.prestigePoints);
             }
         }
+    }
+
+    public static void printPlanciaCentrale(BoardDTO boardDTO, GameDTO gameDTO) {
+        StringBuilder tilesString = new StringBuilder();
+        if (boardDTO.offerTiles != null) {
+            for (OfferTileDTO tile : boardDTO.offerTiles) {
+                String symbol = getTileSymbol(tile.id);
+                // Se c'è un occupante, usa il suo colore. Altrimenti grigio di default.
+                String tileColor = (tile.occupantNickname != null) ? getPlayerColorANSI(tile.occupantColor) : ANSI_GRAY;
+
+                tilesString.append(tileColor)
+                        .append("[ ").append(tile.id).append(" : ").append(symbol).append(" ]")
+                        .append(ANSI_RESET).append("   ");
+            }
+        }
+
+        // Intestazione delle colonne (allargata a 35 per far spazio ai bonus!)
+        System.out.printf("%-35s | %s\n", "ORDINE DI TURNO", "TESSERE OFFERTA");
+        System.out.println("------------------------------------+--------------------------------------------------------");
+
+        int numSlots = (boardDTO.turnOrderSlots != null) ? boardDTO.turnOrderSlots.size() : 0;
+
+        // Caso limite di sicurezza
+        if (numSlots == 0) {
+            System.out.println("                                   | " + tilesString);
+            return;
+        }
+
+        for (int i = 0; i < numSlots; i++) {
+            TurnOrderSlotDTO slot = boardDTO.turnOrderSlots.get(i);
+
+            String nick = (slot.occupantNickname != null) ? slot.occupantNickname : "  -  ";
+            String color = (slot.occupantColor != null) ? getPlayerColorANSI(slot.occupantColor) : ANSI_GRAY;
+
+            // Chiediamo alla CLI di tradurre il numero in grafica
+            String modifierDisplay = getModifierSymbol(slot.modifier);
+
+            // Creiamo il testo pulito per contare i caratteri (togliendo i codici colore ANSI)
+            String visibleText = (i + 1) + "° " + nick + " [ " + modifierDisplay.replaceAll("\u001B\\[[;\\d]*m", "") + " ]";
+
+            // Allineamento a 35 caratteri
+            int paddingNeeded = Math.max(0, 35 - visibleText.length());
+            String padding = " ".repeat(paddingNeeded);
+
+            // Stringa finale colorata
+            String leftColumn = (i + 1) + "° " + color + nick + ANSI_RESET + " [ " + modifierDisplay + " ]" + padding;
+
+            String rightColumn = (i == 0) ? tilesString.toString() : "";
+
+            System.out.println(leftColumn + "| " + rightColumn);
+        }
+    }
+
+    private static String getTileSymbol(String tileId) {
+        if (tileId == null) return "❓";
+        return switch (tileId) {
+            case "A" -> "+ 3🍗";
+            case "B" -> " ↑ ";
+            case "C" -> " ↓ ";
+            case "D" -> "↓ ↓";
+            case "E" -> "↑ ↓";
+            case "F" -> "↑ ↑";
+            case "G" -> "↑ ↑ ↓";
+            default -> "❓";
+        };
+    }
+
+    private static String getModifierSymbol(int modifier) {
+        if (modifier > 0) return ANSI_GREEN + "+" + modifier + " 🍗" + ANSI_RESET;
+        if (modifier < 0) return ANSI_RED + modifier + " 🍗 / " + (modifier * 2) + " ⭐" + ANSI_RESET;
+        return ANSI_GRAY + "  -  " + ANSI_RESET;
     }
 }
