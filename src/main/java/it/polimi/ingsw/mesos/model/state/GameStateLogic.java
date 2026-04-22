@@ -60,23 +60,21 @@ public interface GameStateLogic {
      * @throws IllegalStateException if the action is not allowed in the current state.
      */
 
-
     default void placeTotemOnOffer(Game g, Player p, OfferTile t) {
         throw new IllegalStateException(
                 "Cannot place totem in state: " + getStateId()
         );
     }
 
-
     default void takeCard(Game g, Player p, int index, boolean upper) {
         throw new IllegalStateException("cannot take cards in state: " + getStateId());
     }
-
-
 
     default void skipExtraDraw(Game g) {
         throw new IllegalStateException("cannot skipdraw in state: " + getStateId());
     }
 
-    default Player getCurrentPlayer(Game g) {return null;}
+    default Player getActivePlayer(Game g) {return null;}
+
+    default boolean isNextUpper(Game g) {return false;}
 }

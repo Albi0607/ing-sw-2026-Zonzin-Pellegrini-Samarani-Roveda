@@ -37,6 +37,7 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     @Override
     public boolean placeTotem(String nickname, char position) throws RemoteException {
 
+        /*
         try {
             controller.onPlaceTotem(nickname, position);
             //GameDTO game = controller.lastGameUpdate();
@@ -46,6 +47,10 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         }
 
         return true;
+         */
+
+        return controller.onPlaceTotem(nickname, position);
+
     }
 
     @Override

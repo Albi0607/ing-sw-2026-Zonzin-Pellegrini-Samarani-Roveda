@@ -19,17 +19,19 @@ public class CLI implements View {
     private ClientState currentClientState;
 
     private volatile boolean actionSent = false;
+    private volatile boolean boardUpdated = false;
+    private volatile boolean waitingPrinted = false;
 
     public CLI() {
         this.scanner = new Scanner(System.in);
     }
 
-
     @Override
     public void showLastUpdate(GameDTO game) {
         this.currentGameState = game;
         this.actionSent = false;
-        drawUI();
+        this.waitingPrinted = false;
+        this.boardUpdated = true;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class CLI implements View {
     @Override
     public void showMessage(String message) {
         System.out.println(CLIPrinter.ANSI_RED + "🔔 NOTIFICA: " + message + CLIPrinter.ANSI_RESET);
-        this.actionSent = false; // Se la mossa era sbagliata, ci permette di riprovare
+        this.actionSent = false;
     }
 
     public void start() {
@@ -52,6 +54,12 @@ public class CLI implements View {
         setupGame();
 
         while (true) {
+
+            if (boardUpdated) {
+                drawUI();
+                boardUpdated = false;
+            }
+
             if (currentClientState == ClientState.CHOOSE_PLAYERS) {
                 askForPlayers();
             }
@@ -62,26 +70,28 @@ public class CLI implements View {
                         actionSent = true;
                     }
                 }
-                else{
+                else {
                     if (isMyTurn()) {
+                        waitingPrinted = false;
+
                         if (!actionSent) {
                             handleTurn();
                         } else {
-
-                            System.out.print("\r⏳ Mossa inviata, elaborazione in corso...");
+                            System.out.print("\r⏳ Mossa inviata, elaborazione in corso...          ");
                         }
                     }
                     else {
 
                         String activePlayer = currentGameState.currentPlayerNickname;
 
-                        System.out.print("\r⌛ In attesa che " + activePlayer + " faccia la sua mossa...   ");
-                        System.out.flush();
+                        if (!waitingPrinted) {
+                            System.out.println("\n⌛ In attesa che " + activePlayer + " faccia la sua mossa...");
+                            waitingPrinted = true;
+                        }
                     }
                 }
             }
 
-            // Pausa
             try { Thread.sleep(200); } catch (InterruptedException e) {}
         }
     }
@@ -163,14 +173,22 @@ public class CLI implements View {
             }
         }
         else if (currentGameState.currentState == GameState.RESOLVING_ACTIONS) {
-            System.out.println("Azione: Pesca dalla fila " + CLIPrinter.ANSI_YELLOW + "SUPERIORE (↑)" + CLIPrinter.ANSI_RESET);
+
+            boolean isUpper = currentGameState.isUpper;
+
+            String nomeFila = isUpper ? "SUPERIORE (↑)" : "INFERIORE (↓)";
+
+            System.out.println("Fase: " + CLIPrinter.ANSI_YELLOW + "RISOLUZIONE AZIONI" + CLIPrinter.ANSI_RESET);
+            System.out.println("Azione: Devi pescare dalla fila " + CLIPrinter.ANSI_YELLOW + nomeFila + CLIPrinter.ANSI_RESET);
             System.out.print("Digita il NUMERO della carta: ");
             String input = scanner.nextLine().trim();
 
             try {
                 int cardIndex = Integer.parseInt(input) - 1;
                 actionSent = true;
-                controller.takeCard(cardIndex, true);
+
+                controller.takeCard(cardIndex, isUpper);
+
             } catch (NumberFormatException e) {
                 System.out.println(CLIPrinter.ANSI_RED + "❌ Numero non valido!" + CLIPrinter.ANSI_RESET);
             }

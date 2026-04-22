@@ -190,16 +190,25 @@ public class GameController {
      * @param tileId tile the totem will be positioned
      **/
 
-    public void onPlaceTotem(String nickname, char tileId) {
-        requireState(GameState.PLACING_TOTEMS);
+    public boolean onPlaceTotem(String nickname, char tileId) {
+        try {
+            requireState(GameState.PLACING_TOTEMS);
 
-        Player player = requirePlayer(nickname);
-        OfferTile tile = requireTile(tileId);
+            Player player = requirePlayer(nickname);
+            OfferTile tile = requireTile(tileId);
 
-        game.placeTotemOnOffer(player, tile);
+            game.placeTotemOnOffer(player, tile);
 
-        broadcastUpdate();
+            broadcastUpdate();
 
+            return true;
+
+        } catch (Exception e) {
+
+            System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -246,9 +255,17 @@ public class GameController {
         GameDTO dto = new GameDTO();
         dto.currentState         = game.getCurrentState().getStateId();
         dto.currentRound         = game.getCurrentRound();
+        dto.isUpper =  game.isNextUpper();
 
-        // Era come intero (0=I, 1=II, 2=III)
-        dto.era = game.getCurrentEra() != null ? game.getCurrentEra().ordinal() : 0; // ordinal ritorna l'indice posizione nell'enumerazione
+        if (game.getCurrentEra() != null) {
+            dto.era = switch (game.getCurrentEra()) {
+                case ERA_I   -> "I";
+                case ERA_II  -> "II";
+                case ERA_III -> "III";
+            };
+        } else {
+            dto.era = "I";
+        }
 
         dto.board = buildBoardDTO(game.getBoard());
 

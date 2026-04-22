@@ -66,11 +66,11 @@ class MesosIntegrationTest {
 
         // Il primo giocatore sceglie la tessera 'B'
         OfferTile tileB = board.getTile('B');
-        Player active1 = ps.getActivePlayer();
+        Player active1 = ps.getActivePlayer(game);
         game.placeTotemOnOffer(active1, tileB);
 
         // Il secondo giocatore prova a scegliere la STESSA tessera (deve fallire)
-        Player active2 = ps.getActivePlayer();
+        Player active2 = ps.getActivePlayer(game);
         assertThrows(Exception.class, () -> game.placeTotemOnOffer(active2, tileB),
                 "Non si può scegliere una tessera già occupata");
 
@@ -168,7 +168,7 @@ class MesosIntegrationTest {
 
         PlacingState nextPlacing = (PlacingState) game.getCurrentState();
 
-        assertEquals(active1, nextPlacing.getActivePlayer());
+        assertEquals(active1, nextPlacing.getActivePlayer(game));
 
     }
 
