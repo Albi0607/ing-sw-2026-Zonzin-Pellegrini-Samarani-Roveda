@@ -77,4 +77,6 @@ public interface GameStateLogic {
     default void skipExtraDraw(Game g) {
         throw new IllegalStateException("cannot skipdraw in state: " + getStateId());
     }
+
+    default Player getCurrentPlayer(Game g) {return null;}
 }

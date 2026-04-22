@@ -19,13 +19,19 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     //quando i giocatori accedono per la prima volta li metto nel registro cosi posso chiamare il callback e valuta se
     //è il primo utente connesso in modo da fargli scegliere il numero di giocatori della partita
     public boolean registerClient(String nickname, CallBack clientCallback) throws RemoteException {
+
+        //nel try mancava il return true, la versione precedente ritornava a prescindere sempre false
         try {
-            VirtualView view = new RMIVirtualView(nickname,clientCallback);
-            controller.addPlayer(nickname,view);
+            VirtualView view = new RMIVirtualView(nickname, clientCallback);
+            controller.addPlayer(nickname, view);
+
+            return true;
+
         } catch (Exception e) {
-            System.out.println("Problema di registrazione del client");
+            System.out.println("Problema di registrazione del client: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     @Override

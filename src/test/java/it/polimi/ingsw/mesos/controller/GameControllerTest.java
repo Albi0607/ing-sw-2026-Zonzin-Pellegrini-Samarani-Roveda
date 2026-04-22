@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.controller;
 
-import it.polimi.ingsw.mesos.RMI.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.RMI.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
