@@ -53,7 +53,7 @@ public class ClientController {
             }
             else{
                 System.out.println("Errore piazzamento totem");
-                view.showMessage("Tessera occupata o mossa non valida! Riprova."); // aggiunto per gestire l'errore di piazzamento tessera
+                view.showMessage("Tessera occupata o mossa non valida! Riprova."); //aggiunto questo
             }
         }
         else{
@@ -69,6 +69,7 @@ public class ClientController {
             }
             else{
                 System.out.println("Errore nel prendere la carta");
+                view.showMessage("Mossa non valida o errore nel prendere la carta."); //aggiunto questo
             }
         }
         else{

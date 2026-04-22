@@ -10,7 +10,7 @@ public class GameDTO implements Serializable {
     public List<PlayerDTO> players;
     public BoardDTO board;
     public int currentRound;
-    public int era;
+    public String era;
     public GameState currentState;
     public String currentPlayerNickname;
     public boolean isUpper;

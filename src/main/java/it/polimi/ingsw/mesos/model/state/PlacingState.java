@@ -103,18 +103,14 @@ public class PlacingState implements GameStateLogic {
         throw new IllegalStateException("Errore: Non puoi saltare la pesca durante la Fase di placing totem!!!");
     }
 
-
     @Override
     public GameState getStateId() { return GameState.PLACING_TOTEMS; }
 
     @Override
-    public Player getCurrentPlayer(Game g) {
-        // actingOrder è la lista dei giocatori ordinata per il piazzamento
-        return actingOrder.get(activePlayerIndex);
-    }
+    public boolean isNextUpper(Game g) {return false;}
 
-
-    public Player getActivePlayer() {
+    @Override
+    public Player getActivePlayer(Game g) {
         if (actingOrder == null || activePlayerIndex >= actingOrder.size()) {
             return null;
         }
