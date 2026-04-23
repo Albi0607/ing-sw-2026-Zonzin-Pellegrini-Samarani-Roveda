@@ -1,0 +1,48 @@
+{
+  "colors": {
+    "CYAN": "\u001B[36m",
+    "YELLOW": "\u001B[33m",
+    "RED": "\u001B[31m",
+    "GREEN": "\u001B[32m",
+    "PURPLE": "\u001B[35m",
+    "BLUE": "\u001B[34m",
+    "GRAY": "\u001B[90m",
+    "WHITE": "\u001B[37m",
+    "RESET": "\u001B[0m"
+  },
+
+  "symbols": {
+    "food": "🍗",
+    "prestige": "⭐",
+    "shaman_star": "✨",
+    "event_bolt": "⚡",
+    "building_hut": "🛖",
+    "shield": "🛡️",
+    "cards": "🃏"
+  },
+
+  "inventions": {
+    "BOAT": "🛶",
+    "SPEAR": "🔱",
+    "HOOK": "🪝",
+    "NECKLACE": "📿",
+    "BOWL": "🥣",
+    "ROPE": "🪢",
+    "DOLL": "🪆",
+    "STICK": "🪵",
+    "CLOTH": "🧵",
+    "BREAD": "🍞"
+  },
+
+  "event_settings": {
+    "SUSTENANCE": { "color": "RED", "icon": "event_bolt" },
+    "HUNT": { "color": "RED", "icon": "event_bolt" },
+    "SHAMANIC_RITUAL": { "color": "RED", "icon": "event_bolt" },
+    "PAINTING": { "color": "RED", "icon": "event_bolt" },
+    "CAVE_PAINTING": { "color": "RED", "icon": "event_bolt" }
+  },
+
+  "building_settings": {
+    "DEFAULT": { "color": "YELLOW", "icon": "building_hut" }
+  }
+}
