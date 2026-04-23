@@ -135,6 +135,7 @@ public class CLI implements View {
     private void drawUI() {
         if (currentGameState == null) return;
         CLIPrinter.clearScreen();
+        CLIPrinter.printEventPhase(currentGameState);
         CLIPrinter.printHeader(currentGameState, false);
         CLIPrinter.printBoard(currentGameState);
         CLIPrinter.printAllPlayersStatus(currentGameState);
