@@ -30,6 +30,7 @@ public class Game {
     private int currentRound;
     private Era currentEra;
     private GameStateLogic currentState;
+    private List<String> lastResolvedEvents = new ArrayList<>();
 
     /**
      * Initializes a new Game instance with the provided list of players.
@@ -327,6 +328,18 @@ public class Game {
         } else {
             throw new IllegalStateException("CRITICAL ERROR: No active state to skip draw action.");
         }
+    }
+
+    public void setLastResolvedEvents(List<String> events) {
+        this.lastResolvedEvents = events;
+    }
+
+    public List<String> getLastResolvedEvents() {
+        return lastResolvedEvents;
+    }
+
+    public void clearLastResolvedEvents() {
+        this.lastResolvedEvents.clear();
     }
 
     public String getCurrentPlayerNickname() {

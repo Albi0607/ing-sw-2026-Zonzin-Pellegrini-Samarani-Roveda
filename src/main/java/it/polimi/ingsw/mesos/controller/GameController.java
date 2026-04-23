@@ -249,6 +249,8 @@ public class GameController {
         for (VirtualView view : players.values()) {
             view.sendGame(dto);
         }
+
+        game.clearLastResolvedEvents();
     }
 
     // metodo che ricostruisce lo stato attuale del gioco valido, per ogni aggiornamento
@@ -257,6 +259,8 @@ public class GameController {
         dto.currentState         = game.getCurrentState().getStateId();
         dto.currentRound         = game.getCurrentRound();
         dto.isUpper =  game.isNextUpper();
+
+        dto.lastResolvedEvents = new ArrayList<>(game.getLastResolvedEvents());
 
         if (game.getCurrentEra() != null) {
             dto.era = switch (game.getCurrentEra()) {
