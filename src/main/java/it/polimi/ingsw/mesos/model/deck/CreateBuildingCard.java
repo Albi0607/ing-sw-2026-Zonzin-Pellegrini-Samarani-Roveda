@@ -80,7 +80,14 @@ public class CreateBuildingCard {
                             j.victoryPoints,
                             effect
                     );
+
+                    card.setId(j.id);
+
                     allBuildingCards.add(card);
+
+                    CardRegistry.registerCard(j.id, j);//aggiunge la carta anche al nostro database
+
+
 
             }
             //mi devo ricordare di gestire queste eccezioni con ramo try catch quando verrà creato il deck in main

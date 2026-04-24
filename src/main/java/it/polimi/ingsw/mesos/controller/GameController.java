@@ -18,6 +18,7 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameController {
@@ -248,6 +249,8 @@ public class GameController {
         for (VirtualView view : players.values()) {
             view.sendGame(dto);
         }
+
+        game.clearLastResolvedEvents();
     }
 
     // metodo che ricostruisce lo stato attuale del gioco valido, per ogni aggiornamento
@@ -256,6 +259,8 @@ public class GameController {
         dto.currentState         = game.getCurrentState().getStateId();
         dto.currentRound         = game.getCurrentRound();
         dto.isUpper =  game.isNextUpper();
+
+        dto.lastResolvedEvents = new ArrayList<>(game.getLastResolvedEvents());
 
         if (game.getCurrentEra() != null) {
             dto.era = switch (game.getCurrentEra()) {
@@ -300,23 +305,48 @@ public class GameController {
                 .map(this::buildCardDTO)
                 .collect(java.util.stream.Collectors.toList());
 
+        dto.offerTiles = new ArrayList<>();
+        for (OfferTile tile : board.getTiles()) { // Assumo tu abbia un getOfferTiles()
+            OfferTileDTO tileDto = new OfferTileDTO();
+            tileDto.id = String.valueOf(tile.getId()); // "A", "B", ecc...
+
+            if (tile.getHost() != null) {
+                tileDto.occupantNickname = tile.getHost().getNickname();
+                tileDto.occupantColor = tile.getHost().getColor();
+            }
+            dto.offerTiles.add(tileDto);
+        }
+
+        dto.turnOrderSlots = new ArrayList<>();
+
+
+        int[] modifiers = board.getTurnOrderTrack().getSlots();
+        List<Player> positions = board.getTurnOrderTrack().getPositions();
+
+        System.out.println("DEBUG DTO: Numero giocatori nella track: " +
+                positions.stream().filter(Objects::nonNull).count());
+
+        for (int i = 0; i < positions.size(); i++) {
+            TurnOrderSlotDTO slotDto = new TurnOrderSlotDTO();
+            Player p = positions.get(i);
+
+            if (p != null) {
+                slotDto.occupantNickname = p.getNickname();
+                slotDto.occupantColor = p.getColor();
+            }
+
+            // Passiamo il numero intero così com'è!
+            slotDto.modifier = (i < modifiers.length) ? modifiers[i] : 0;
+
+            dto.turnOrderSlots.add(slotDto);
+        }
+
         return dto;
     }
 
     private CardDTO buildCardDTO(Card c) {
         CardDTO dto = new CardDTO();
-        dto.era = c.getEra() != null ? c.getEra().ordinal() : 0;
-
-        if (c instanceof CharacterCard charCard) {
-            dto.type = CardType.CHARACHTER_CARD;
-            dto.characterType = charCard.getType();
-        } else if (c instanceof EventCard eventCard) {
-            dto.type = CardType.EVENT_CARD;
-            dto.eventType = eventCard.getType();
-        } else if (c instanceof BuildingCard) {
-            dto.type = CardType.BUILDING_CARD;
-        }
-
+        dto.id = c.getId();
         return dto;
     }
 
@@ -324,23 +354,17 @@ public class GameController {
         TribeDTO dto = new TribeDTO();
 
         dto.characters = new ArrayList<>();
-        for (int i = 0; i < tribe.getCharacters().size(); i++) {
-            CharacterCard c = tribe.getCharacters().get(i);
+
+        for (CharacterCard c : tribe.getCharacters()) {
             CardDTO card = new CardDTO();
-            card.id            = i;
-            card.type          = CardType.CHARACHTER_CARD;
-            card.characterType = c.getType();
-            card.era           = c.getEra().ordinal();
+            card.id = c.getId();
             dto.characters.add(card);
         }
 
         dto.buildings = new ArrayList<>();
-        for (int i = 0; i < tribe.getBuildings().size(); i++) {
-            BuildingCard b = tribe.getBuildings().get(i);
+        for (BuildingCard b : tribe.getBuildings()) {
             CardDTO card = new CardDTO();
-            card.id   = i;
-            card.type = CardType.BUILDING_CARD;
-            card.era  = b.getEra().ordinal();
+            card.id = b.getId();
             dto.buildings.add(card);
         }
 

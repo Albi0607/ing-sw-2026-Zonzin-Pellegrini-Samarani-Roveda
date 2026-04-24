@@ -7,6 +7,7 @@ import it.polimi.ingsw.mesos.model.enums.EventType;
  * @author Alberto Roveda*/
 
 public class EventCardJson {
+    public String id;
     public EventType type;
     public Era era;
     public int playersRequired;

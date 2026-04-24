@@ -9,6 +9,7 @@ import it.polimi.ingsw.mesos.model.enums.*;
  *  */
 
 public class BuildingCardJson {
+    public String id;
     public Era era;
     public int cost;
     public int victoryPoints;

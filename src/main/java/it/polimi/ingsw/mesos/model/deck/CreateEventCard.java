@@ -78,7 +78,11 @@ public class CreateEventCard {
 
                 }
 
+                card.setId(j.id);
+
                 allEventCards.add(card);
+
+                CardRegistry.registerCard(j.id, j);//aggiunge la carta anche al nostro database
 
             }
 

@@ -533,12 +533,15 @@ class MesosIntegrationTest {
 
     @Test
     void EventState() {
+        game.setCurrentRound(1);
         Board board = game.getBoard();
         board.getUpperRow().clear();
         board.getLowerRow().clear();
 
         int pp = marco.getPrestigePoints();
         int food = marco.getFood();
+
+        board.getTurnOrderTrack().resetOrder();
 
         board.getTurnOrderTrack().setEffectsActive(true);
 
@@ -576,7 +579,13 @@ class MesosIntegrationTest {
         CavePaintingEvent cevent = new CavePaintingEvent(Era.ERA_I, 2, false, 1, 2, 3, 2);
         board.getLowerRow().add(cevent);
 
+        board.getTile('B').setHost(sofia);
+        board.getTile('C').setHost(marco);
+
+        board.getTurnOrderTrack().setEffectsActive(false);
+
         game.changeState(new EventState());
+
 
         //marco ha pagato 1 di cibo perchè si trovava sull'ultima casella della turnordertrack
         //marco dovrebbe prendere 8 punti dato evento caccia + effetto edificio durante l'evento e dovrebbe perdere anche 3 punti causa evento pitture rupestri
