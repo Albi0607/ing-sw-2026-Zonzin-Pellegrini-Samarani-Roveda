@@ -26,6 +26,10 @@ public class CLI implements View {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Updates the local game state, resets action flags, and triggers a board UI refresh.
+     * @param game The Data Transfer Object containing the updated game state.
+     */
     @Override
     public void showLastUpdate(GameDTO game) {
         this.currentGameState = game;
@@ -34,18 +38,30 @@ public class CLI implements View {
         this.boardUpdated = true;
     }
 
+    /**
+     * Updates the current client-side state (e.g., waiting, in-game, choosing players).
+     * @param state The new state of the client.
+     */
     @Override
     public void showClientStateUpdate(ClientState state) {
         this.currentClientState = state;
 
     }
 
+    /**
+     * Displays a notification message from the server to the user.
+     * @param message The message to be displayed.
+     */
     @Override
     public void showMessage(String message) {
         System.out.println(CLIPrinter.ANSI_RED + "🔔 NOTIFICA: " + message + CLIPrinter.ANSI_RESET);
         this.actionSent = false;
     }
 
+    /**
+     * Main execution loop of the CLI. Handles connection setup and
+     * manages the UI rendering and turn logic based on game updates.
+     */
     public void start() {
         CLIPrinter.clearScreen();
         System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
@@ -96,6 +112,10 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Prompts the user to select a network protocol (RMI or Socket)
+     * and initializes the ClientController.
+     */
     private void chooseNetwork() {
         System.out.println("\nScegli il tipo di connessione:");
         System.out.println("1. RMI");
@@ -125,6 +145,9 @@ public class CLI implements View {
         this.controller = new ClientController(this, network);
     }
 
+    /**
+     * Handles the initial player registration by asking for a nickname.
+     */
     private void setupGame() {
         System.out.print("\nInserisci il tuo nickname: ");
         this.myNickname = scanner.nextLine().trim();
@@ -132,20 +155,33 @@ public class CLI implements View {
         System.out.println(CLIPrinter.ANSI_YELLOW + "In attesa degli altri giocatori o di comunicazioni dal Server..." + CLIPrinter.ANSI_RESET);
     }
 
+    /**
+     * Coordinates the printing of the game header, board, and player status
+     * using the CLIPrinter.
+     */
     private void drawUI() {
         if (currentGameState == null) return;
         CLIPrinter.clearScreen();
+        CLIPrinter.printEventPhase(currentGameState);
         CLIPrinter.printHeader(currentGameState, false);
         CLIPrinter.printBoard(currentGameState);
         CLIPrinter.printAllPlayersStatus(currentGameState);
         System.out.println("Fase attuale: " + CLIPrinter.ANSI_GREEN + currentGameState.currentState + CLIPrinter.ANSI_RESET + "\n");
     }
 
+    /**
+     * Checks if the current turn belongs to this client's player.
+     * @return true if it is the client's turn, false otherwise.
+     */
     private boolean isMyTurn() {
         return currentGameState.currentPlayerNickname != null &&
                 currentGameState.currentPlayerNickname.equals(myNickname);
     }
 
+    /**
+     * Handles the specific logic for the first player to decide the
+     * total number of participants for the match.
+     */
     private void askForPlayers() {
         System.out.print(CLIPrinter.ANSI_CYAN + "Sei il primo giocatore! Scegli il numero di giocatori (2-5): " + CLIPrinter.ANSI_RESET);
         try {
@@ -158,6 +194,10 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Manages user input during the player's turn, differentiating between
+     * placing totems and taking cards.
+     */
     private void handleTurn() {
         System.out.println(CLIPrinter.ANSI_CYAN + " TOCCA A TE! " + CLIPrinter.ANSI_RESET);
 

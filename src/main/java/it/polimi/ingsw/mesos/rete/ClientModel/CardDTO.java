@@ -7,15 +7,7 @@ import java.io.Serializable;
 
 public class CardDTO implements Serializable {
 
-    public int id;
-    //se carta event o carta character o carta edificio
-    public CardType type;
-    //se è una carta evento distingui il tipo
-    public EventType eventType;
-    //se è una carta personaggio distingui il tipo
-    public CharacterType characterType;
-
-    public int era;
+    public String id;
 
     //non serve utilizzo id della carta per visionarla
 /*

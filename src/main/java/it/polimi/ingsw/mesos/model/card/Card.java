@@ -12,11 +12,20 @@ public abstract class Card {
 
     /**Era attribute for all cards*/
     private final Era era;
+    protected String id;
 
     /**General constructor for all cards
      * @param era the era of the card*/
     public Card(Era era) {
         this.era = era;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**Getter method to retrieve the era of the card

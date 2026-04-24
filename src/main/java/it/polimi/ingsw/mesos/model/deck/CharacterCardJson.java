@@ -8,6 +8,7 @@ import it.polimi.ingsw.mesos.model.enums.InventionIcon;
  * character to construct, with the corresponding parameters that differ from one character to another
  * @author Alberto Roveda*/
 public class CharacterCardJson {
+    public String id;
     public CharacterType type;
     public Era era;
     public int playersRequired;

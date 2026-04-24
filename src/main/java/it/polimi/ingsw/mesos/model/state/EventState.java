@@ -89,30 +89,37 @@ public class EventState implements GameStateLogic {
                 .map(card -> (EventCard) card)
                 .collect(java.util.stream.Collectors.toList());
 
-        if (eventsToResolve.isEmpty()) return;
+        List<String> resolvedNames = new ArrayList<>();
 
+        if (eventsToResolve.isEmpty()){
+            resolvedNames.add("Nessun evento risolto.");
+        }else{
+            eventsToResolve.sort((e1, e2) -> {
+                // Il Sostentamento (SUSTENANCE) va sempre per ultimo
+                boolean isSust1 = e1.getType() == EventType.SUSTENANCE;
+                boolean isSust2 = e2.getType() == EventType.SUSTENANCE;
 
-        eventsToResolve.sort((e1, e2) -> {
-            // Il Sostentamento (SUSTENANCE) va sempre per ultimo
-            boolean isSust1 = e1.getType() == EventType.SUSTENANCE;
-            boolean isSust2 = e2.getType() == EventType.SUSTENANCE;
+                if (isSust1 != isSust2) {
+                    return isSust1 ? 1 : -1;
+                }
 
-            if (isSust1 != isSust2) {
-                return isSust1 ? 1 : -1;
+                // stesso tipo ma Ordine di Era (I < II < III)
+                if (e1.getType() == e2.getType()) {
+                    return e1.getEra().compareTo(e2.getEra());
+                }
+
+                return 0;
+            });
+
+            for (EventCard event : eventsToResolve) {
+                System.out.println("Attivazione Evento: " + event.getType() + " [Era " + event.getEra() + "]");
+                resolvedNames.add(event.getType().toString());
+                event.resolve(g);
             }
-
-            // stesso tipo ma Ordine di Era (I < II < III)
-            if (e1.getType() == e2.getType()) {
-                return e1.getEra().compareTo(e2.getEra());
-            }
-
-            return 0;
-        });
-
-        for (EventCard event : eventsToResolve) {
-            System.out.println("Attivazione Evento: " + event.getType() + " [Era " + event.getEra() + "]");
-            event.resolve(g);
         }
+
+        g.setLastResolvedEvents(resolvedNames);
+
     }
 
     @Override
