@@ -82,6 +82,16 @@ public class client_RMI implements Network {
         }
     }
 
+    @Override
+    public boolean skipExtraDraw(String nickname){
+        try{
+            return remote.skipExtraDraw(nickname);
+        }
+        catch(RemoteException e){
+            return false;
+        }
+    }
+
     /**
      * Method that allows the player (to be used only if they are the first connected player) to choose the number of
      * players participating in the game

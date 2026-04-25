@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.controller.GameController;
 import java.rmi.*;
 import java.rmi.registry.*;
 
+//fare documentazione di questa classe
 public class server_RMI {
 
     public void start(GameController controller) {
