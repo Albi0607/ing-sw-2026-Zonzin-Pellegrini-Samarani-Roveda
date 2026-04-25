@@ -3,13 +3,37 @@ package it.polimi.ingsw.mesos.rete;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 
+/**
+ * Generic interface used and managed by the server to send communications to the client without knowing which type of
+ * network implementation is being used. The methods of this interface are invoked by the server in the same way for
+ * both RMI and socket implementations. Two classes implement this interface, each handling these method calls according
+ * to the specific network type
+ */
 public interface VirtualView {
 
+    /**
+     * Method that sends the game updated to the latest modification to the ClientController so that it can be displayed
+     * in the client view
+     * @param game latest game update
+     */
     void sendGame(GameDTO game);
 
+    /**
+     * Method that sends the current state of the player (essential before the game starts) so that the client can
+     * determine what actions it must perform
+     * @param state latest updated client state
+     */
     void sendClientState(ClientState state);
-    //capire cosa farci soprattutto in RMI
+
+    /**
+     * Method that allows the server to send error messages or general notifications to the client
+     * @param message message to be displayed in the client view
+     */
     void showMessage(String message);
 
+    /**
+     * Method used to retrieve the client's name
+     * @return client nickname
+     */
     String getNickname();
 }

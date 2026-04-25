@@ -6,74 +6,88 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.rmi.*;
 import java.rmi.server.*;
 
+/**
+ * Class that implements the associated remote interface and provides the methods invoked by the client on the server
+ * side, enabling the client to perform actions in the game
+ */
 public class RemoteMethodsImplementation extends UnicastRemoteObject implements RemoteMethods {
 
     private final GameController controller;
 
-
+    /**
+     * Constructor of this class that enables remote method invocation through the use of the GameController
+     * @param controller GameController on which the methods are invoked and which updates the associated model
+     * @throws RemoteException if there are network errors during the method invocation
+     */
     public RemoteMethodsImplementation(GameController controller) throws RemoteException {
         this.controller = controller;
     }
 
-
-    //quando i giocatori accedono per la prima volta li metto nel registro cosi posso chiamare il callback e valuta se
-    //è il primo utente connesso in modo da fargli scegliere il numero di giocatori della partita
+    /**
+     *
+     * Method that allows the client to register for a game session on the server side
+     * @param nickname name chosen by the client
+     * @param clientCallback object that allows the server to update and exchange messages with the client
+     * @return true if the registration was successful; otherwise, false
+     * @throws RemoteException if there are network errors during the method invocation
+     */
     public boolean registerClient(String nickname, CallBack clientCallback) throws RemoteException {
 
-        //nel try mancava il return true, la versione precedente ritornava a prescindere sempre false
         try {
             VirtualView view = new RMIVirtualView(nickname, clientCallback);
             controller.addPlayer(nickname, view);
-
             return true;
 
         } catch (Exception e) {
-            System.out.println("Problema di registrazione del client: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
 
+    /**
+     * Method that allows the client to place the totem on the OfferTile
+     * @param nickname name chosen by the client
+     * @param position position selected on the OfferTile
+     * @return true if the action was performed successfully; otherwise, false
+     * @throws RemoteException if there are network errors during the method invocation
+     */
     @Override
     public boolean placeTotem(String nickname, char position) throws RemoteException {
 
-        /*
-        try {
-            controller.onPlaceTotem(nickname, position);
-            //GameDTO game = controller.lastGameUpdate();
-            //broadcast(game);
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
-         */
-
         return controller.onPlaceTotem(nickname, position);
-
     }
 
+    /**
+     * Method that allows the player to draw a card from the upper or lower row
+     * @param nickname name chosen by the client
+     * @param position position indicating the selected card
+     * @param isUpper if true, the card must be taken from the upper row; otherwise, from the lower row
+     * @return true if the action was performed successfully; otherwise, false
+     * @throws RemoteException if there are network errors during the method invocation
+     */
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper) throws RemoteException {
-        try {
-            controller.onTakeCard(nickname, position, isUpper);
-            //GameDTO game = controller.lastGameUpdate();
-            //broadcast(game);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+
+        return controller.onTakeCard(nickname, position, isUpper);
     }
 
 
+    /**
+     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
+     * players participating in the game
+     * @param numPlayers number of players selected, ranging from 2 to 5
+     * @return true if the players were chosen successfully; otherwise, false
+     * @throws RemoteException if there are network errors during the method invocation
+     */
     @Override
     public boolean choosePlayers(int numPlayers) throws RemoteException {
         try {
             controller.setNumPlayers(numPlayers);
+            return true;
         } catch (Exception e) {
             return false;
         }
-        return true;
     }
+
+    //aggiungere metodo skipOnExtraDraw per gestire il caso del edificio che permette di pescare una carta in più
 
 }

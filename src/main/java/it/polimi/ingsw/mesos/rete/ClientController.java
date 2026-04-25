@@ -4,6 +4,15 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.enums.GameState;
 
+/**
+ * Class that manages all actions a client can perform within the game. It maintains a generic reference to both the
+ * view being displayed and the network type used to communicate with the server, so that it does not depend on specific
+ * implementations but instead invokes the common methods provided by the two generic interfaces
+ *
+ * It also holds a reference to the game, in particular to its latest updated state (if everything is functioning
+ * correctly), and, through interaction with the server, it uses the clientState attribute to determine which actions
+ * the client is required to perform
+ */
 public class ClientController {
 
     private final Network network;
@@ -13,60 +22,102 @@ public class ClientController {
     private GameDTO game;
     private ClientState clientState;
 
+    /**
+     * Constructor of the class that requires as parameters the object responsible for managing the view type
+     * (CLI or GUI) and the object responsible for managing the network type (RMI or socket)
+     * @param view object specific to the view type: CLI or GUI
+     * @param network object specific to the network type: RMI or socket
+     */
     public ClientController(View view, Network network){
         this.view = view;
         this.network = network;
         this.clientState=ClientState.WAITING_CONNECTION;
     }
 
+    /**
+     * Method that allows the client to display the game updated to reflect the latest changes from the model
+     * @param game latest game update
+     */
     public void updateGame(GameDTO game){
         this.game = game;
         view.showLastUpdate(game);
     }
 
-    //attenzione che qua game potrebbe es
+    /**
+     * Method that updates the attribute indicating the user's current state and, consequently, the actions they must
+     * perform (mostly before the start of the game)
+     * @param state latest updated client state
+     */
     public void updateClientState(ClientState state){
         this.clientState = state;
         view.showClientStateUpdate(clientState);
     }
 
-    //metto nell'attributo nickname del controller il nickname scelto oltre a effettuare la registrazione
+
+    /**
+     * Method that allows the client to display general messages related to the connection and game progress
+     * @param message message to be displayed in the client view
+     */
+    public void showMessage(String message){
+        view.showMessage(message);
+    }
+
+    /**
+     * Method that allows the client to display error messages related to the connection and game progress
+     * @param error error to be displayed in the client view
+     */
+    public void showError(String error) {
+        view.showMessage(error);
+    }
+
+    /**
+     * Method that allows the client to register for a game session on the server side
+     * The selected nickname is stored in the controller’s nickname attribute in addition to performing the registration.
+     * @param nickname name chosen by the client
+     */
     public void register(String nickname){
         if(clientState==ClientState.WAITING_CONNECTION) {
             if (network.register(nickname, this)) {
                 this.nickname = nickname;
-                System.out.println("Registrazione avvenuta correttamente");
+                view.showMessage("Registrazione avvenuta correttamente");
             }else{
-                System.out.println("ERRORE di registrazione ");//aggiunto questo else
+                view.showMessage("ERRORE di registrazione ");//aggiunto questo else
             }
         }
         else{
-            System.out.println("Errore nella registrazione");
+            view.showMessage("Errore nella registrazione");
         }
 
     }
 
+    /**
+     * Method that allows the client to place the totem on the OfferTile
+     * @param position position selected on the OfferTile
+     */
     public void placeTotem(char position){
-        if(game!=null&&game.currentState== GameState.PLACING_TOTEMS&&game.currentPlayerNickname.equals(nickname)&&clientState==ClientState.IN_GAME) {
+        if(myTurnInGame(GameState.PLACING_TOTEMS)) {
             if(network.placeTotem(nickname, position)){
-                System.out.println("Totem piazzato correttamente");
+                view.showMessage("Totem piazzato correttamente");
             }
             else{
-                System.out.println("Errore piazzamento totem");
-                view.showMessage("Tessera occupata o mossa non valida! Riprova."); //aggiunto questo
+                view.showMessage(" Errore piazzamento totem: tessera occupata o mossa non valida! Riprova."); //aggiunto questo
             }
         }
         else{
-            System.out.println("Non puoi piazzare il totem poiché non tocca a te");
+            view.showMessage("Non puoi piazzare il totem poiché non tocca a te");
         }
 
     }
 
+    /**
+     * Method that allows the player to draw a card from the upper or lower row
+     * @param position position indicating the selected card
+     * @param isUpper if true, the card must be taken from the upper row; otherwise, from the lower row
+     */
     public void takeCard(int position,boolean isUpper){
-        /*
-        if(game!=null&&game.currentState== GameState.RESOLVING_ACTIONS&&game.currentPlayerNickname.equals(nickname)&&clientState==ClientState.IN_GAME) {
+        if(myTurnInGame(GameState.RESOLVING_ACTIONS)) {
             if(network.takeCard(nickname,position,isUpper)){
-                System.out.println("Carta presa correttamente");
+                view.showMessage("Carta presa correttamente");
             }
             else{
                 System.out.println("Errore nel prendere la carta");
@@ -74,19 +125,16 @@ public class ClientController {
             }
         }
         else{
-            System.out.println("Non puoi prendere la carta poiché non tocca a te");
+            view.showMessage("Non puoi prendere la carta poiché non tocca a te");
         }
-         */
 
-        if (game != null && game.currentState == GameState.RESOLVING_ACTIONS && game.currentPlayerNickname.equals(nickname) && clientState == ClientState.IN_GAME) {
-
-            network.takeCard(nickname, position, isUpper);
-
-        } else {
-            System.out.println("Non puoi prendere la carta poiché non tocca a te o non è la fase corretta");
-        }
     }
 
+    /**
+     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
+     * players participating in the game
+     * @param numPlayers number of players selected, ranging from 2 to 5
+     */
     public void choosePlayer(int numPlayers){
         if(clientState==ClientState.CHOOSE_PLAYERS) {
             if(network.choosePlayers(numPlayers)){
@@ -101,15 +149,17 @@ public class ClientController {
         }
     }
 
-    //aggiungere il metodo per fare una pescata extra
-
-
-     public void showMessage(String message){
-        view.showMessage(message);
-     }
-
-    public void showError(String error) {
-        view.showMessage(error);
+    /**
+     * Private method used within this class by other methods to check whether it is the client’s turn, and therefore
+     * determine whether the client is allowed to perform certain actions or not
+     * @param state state in which the game should be in order to perform a specific action
+     * @return true if the state is correct and the client is therefore allowed to perform the action; otherwise, false.
+     */
+    private boolean myTurnInGame(GameState state){
+        return game != null && game.currentState == state && game.currentPlayerNickname.equals(nickname) && clientState == ClientState.IN_GAME;
     }
+
+
+    //aggiungere il metodo per fare una pescata extra
 
 }

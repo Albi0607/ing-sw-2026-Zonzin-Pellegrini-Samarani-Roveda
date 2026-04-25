@@ -6,16 +6,31 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.RemoteException;
 
+/**
+ * Class that implements the associated interface and manages, according to the RMI protocol, server-side calls that
+ * modify, update, and notify the client
+ */
 public class RMIVirtualView implements VirtualView {
 
-    private String nickname;
-    private CallBack clientCallBack;
+    private final  String nickname;
+    private final CallBack clientCallBack;
 
+    /**
+     * Constructor of the class that defines the associated client nickname and the object that allows the server,
+     * in RMI, to invoke methods on the client side
+     * @param nickname client nickname
+     * @param clientCallBack object that allows the server to invoke methods on the client side
+     */
     public RMIVirtualView(String nickname,CallBack clientCallBack){
         this.nickname=nickname;
         this.clientCallBack=clientCallBack;
     }
 
+    /**
+     * Method that sends the game updated to the latest modification to the ClientController so that it can be displayed
+     * in the client view
+     * @param game latest game update
+     */
     @Override
     public void sendGame(GameDTO game) {
         try {
@@ -25,6 +40,11 @@ public class RMIVirtualView implements VirtualView {
         }
     }
 
+    /**
+     * Method that sends the current state of the player (essential before the game starts) so that the client can
+     * determine what actions it must perform
+     * @param state latest updated client state
+     */
     @Override
     public void sendClientState(ClientState state){
         try {
@@ -35,7 +55,10 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
-    //capire come gestire questo message lato RMI
+    /**
+     * Method that allows the server to send error messages or general notifications to the client
+     * @param message message to be displayed in the client view
+     */
     @Override
     public void showMessage(String message) {
         try {
@@ -46,6 +69,10 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
+    /**
+     * Method used to retrieve the client's name
+     * @return client nickname
+     */
     @Override
     public String getNickname() {
         return this.nickname;
