@@ -28,7 +28,7 @@ public class GameController {
     //capire come gestire le virtual view per poi usare il protocollo di rete adeguato
     private final Map<String, VirtualView> players = new ConcurrentHashMap<>();
     //private View view;
-    private List<String> pendingNicknames = new ArrayList<>();
+    private final  List<String> pendingNicknames;
     private int expectedNumPlayers=0;
     public GameController() {
         this.pendingNicknames = new ArrayList<>();
@@ -42,6 +42,8 @@ public class GameController {
      */
     //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
 
+    // da cambiare meglio metterlo booleano così il client sa se ha inserito correttamente il numero di giocatori oppure
+    // se deve inserirlo di nuovo perche ha sbagliato
     public synchronized void setNumPlayers(int expectedNumPlayers) {
         if(this.expectedNumPlayers != 0){
             System.out.println("Numero di player gia settato da un altro giocatore");
@@ -234,11 +236,15 @@ public class GameController {
 
     }
 
-    public void onSkipExtraDraw(String nickname) {
+    //meglio metterlo booleano così il client sa se l'azione è stata svolta correttamente
+    //attenzione che sia questo metodo sia onTakeCard si svolgono con lo stesso stato potrebbe essere necessario
+    // distinguerli in qualche modo altrimenti il client non sa bene quale azione tocca fare
+    public boolean onSkipExtraDraw(String nickname) {
         requireState(GameState.RESOLVING_ACTIONS);
         Player player = requirePlayer(nickname);
         game.skipExtraDraw(player);
         broadcastUpdate();
+        return true;
     }
 
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
