@@ -212,16 +212,16 @@ public class GameController {
         }
     }
 
-
-    public void onTakeCard(String nickname, int cardIndex, boolean isUpper) {
+    //aggiungo valore di ritorno booleano per capire se l'azione è andata a buon fine
+    public boolean onTakeCard(String nickname, int cardIndex, boolean isUpper) {
 
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             Player player = requirePlayer(nickname);
 
             game.takeCard(player, cardIndex, isUpper);
-
             broadcastUpdate();
+            return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
 
@@ -229,6 +229,7 @@ public class GameController {
             if (view != null) {
                 view.showMessage("Mossa non valida: " + e.getMessage());
             }
+            return false;
         }
 
     }
