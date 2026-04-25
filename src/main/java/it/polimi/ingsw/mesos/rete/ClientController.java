@@ -131,6 +131,26 @@ public class ClientController {
     }
 
     /**
+     * Method that allows the client not to draw the extra card at the end of the turn if they possess the triggering
+     * building
+     */
+    //definire meglio questa azione insieme a takeCard poiché avvengono entrambe nello stesso stato e quindi potrebbe
+    // non esserci differenziazione da parte del client
+    public void skipOnExtraDraw(){
+        if(myTurnInGame(GameState.RESOLVING_ACTIONS)){
+            if(network.skipExtraDraw(nickname)){
+                view.showMessage("Azione di non pescare nessuna carta fatta in maniera corretta");
+            }
+            else{
+                view.showMessage("Errore nel non pescare la carta");
+            }
+        }
+        else{
+            view.showMessage("Non puoi scegliere di non pescare la carta poiché non tocca a te");
+        }
+    }
+
+    /**
      * Method that allows the player (to be used only if they are the first connected player) to choose the number of
      * players participating in the game
      * @param numPlayers number of players selected, ranging from 2 to 5

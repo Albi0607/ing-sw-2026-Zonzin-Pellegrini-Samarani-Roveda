@@ -70,6 +70,18 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         return controller.onTakeCard(nickname, position, isUpper);
     }
 
+    /**
+     * Method that allows the client not to draw the extra card at the end of the turn if they possess the triggering
+     * building
+     * @param nickname name of the player performing the action
+     * @return true if the client has chosen not to draw the extra card due to the effect of the triggering building;
+     * otherwise, false
+     * @throws RemoteException if there are network errors during the method invocation
+     */
+    @Override
+    public boolean skipExtraDraw(String nickname) throws RemoteException{
+        return controller.onSkipExtraDraw(nickname);
+    }
 
     /**
      * Method that allows the player (to be used only if they are the first connected player) to choose the number of
