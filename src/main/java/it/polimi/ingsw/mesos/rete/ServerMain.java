@@ -11,13 +11,21 @@ import it.polimi.ingsw.mesos.socket.serverSocket;
  */
 public class ServerMain {
 
+    //capire come gestire la porta diversa anche lato client, forse in RMI non c'é bisogno di sapere la porta
     public static void main(String[] args) {
         GameController controller = new GameController();
+        //porta di default;
+        int port = 1099;
+
+        if(args.length>0){
+            port=Integer.parseInt(args[0]);
+        }
+        final int finalPort = port;
 
         //RMI THREAD
         new Thread(() -> {
             server_RMI rmi = new server_RMI();
-            rmi.start(controller);
+            rmi.start(controller,finalPort);
         }).start();
 
         /*

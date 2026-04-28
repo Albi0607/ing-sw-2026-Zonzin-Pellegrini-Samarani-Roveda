@@ -42,8 +42,8 @@ public class GameController {
      */
     //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
 
-    // da cambiare meglio metterlo booleano così il client sa se ha inserito correttamente il numero di giocatori oppure
-    // se deve inserirlo di nuovo perche ha sbagliato
+    //bisogna ripensarlo poiché se viene messo un numero di giocatori errato il gioco si ferma e non permette più di
+    //inserirne
     public synchronized void setNumPlayers(int expectedNumPlayers) {
         if(this.expectedNumPlayers != 0){
             System.out.println("Numero di player gia settato da un altro giocatore");
@@ -250,6 +250,7 @@ public class GameController {
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
     //metodo che dicevamo aggiornare tutte le altre view
     //capire cosa fare quando cade la rete
+    //capire cosa fare quando un player si disconnette: chi fa le sue azioni? Si saltano?
     protected void broadcastUpdate() {
         if (game == null) return;
         GameDTO dto = buildLastGameDTO();
@@ -418,6 +419,13 @@ public class GameController {
             throw new IllegalArgumentException("Tile " + tileId + " not found!");
         }
         return tile;
+    }
+
+    //metodo per rimuove giocatori che perdono connessione, capire se c'é altro da fare
+    //bisogna però tenere nickname perché se si riconnette deve controllare che metta stesso nickname per potere ritornare
+    //a giocare
+    private void RemovePlayer(String nickname){
+        players.remove(nickname);
     }
 
     // manca un metodo che rispedisce la notifica dal controller al client

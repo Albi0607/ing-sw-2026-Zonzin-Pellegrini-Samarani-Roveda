@@ -10,6 +10,7 @@ import java.rmi.registry.*;
  * invocations
  * */
 
+//per attivare la lobby devo avere come attribuo il game controller al quale faccio registry
 public class client_RMI implements Network {
 
     RemoteMethods remote;
