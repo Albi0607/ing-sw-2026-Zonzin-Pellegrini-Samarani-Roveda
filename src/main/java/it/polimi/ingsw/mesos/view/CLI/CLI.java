@@ -126,7 +126,7 @@ public class CLI implements View {
         Network network = null;
 
         if (choice.equals("1")) {
-            System.out.println("Connessione RMI in corso (su localhost)...");
+            System.out.println("Connessione RMI in corso...");
             try {
                 network = new client_RMI();
             } catch (Exception e) {

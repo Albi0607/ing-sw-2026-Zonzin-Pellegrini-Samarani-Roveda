@@ -240,11 +240,19 @@ public class GameController {
     //attenzione che sia questo metodo sia onTakeCard si svolgono con lo stesso stato potrebbe essere necessario
     // distinguerli in qualche modo altrimenti il client non sa bene quale azione tocca fare
     public boolean onSkipExtraDraw(String nickname) {
-        requireState(GameState.RESOLVING_ACTIONS);
-        Player player = requirePlayer(nickname);
-        game.skipExtraDraw(player);
-        broadcastUpdate();
-        return true;
+        try {
+            requireState(GameState.RESOLVING_ACTIONS);
+            Player player = requirePlayer(nickname);
+            game.skipExtraDraw(player);
+            broadcastUpdate();
+            return true;
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            VirtualView view = players.get(nickname);
+            if (view != null) {
+                view.showMessage("Mossa non valida: " + e.getMessage());
+            }
+            return false;
+        }
     }
 
     //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
