@@ -209,5 +209,77 @@ class GameControllerTest {
         System.out.println("Stress Test del Controller completato con successo: Barriere di sicurezza intatte.");
     }
 
+    @Test
+    void testOnSkipExtraDraw_Success() {
+        avanzaFinoARisoluzioneAzioni();
+
+        // Ci assicuriamo di essere nello stato corretto
+        assertEquals(GameState.RESOLVING_ACTIONS, controller.getGame().getCurrentState().getStateId());
+
+        // Dobbiamo capire a quale giocatore tocca eseguire la risoluzione ora
+        ResolvingState rs = (ResolvingState) controller.getGame().getCurrentState();
+        Player activePlayer = rs.getActivePlayer(controller.getGame());
+
+        assertNotNull(activePlayer, "Ci dovrebbe essere un giocatore attivo in risoluzione");
+
+        // Il giocatore attivo decide di saltare
+        boolean result = controller.onSkipExtraDraw(activePlayer.getNickname());
+
+        assertTrue(result, "onSkipExtraDraw deve ritornare true quando l'azione è legale");
+    }
+
+    @Test
+    void testOnSkipExtraDraw_WrongState_ReturnsFalse() {
+        // Prepariamo la partita ma NON avanziamo fino a RESOLVING_ACTIONS
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", mockView);
+        controller.addPlayer("Bob", mockView);
+        controller.startGame();
+
+        // Siamo ancora in PLACING_TOTEMS
+        assertEquals(GameState.PLACING_TOTEMS, controller.getGame().getCurrentState().getStateId());
+
+        // Alice prova a saltare un'azione fuori fase
+        boolean result = controller.onSkipExtraDraw("Alice");
+
+        assertFalse(result, "onSkipExtraDraw deve ritornare false se chiamato nello stato sbagliato");
+    }
+
+    @Test
+    void testOnSkipExtraDraw_PlayerNotFound_ReturnsFalse() {
+        avanzaFinoARisoluzioneAzioni();
+
+        // Proviamo a chiamare l'azione con un nome che non fa parte del gioco
+        boolean result = controller.onSkipExtraDraw("CarloFantasma");
+
+        assertFalse(result, "onSkipExtraDraw deve ritornare false se il giocatore non esiste");
+    }
+
+    private void avanzaFinoARisoluzioneAzioni() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", mockView);
+        controller.addPlayer("Bob", mockView);
+
+        // NOTA: Ho tolto controller.startGame() perché il tuo addPlayer lo chiama
+        // in automatico non appena entra l'ultimo giocatore (la stanza si riempie).
+
+        // Ci sono 2 giocatori, quindi dobbiamo fare 2 piazzamenti validi
+        for (int i = 0; i < 2; i++) {
+            // 1. Chiediamo al gioco a chi tocca esattamente in questo momento
+            String currentNickname = controller.getGame().getCurrentPlayerNickname();
+            assertNotNull(currentNickname, "Il giocatore corrente non dovrebbe essere null");
+
+            // 2. Chiediamo alla board quale è la prima tessera offerta ancora libera
+            char availableTile = controller.getGame().getBoard().getTiles().stream()
+                    .filter(t -> t.getHost() == null) // Prendiamo solo quelle libere
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Nessuna tessera libera trovata!"))
+                    .getId();
+
+            // 3. Facciamo la mossa legalmente
+            boolean success = controller.onPlaceTotem(currentNickname, availableTile);
+            assertTrue(success, "Il piazzamento del totem dovrebbe andare a buon fine");
+        }
+    }
 }
 
