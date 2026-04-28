@@ -5,6 +5,8 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Class that implements the associated remote interface and provides the methods invoked by the client on the server
@@ -12,7 +14,10 @@ import java.rmi.server.*;
  */
 public class RemoteMethodsImplementation extends UnicastRemoteObject implements RemoteMethods {
 
+    //al posto di GameController passare tutta la lobby
     private final GameController controller;
+    //da capire se usare o meno
+    //private final Queue<Runnable> actions = new LinkedList<>();
 
     /**
      * Constructor of this class that enables remote method invocation through the use of the GameController
@@ -21,6 +26,34 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
      */
     public RemoteMethodsImplementation(GameController controller) throws RemoteException {
         this.controller = controller;
+
+        //da capire se usare o meno, forse molto utile per multipartite
+        //la gestione del valore di ritorno ed eventuali errori va cambiata però
+    /*
+        new Thread(()-> {
+            while (true) {
+                Runnable action;
+
+                synchronized (actions) {
+                    while (actions.isEmpty()) {
+                        try {
+                            actions.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            return;
+                        }
+                    }
+                    action = actions.poll();
+                }
+
+                try {
+                    action.run;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        */
     }
 
     /**
@@ -99,7 +132,5 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
             return false;
         }
     }
-
-    //aggiungere metodo skipOnExtraDraw per gestire il caso del edificio che permette di pescare una carta in più
 
 }
