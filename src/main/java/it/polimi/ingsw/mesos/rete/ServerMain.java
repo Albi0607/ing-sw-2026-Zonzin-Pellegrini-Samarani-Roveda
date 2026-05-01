@@ -28,13 +28,12 @@ public class ServerMain {
             rmi.start(controller,finalPort);
         }).start();
 
-        /*
         //SOCKET THREAD
         new Thread(() -> {
             serverSocket socket = new serverSocket();
-            socket.start(controller);
+            // 1234 per il socket per non andare in conflitto con RMI (1099)
+            socket.start(controller, 1234 );
         }).start();
-        */
 
         System.out.println("Server avviati e pronti a connessioni");
     }
