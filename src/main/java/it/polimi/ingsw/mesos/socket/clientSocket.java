@@ -16,19 +16,14 @@ public class clientSocket implements Network {
 
     private ClientController controller;
 
-    public clientSocket(String host, int port) {
-        try {
-            socket = new Socket(host, port);
+    public clientSocket(String host, int port) throws IOException {
+        socket = new Socket(host, port);
 
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            in = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(socket.getInputStream());
 
-            new Thread(this::listenFromServer).start();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new Thread(this::listenFromServer).start();
     }
 
     @Override
@@ -49,7 +44,7 @@ public class clientSocket implements Network {
         sendMessage(new TakeCardMessage(nickname, position, isUpper));
         return true;
     }
-
+    
     @Override
     public boolean choosePlayers(int numPlayers) {
         sendMessage(new ChoosePlayersMessage(numPlayers));

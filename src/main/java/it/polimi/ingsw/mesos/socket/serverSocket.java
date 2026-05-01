@@ -11,36 +11,13 @@ import java.util.List;
 
 public class serverSocket {
 
-    private final int portNumber;
-    private final GameController controller;
     private final List<ClientHandler> clients = new ArrayList<>();
-
     //potrebbe servire non mi è ancora chiaro se il server deve in qualche modo usare questa lista per iterare/osservare i client (es. gestione disconnessioni)
 
-    public serverSocket(int portNumber) {
-        this.portNumber = portNumber;
-        this.controller = new GameController();
-
-    }
-    public static void main(String[] args) {
-        int portNumber = 1234;
-        if (args.length > 0) {
-            try {
-                portNumber = Integer.parseInt(args[0]);
-            } catch (NumberFormatException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        new serverSocket(portNumber).start();
-    }
-
-    public void start() {
-        System.out.println("Starting Socket server on port: " + portNumber + "...");
-
+    public void start(GameController controller, int port) {
         // ricorda: notazione confusionaria, esiste serverSocket di tipo ServerSocket e serverSocket l'attuale classe, due cose diverse
-        try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Listening. Waiting for players...");
-
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("New connection from: "

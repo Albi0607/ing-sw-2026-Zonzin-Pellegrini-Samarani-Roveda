@@ -263,7 +263,9 @@ public class GameController {
         if (game == null) return;
         GameDTO dto = buildLastGameDTO();
         for (VirtualView view : players.values()) {
-            view.sendGame(dto);
+            try {
+                view.sendGame(dto);
+            } catch (Exception e) {} // per gestire l'eccezione quando cade la rete
         }
 
         game.clearLastResolvedEvents();
@@ -390,7 +392,9 @@ public class GameController {
     //notifica il cambio state agli altri player
     protected void sendClientStateToAll(ClientState state) {
         for  (VirtualView view : players.values()) {
-            view.sendClientState(state);
+            try {
+                view.sendClientState(state);
+            }catch (Exception e) {} // per gestire l'eccezione quando cade la rete
         }
     }
 
