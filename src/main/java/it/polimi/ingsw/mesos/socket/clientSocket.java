@@ -3,10 +3,7 @@ package it.polimi.ingsw.mesos.socket;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.*;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.ChoosePlayersMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.PlaceTotemMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.RegisterMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.TakeCardMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -56,6 +53,12 @@ public class clientSocket implements Network {
     @Override
     public boolean choosePlayers(int numPlayers) {
         sendMessage(new ChoosePlayersMessage(numPlayers));
+        return true;
+    }
+
+    @Override
+    public boolean skipExtraDraw(String nickname) {
+        sendMessage(new SkipExtraDrawMessage(nickname));
         return true;
     }
 
