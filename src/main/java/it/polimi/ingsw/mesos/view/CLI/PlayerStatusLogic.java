@@ -1,11 +1,10 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
-import it.polimi.ingsw.mesos.model.deck.CardRegistry;
+import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.model.deck.CharacterCardJson;
 import it.polimi.ingsw.mesos.model.enums.CharacterType;
 import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
-import it.polimi.ingsw.mesos.view.CLI.BuildingFormatter;
 
 import java.util.ArrayList;
 import java.util.List;

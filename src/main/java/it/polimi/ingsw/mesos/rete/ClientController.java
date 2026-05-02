@@ -119,10 +119,6 @@ public class ClientController {
             if(network.takeCard(nickname,position,isUpper)){
                 view.showMessage("Carta presa correttamente");
             }
-            else{
-                System.out.println("Errore nel prendere la carta");
-                view.showMessage("Mossa non valida o errore nel prendere la carta."); //aggiunto questo
-            }
         }
         else{
             view.showMessage("Non puoi prendere la carta poiché non tocca a te");
