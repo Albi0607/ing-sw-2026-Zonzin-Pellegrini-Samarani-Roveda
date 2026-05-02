@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.model.deck;
+package it.polimi.ingsw.mesos.view;
 import java.util.HashMap;
 import java.util.Map;
 
