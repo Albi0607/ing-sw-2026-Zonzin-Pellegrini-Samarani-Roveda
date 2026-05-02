@@ -82,8 +82,6 @@ public class CreateEventCard {
 
                 allEventCards.add(card);
 
-                CardRegistry.registerCard(j.id, j);//aggiunge la carta anche al nostro database
-
             }
 
             //mi devo ricordare di gestire queste eccezioni con ramo try catch quando verrà creato il deck in main

@@ -85,8 +85,6 @@ public class CreateBuildingCard {
 
                     allBuildingCards.add(card);
 
-                    CardRegistry.registerCard(j.id, j);//aggiunge la carta anche al nostro database
-
 
 
             }
