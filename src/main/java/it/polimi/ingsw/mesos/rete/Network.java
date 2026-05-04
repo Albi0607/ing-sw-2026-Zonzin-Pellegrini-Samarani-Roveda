@@ -1,19 +1,15 @@
 package it.polimi.ingsw.mesos.rete;
 
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+
+import java.util.List;
+
 /**
  * Generic interface for network management; both the RMI client and the socket client must implement this interface so
  * that the ClientController can invoke network methods without knowing which network implementation is being used
  */
 public interface Network {
 
-    /**
-     * Method that allows the client to register for a game session on the server side
-     * @param nickname name chosen by the client
-     * @param controller ClientController used to create a server-side reference, allowing the server to send game
-     * updates and other types of messages to the client.
-     * @return true if the registration was successful; otherwise, false
-     */
-    boolean register(String nickname, ClientController controller);
 
     /**
      * Method that allows the client to place the totem on the OfferTile
@@ -41,12 +37,12 @@ public interface Network {
      */
     boolean skipExtraDraw(String nickname);
 
-    /**
-     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
-     * players participating in the game
-     * @param numPlayers number of players selected, ranging from 2 to 5
-     * @return true if the players were chosen successfully; otherwise, false
-     */
-    boolean choosePlayers(int numPlayers);
+
+    String getLobby(ClientController controller);
+
+    //azioni del client sulla lobby
+    boolean createNewGame(String nickname, int expectedNumPlayers, String viewId);
+
+    boolean joinGame(String nickname, int id, String viewId);
 
 }

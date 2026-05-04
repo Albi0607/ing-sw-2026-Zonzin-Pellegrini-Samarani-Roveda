@@ -3,6 +3,9 @@ package it.polimi.ingsw.mesos.rete;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+
+import java.util.List;
 
 /**
  * Class that manages all actions a client can perform within the game. It maintains a generic reference to both the
@@ -17,8 +20,10 @@ public class ClientController {
 
     private final Network network;
     private final View view;
+    private String virtualViewId;
 
     private String nickname;
+    private List<LobbyInfoDTO> lobby;
     private GameDTO game;
     private ClientState clientState;
 
@@ -31,7 +36,6 @@ public class ClientController {
     public ClientController(View view, Network network){
         this.view = view;
         this.network = network;
-        this.clientState=ClientState.WAITING_CONNECTION;
     }
 
     /**
@@ -70,25 +74,7 @@ public class ClientController {
         view.showMessage(error);
     }
 
-    /**
-     * Method that allows the client to register for a game session on the server side
-     * The selected nickname is stored in the controller’s nickname attribute in addition to performing the registration.
-     * @param nickname name chosen by the client
-     */
-    public void register(String nickname){
-        if(clientState==ClientState.WAITING_CONNECTION) {
-            if (network.register(nickname, this)) {
-                this.nickname = nickname;
-                view.showMessage("Registrazione avvenuta correttamente");
-            }else{
-                view.showMessage("ERRORE di registrazione ");//aggiunto questo else
-            }
-        }
-        else{
-            view.showMessage("Errore nella registrazione");
-        }
 
-    }
 
     /**
      * Method that allows the client to place the totem on the OfferTile
@@ -147,25 +133,6 @@ public class ClientController {
     }
 
     /**
-     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
-     * players participating in the game
-     * @param numPlayers number of players selected, ranging from 2 to 5
-     */
-    public void choosePlayer(int numPlayers){
-        if(clientState==ClientState.CHOOSE_PLAYERS) {
-            if(network.choosePlayers(numPlayers)){
-                System.out.println("Numero di giocatori scelto correttamente");
-            }
-            else{
-                System.out.println("Numero di giocatori non scelto");
-            }
-        }
-        else{
-            System.out.println("Non puoi scegliere il numero di giocatori perché non tocca a te");
-        }
-    }
-
-    /**
      * Private method used within this class by other methods to check whether it is the client’s turn, and therefore
      * determine whether the client is allowed to perform certain actions or not
      * @param state state in which the game should be in order to perform a specific action
@@ -175,7 +142,35 @@ public class ClientController {
         return game != null && game.currentState == state && game.currentPlayerNickname.equals(nickname) && clientState == ClientState.IN_GAME;
     }
 
+    //metodo per mostrare la lobby
+    public void showLobby(List<LobbyInfoDTO> lobby) {
+        this.lobby=lobby;
+        view.showLobby(lobby);
+    }
 
-    //aggiungere il metodo per fare una pescata extra
+    //metodi da eseguire nella lobby
+
+    //metodo iniziale per accedere alla lobby poi la lobby si aggiornerà automaticamente
+    public void getLobby(){
+        this.virtualViewId= network.getLobby(this);
+        this.clientState=ClientState.LOBBY;
+    }
+
+    public void createNewGame(String nickname, int expectedNumPlayers){
+        if(clientState!=ClientState.LOBBY){
+            return;
+        }
+        this.nickname=nickname;
+        //ti deve chiedere di inserire nickname e il numero di giocatori dalla view
+        network.createNewGame(nickname,expectedNumPlayers,virtualViewId);
+
+    }
+    public void joinGame(String nickname, int id){
+        if(clientState!=ClientState.LOBBY){
+            return;
+        }
+        this.nickname=nickname;
+        network.joinGame(nickname,id,virtualViewId);
+    }
 
 }

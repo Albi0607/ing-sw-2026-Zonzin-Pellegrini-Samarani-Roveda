@@ -13,7 +13,9 @@ public class ServerMain {
 
     //capire come gestire la porta diversa anche lato client, forse in RMI non c'é bisogno di sapere la porta
     public static void main(String[] args) {
-        GameController controller = new GameController();
+        //aggiungo serverState e lobby per la gestione delle partite
+        ServerState serverState = new ServerState();
+
         //porta di default;
         int port = 1099;
 
@@ -25,14 +27,14 @@ public class ServerMain {
         //RMI THREAD
         new Thread(() -> {
             server_RMI rmi = new server_RMI();
-            rmi.start(controller,finalPort);
+            rmi.start(serverState,finalPort);
         }).start();
 
         //SOCKET THREAD
         new Thread(() -> {
             serverSocket socket = new serverSocket();
             // 1234 per il socket per non andare in conflitto con RMI (1099)
-            socket.start(controller, 1234 );
+            socket.start(serverState, 1234 );
         }).start();
 
         System.out.println("Server avviati e pronti a connessioni");

@@ -2,9 +2,11 @@ package it.polimi.ingsw.mesos.RMI;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  * Remote interface that allows the server to invoke methods on the client to update the view and display messages
@@ -31,6 +33,8 @@ public interface CallBack extends Remote {
      * @param message message to be displayed
      * @throws RemoteException if there are network errors during the method invocation
      */
-    void showMessage(String message)throws RemoteException;
+    void showMessage(String message) throws RemoteException;
 
+    //metodo per mandare la lobby in caso di modifiche
+    void showLobby(List<LobbyInfoDTO> lobby) throws RemoteException;
 }

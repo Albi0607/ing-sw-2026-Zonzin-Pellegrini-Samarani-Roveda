@@ -45,6 +45,7 @@ public class GameController {
     //bisogna ripensarlo poiché se viene messo un numero di giocatori errato il gioco si ferma e non permette più di
     //inserirne
     public synchronized void setNumPlayers(int expectedNumPlayers) {
+        //con lobby dovrebbe essere impossibile ricorrere a questo caso
         if(this.expectedNumPlayers != 0){
             System.out.println("Numero di player gia settato da un altro giocatore");
             return;
@@ -70,7 +71,7 @@ public class GameController {
         } else {
 
             for (VirtualView view : players.values()) {
-                view.sendClientState(ClientState.WAITING_CONNECTION);
+                view.sendClientState(ClientState.WAITING_PLAYERS);
                 view.showMessage("Partita impostata a " + expectedNumPlayers + " giocatori. In attesa degli sfidanti...");
             }
         }
@@ -107,12 +108,14 @@ public class GameController {
         pendingNicknames.add(nickname);
         players.put(nickname,view);
 
-
+        /* Non si fa piu questo controllo poiché esiste un metodo apposta per creare i game
         if (expectedNumPlayers == 0 && pendingNicknames.size() == 1) {
             // È il primissimo giocatore a entrare! Gli chiediamo di scegliere i posti.
             view.sendClientState(ClientState.CHOOSE_PLAYERS);
         }
-        else if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
+
+        else*/
+        if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
             // La stanza è piena. Creiamo la partita...
             createGame();
 
@@ -129,7 +132,7 @@ public class GameController {
         }
         else {
             // È entrato un giocatore, ma la stanza non è ancora piena.
-            view.sendClientState(ClientState.WAITING_CONNECTION);
+            view.sendClientState(ClientState.WAITING_PLAYERS);
         }
     }
 
@@ -179,6 +182,7 @@ public class GameController {
     public void endGame() {
         // capire cosa mettere qui
         //  view.notifyGameEnded(game.getWinner());
+        //gestire disconnessioni da serverState e lobby delle partite e giocatori
     }
 
     // AZIONI DEL GIOCATORE
@@ -433,6 +437,9 @@ public class GameController {
         return tile;
     }
 
+    //il GameController dovrebbe mandare timer con richieste ogni 3 secondi cosi da capire se i client sono ancora
+    //collegati oppure se rimuovere le connessioni
+
     //metodo per rimuove giocatori che perdono connessione, capire se c'é altro da fare
     //bisogna però tenere nickname perché se si riconnette deve controllare che metta stesso nickname per potere ritornare
     //a giocare
@@ -452,6 +459,8 @@ public class GameController {
         return expectedNumPlayers;
     }
 
+
+    //mettere metodo che controlla che il giocatore che fa azioni abbia nickname che appartiene alla partita
 }
 
 

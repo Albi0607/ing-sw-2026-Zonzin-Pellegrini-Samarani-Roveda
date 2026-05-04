@@ -1,12 +1,12 @@
 package it.polimi.ingsw.mesos.RMI;
 
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.rete.ServerState;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
 import java.rmi.server.*;
-import java.util.LinkedList;
-import java.util.Queue;
+
 
 /**
  * Class that implements the associated remote interface and provides the methods invoked by the client on the server
@@ -14,18 +14,13 @@ import java.util.Queue;
  */
 public class RemoteMethodsImplementation extends UnicastRemoteObject implements RemoteMethods {
 
-    //al posto di GameController passare tutta la lobby
-    private final GameController controller;
+    private final ServerState serverState;
     //da capire se usare o meno
     //private final Queue<Runnable> actions = new LinkedList<>();
 
-    /**
-     * Constructor of this class that enables remote method invocation through the use of the GameController
-     * @param controller GameController on which the methods are invoked and which updates the associated model
-     * @throws RemoteException if there are network errors during the method invocation
-     */
-    public RemoteMethodsImplementation(GameController controller) throws RemoteException {
-        this.controller = controller;
+
+    public RemoteMethodsImplementation(ServerState serverState) throws RemoteException {
+        this.serverState = serverState;
 
         //da capire se usare o meno, forse molto utile per multipartite
         //la gestione del valore di ritorno ed eventuali errori va cambiata però
@@ -56,25 +51,6 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         */
     }
 
-    /**
-     *
-     * Method that allows the client to register for a game session on the server side
-     * @param nickname name chosen by the client
-     * @param clientCallback object that allows the server to update and exchange messages with the client
-     * @return true if the registration was successful; otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
-     */
-    public boolean registerClient(String nickname, CallBack clientCallback) throws RemoteException {
-
-        try {
-            VirtualView view = new RMIVirtualView(nickname, clientCallback);
-            controller.addPlayer(nickname, view);
-            return true;
-
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     /**
      * Method that allows the client to place the totem on the OfferTile
@@ -86,6 +62,7 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     @Override
     public boolean placeTotem(String nickname, char position) throws RemoteException {
 
+        GameController controller = serverState.getController(nickname);
         return controller.onPlaceTotem(nickname, position);
     }
 
@@ -100,6 +77,7 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper) throws RemoteException {
 
+        GameController controller = serverState.getController(nickname);
         return controller.onTakeCard(nickname, position, isUpper);
     }
 
@@ -113,21 +91,34 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
      */
     @Override
     public boolean skipExtraDraw(String nickname) throws RemoteException{
+        GameController controller = serverState.getController(nickname);
         return controller.onSkipExtraDraw(nickname);
     }
 
-    /**
-     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
-     * players participating in the game
-     * @param numPlayers number of players selected, ranging from 2 to 5
-     * @return true if the players were chosen successfully; otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
-     */
-    @Override
-    public boolean choosePlayers(int numPlayers) throws RemoteException {
+    //metodi remoti da usare nella lobby
+
+    //gestire questo metodo con l'utilizzo di una view parziale senza nome
+    public String getLobby(CallBack clientCallback) throws RemoteException{
+        VirtualView view = new RMIVirtualView("", clientCallback);
+        String virtualViewId = view.getId();
+        serverState.connections.put(virtualViewId,view);
+        serverState.lobby.addViewer(virtualViewId);
+        return view.getId();
+    }
+
+    public boolean createNewGame(String nickname, int expectedNumPlayers, String virtualViewId) throws  RemoteException{
         try {
-            controller.setNumPlayers(numPlayers);
-            return true;
+            //si deve riutilizzare la stessa view
+            return serverState.createNewGame(nickname,expectedNumPlayers,virtualViewId);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean joinGame(String nickname, int id, String virtualViewId) throws RemoteException{
+        try {
+            //si deve riutilizzare la stessa view
+            return serverState.joinGame(nickname,id,virtualViewId);
         } catch (Exception e) {
             return false;
         }
