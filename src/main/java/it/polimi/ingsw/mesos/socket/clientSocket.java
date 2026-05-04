@@ -8,6 +8,17 @@ import it.polimi.ingsw.mesos.socket.Message.messageClient.*;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Implementation of the {@link Network} interface using Java Socket communication.
+ * <p>
+ * This class is responsible for establishing a connection with the server,
+ * sending serialized {@link Message} objects, and continuously listening
+ * for incoming messages from the server on a dedicated thread.
+ * <p>
+ * All server communication is performed using {@link ObjectOutputStream}
+ * and {@link ObjectInputStream}.
+ */
+
 public class clientSocket implements Network {
 
     private Socket socket;
@@ -16,6 +27,16 @@ public class clientSocket implements Network {
 
     private ClientController controller;
 
+    /**
+     * Creates a new client socket and connects to the specified server.
+     * <p>
+     * Initializes input and output streams and starts a background thread
+     * to continuously listen for messages from the server.
+     *
+     * @param host the server hostname or IP address
+     * @param port the server port number
+     * @throws IOException if an I/O error occurs when creating the socket or streams
+     */
     public clientSocket(String host, int port) throws IOException {
         socket = new Socket(host, port);
 
@@ -26,6 +47,13 @@ public class clientSocket implements Network {
         new Thread(this::listenFromServer).start();
     }
 
+    /**
+     * Registers a new client with the server using the given nickname.
+     *
+     * @param nickname  the nickname chosen by the client
+     * @param controller the client-side controller used to handle incoming messages
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean register(String nickname, ClientController controller) {
         this.controller = controller;
@@ -33,30 +61,62 @@ public class clientSocket implements Network {
         return true;
     }
 
+    /**
+     * Sends a request to place a totem in the game.
+     *
+     * @param nickname the nickname of the player
+     * @param position the position where the totem should be placed
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean placeTotem(String nickname, char position) {
         sendMessage(new PlaceTotemMessage(nickname, position));
         return true;
     }
 
+    /**
+     * Sends a request to take a card from a specific position.
+     *
+     * @param nickname the nickname of the player
+     * @param position the position of the card to take
+     * @param isUpper if the card is in the upper row in true, if the card is in the lower row it is false
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper) {
         sendMessage(new TakeCardMessage(nickname, position, isUpper));
         return true;
     }
-    
+
+    /**
+     * Sends a request to choose the number of players for the game.
+     *
+     * @param numPlayers the number of players selected
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean choosePlayers(int numPlayers) {
         sendMessage(new ChoosePlayersMessage(numPlayers));
         return true;
     }
 
+    /**
+     * Sends a request to skip an extra draw phase.
+     *
+     * @param nickname the nickname of the player requesting to skip
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean skipExtraDraw(String nickname) {
         sendMessage(new SkipExtraDrawMessage(nickname));
         return true;
     }
 
+    /**
+     * Sends a serialized message to the server through the output stream.
+     *
+     * @param message the message to be sent
+     */
     private void sendMessage(Message message) {
         try {
             out.writeObject(message);
@@ -66,6 +126,12 @@ public class clientSocket implements Network {
         }
     }
 
+    /**
+     * Continuously listens for messages coming from the server.
+     * Each received message is executed on the client side using
+     * the associated {@link ClientController}.
+     * This method runs on a dedicated thread started at construction time.
+     */
     private void listenFromServer() {
         try {
             while (true) {
