@@ -2,6 +2,9 @@ package it.polimi.ingsw.mesos.rete;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+
+import java.util.List;
 
 /**
  * Generic interface used and managed by the server to send communications to the client without knowing which type of
@@ -36,4 +39,13 @@ public interface VirtualView {
      * @return client nickname
      */
     String getNickname();
+
+    //per settare il nickname quando si crea una partita o si fa join poiché come primissima cosa viene creata una
+    //virtualView gestita dalla lobby senza nome
+    void setNickname(String nickname);
+
+    //metodo per mandare la lobby in caso di modifiche
+    void sendLobby(List<LobbyInfoDTO> lobby);
+
+    String getId();
 }

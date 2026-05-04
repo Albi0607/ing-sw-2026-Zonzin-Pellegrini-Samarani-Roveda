@@ -2,9 +2,12 @@ package it.polimi.ingsw.mesos.RMI;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Class that implements the associated interface and manages, according to the RMI protocol, server-side calls that
@@ -12,8 +15,9 @@ import java.rmi.RemoteException;
  */
 public class RMIVirtualView implements VirtualView {
 
-    private final  String nickname;
+    private String nickname;
     private final CallBack clientCallBack;
+    private final String id = UUID.randomUUID().toString();
 
     /**
      * Constructor of the class that defines the associated client nickname and the object that allows the server,
@@ -76,5 +80,24 @@ public class RMIVirtualView implements VirtualView {
     @Override
     public String getNickname() {
         return this.nickname;
+    }
+
+    @Override
+    public void setNickname(String nickname) {
+        this.nickname=nickname;
+    }
+
+
+    //metodo per mandare la lobby in caso di modifiche
+    public void sendLobby(List<LobbyInfoDTO> lobby){
+        try {
+            clientCallBack.showLobby(lobby);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showMessage");
+        }
+    }
+    @Override
+    public String getId(){
+        return id;
     }
 }

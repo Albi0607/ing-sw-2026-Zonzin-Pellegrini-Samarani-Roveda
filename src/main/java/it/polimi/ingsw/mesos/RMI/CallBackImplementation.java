@@ -3,9 +3,11 @@ package it.polimi.ingsw.mesos.RMI;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 /**
  * Implementation of the associated remote interface that allows the updated game state or messages to be sent from the
@@ -53,5 +55,10 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
     @Override
     public void showMessage(String message) throws RemoteException{
         cController.showMessage(message);
+    }
+
+    //metodo per mandare la lobby in caso di modifiche
+    public void showLobby(List<LobbyInfoDTO> lobby) throws RemoteException{
+        cController.showLobby(lobby);
     }
 }

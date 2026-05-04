@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.rete.Network;
 import java.rmi.*;
 import java.rmi.registry.*;
 
+
 /**
  * Class responsible for establishing an RMI connection with the RMI server and handling all client-side remote method
  * invocations
@@ -13,7 +14,7 @@ import java.rmi.registry.*;
 //per attivare la lobby devo avere come attribuo il game controller al quale faccio registry
 public class client_RMI implements Network {
 
-    RemoteMethods remote;
+    private final RemoteMethods remote;
 
     /**
      * Constructor that initializes this class and connects to the server registry to obtain a reference to the remote
@@ -32,24 +33,6 @@ public class client_RMI implements Network {
 
         String remoteObjectName = "remoteMethods";
         remote = (RemoteMethods) registry.lookup(remoteObjectName);
-    }
-
-    /**
-     * Method that allows the client to register for a game session on the server side
-     * @param nickname name chosen by the client
-     * @param controller ClientController used to create a server-side reference, allowing the server to send game
-     * updates and other types of messages to the client.
-     * @return true if the registration was successful; otherwise, false
-     * */
-    @Override
-    public boolean register(String nickname, ClientController controller){
-        try {
-            CallBack cb = new CallBackImplementation(controller);
-            return (remote.registerClient(nickname, cb));
-
-        } catch(RemoteException e){
-            return false;
-        }
     }
 
     /**
@@ -93,20 +76,34 @@ public class client_RMI implements Network {
         }
     }
 
-    /**
-     * Method that allows the player (to be used only if they are the first connected player) to choose the number of
-     * players participating in the game
-     * @param numPlayers number of players selected, ranging from 2 to 5
-     * @return true if the players were chosen successfully; otherwise, false
-     */
-    @Override
-    public boolean choosePlayers(int numPlayers){
+
+    //aggiunta metodi per la lobby
+
+    public String getLobby(ClientController controller){
         try {
-            return (remote.choosePlayers(numPlayers));
-        } catch (RemoteException e) {
+            CallBack cb = new CallBackImplementation(controller);
+            return remote.getLobby(cb);
+        } catch (RemoteException e){
+            return null;
+        }
+    }
+
+    @Override
+    public boolean createNewGame(String nickname, int expectedNumPlayers,String viewId){
+        try {
+            return remote.createNewGame(nickname,expectedNumPlayers, viewId);
+        } catch (RemoteException e){
             return false;
         }
     }
 
+    @Override
+    public boolean joinGame(String nickname, int id, String viewId){
+        try {
+            return remote.joinGame(nickname,id,viewId);
+        } catch (RemoteException e){
+            return false;
+        }
+    }
 }
 

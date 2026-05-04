@@ -2,6 +2,9 @@ package it.polimi.ingsw.mesos.rete;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+
+import java.util.List;
 
 /**
  * Generic interface for managing how the client views the game representation. This interface will be implemented by
@@ -28,4 +31,7 @@ public interface View {
      * @param message message to be displayed in the client view
      */
     void showMessage(String message);
+
+    //metodo per mostrare la lobby a schermo
+    void showLobby(List<LobbyInfoDTO> lobby);
 }
