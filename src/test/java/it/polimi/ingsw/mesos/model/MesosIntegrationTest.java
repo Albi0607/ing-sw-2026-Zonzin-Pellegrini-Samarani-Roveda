@@ -1,22 +1,17 @@
 package it.polimi.ingsw.mesos.model;
+import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
-import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
-import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
 import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
 import it.polimi.ingsw.mesos.model.card.character.*;
 import it.polimi.ingsw.mesos.model.card.event.*;
-import it.polimi.ingsw.mesos.model.deck.*;
-import it.polimi.ingsw.mesos.model.enums.*;
 import it.polimi.ingsw.mesos.model.state.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Stack;
 
 import static org.junit.jupiter.api.Assertions.*;
 

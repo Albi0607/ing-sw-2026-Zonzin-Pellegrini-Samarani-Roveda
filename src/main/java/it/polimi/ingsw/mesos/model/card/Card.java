@@ -1,10 +1,8 @@
 package it.polimi.ingsw.mesos.model.card;
 
-import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 /** Abstract class to represent any type of card
  * @author Alberto Roveda*/

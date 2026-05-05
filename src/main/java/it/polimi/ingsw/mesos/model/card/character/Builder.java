@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.model.card.character;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Concrete class for cards of type Builder
  * @author Alberto Roveda

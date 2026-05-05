@@ -7,10 +7,7 @@ import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
-import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
-import it.polimi.ingsw.mesos.model.card.character.TribeCard;
-import it.polimi.ingsw.mesos.model.enums.GameState;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 
 import java.util.ArrayList;
 import java.util.List;

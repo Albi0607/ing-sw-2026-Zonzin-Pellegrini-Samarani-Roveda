@@ -11,10 +11,7 @@
  */
 package it.polimi.ingsw.mesos.model.board;
 
-import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.card.Card;
-import it.polimi.ingsw.mesos.model.enums.Color;
 
 public class OfferTile {
     private int upperCount;

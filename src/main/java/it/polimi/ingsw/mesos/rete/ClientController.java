@@ -2,7 +2,7 @@ package it.polimi.ingsw.mesos.rete;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 
 /**
  * Class that manages all actions a client can perform within the game. It maintains a generic reference to both the

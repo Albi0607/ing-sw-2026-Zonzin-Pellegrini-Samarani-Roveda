@@ -1,9 +1,9 @@
 package it.polimi.ingsw.mesos.model.card.building;
 
+import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.character.*;
-import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ class ResourceBonusEffectTest {
         p4.getTribe().addCharacter(artist);
 
 
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_CHARACTER_ADDED);
+        building.getEffect().applyEffect(p1,game, TriggerType.ON_CHARACTER_ADDED);
         building.getEffect().applyEffect(p2,game,TriggerType.ON_CHARACTER_ADDED);
         building.getEffect().applyEffect(p3,game,TriggerType.ON_CHARACTER_ADDED);
         building.getEffect().applyEffect(p4,game,TriggerType.ON_CHARACTER_ADDED);
@@ -174,7 +174,7 @@ class ResourceBonusEffectTest {
         list.add(p4);
 
         Game game = new Game(list);
-        BuildingCard building = new BuildingCard(Era.ERA_I,3,4,new ResourceBonusEffect(null,CharacterType.INVENTOR, ResourceType.FOOD,3));
+        BuildingCard building = new BuildingCard(Era.ERA_I,3,4,new ResourceBonusEffect(null, CharacterType.INVENTOR, ResourceType.FOOD,3));
 
         Inventor inventor1 = new Inventor(Era.ERA_III,3, InventionIcon.BOAT);
         Inventor inventor2 = new Inventor(Era.ERA_II,4, InventionIcon.CLOTH);

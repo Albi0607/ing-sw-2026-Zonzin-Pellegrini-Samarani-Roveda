@@ -1,8 +1,5 @@
 package it.polimi.ingsw.mesos.rete.ClientModel;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-
 import java.io.Serializable;
 
 public class CardDTO implements Serializable {

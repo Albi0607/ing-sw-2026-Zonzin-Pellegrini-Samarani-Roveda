@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.model.deck;
 
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 import java.util.ArrayList;
 import java.util.Collections;

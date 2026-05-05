@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
-import it.polimi.ingsw.mesos.model.deck.CharacterCardJson;
-import it.polimi.ingsw.mesos.model.deck.EventCardJson;
+import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.CharacterCardJson;
+import it.polimi.ingsw.mesos.common.EventCardJson;
 
 import java.util.HashMap;
 import java.util.Map;

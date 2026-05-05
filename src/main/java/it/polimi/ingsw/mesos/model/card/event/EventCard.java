@@ -2,8 +2,8 @@ package it.polimi.ingsw.mesos.model.card.event;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.EventType;
 
 /**Abstract class to define all event classes
  * @author Alberto Roveda

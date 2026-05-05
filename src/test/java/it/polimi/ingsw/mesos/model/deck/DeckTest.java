@@ -5,7 +5,7 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.Gatherer;
 import it.polimi.ingsw.mesos.model.card.character.Hunter;
 import it.polimi.ingsw.mesos.model.card.event.*;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Era;
 import org.junit.jupiter.api.Test;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 

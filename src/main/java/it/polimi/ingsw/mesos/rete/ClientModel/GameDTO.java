@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.rete.ClientModel;
 
 
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 
 import java.io.Serializable;
 import java.util.List;

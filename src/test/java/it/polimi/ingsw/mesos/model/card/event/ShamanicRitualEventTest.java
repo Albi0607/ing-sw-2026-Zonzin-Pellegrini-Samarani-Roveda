@@ -4,8 +4,8 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.character.Shaman;
 import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Era;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -1,10 +1,9 @@
 package it.polimi.ingsw.mesos.model.card.building;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-import it.polimi.ingsw.mesos.model.enums.ResourceType;
-import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

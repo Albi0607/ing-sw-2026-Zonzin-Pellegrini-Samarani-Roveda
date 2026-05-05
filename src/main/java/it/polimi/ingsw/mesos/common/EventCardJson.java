@@ -1,7 +1,7 @@
-package it.polimi.ingsw.mesos.model.deck;
+package it.polimi.ingsw.mesos.common;
 
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.EventType;
 /**Java class of type DTO that maps the attributes of the events.json file to determine which type of event to construct and
  * assign the corresponding parameters required for different event types
  * @author Alberto Roveda*/

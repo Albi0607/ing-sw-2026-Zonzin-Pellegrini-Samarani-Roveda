@@ -6,9 +6,9 @@ import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.Builder;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.GameState;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 
 /**
  * Represents the terminal phase of the game.
