@@ -40,7 +40,7 @@ public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
                 int lp = (eventJson.losePoints != null) ? eventJson.losePoints : 0;
                 details.append("+").append(gp).append(prestigeIcon).append(" / -").append(lp).append(prestigeIcon);
             }
-            case "PAINTING", "CAVE_PAINTING" -> {
+            case "PAINTING" -> {
                 int reqGain = (eventJson.gainNumber != null) ? eventJson.gainNumber : 0;
                 int reqLose = (eventJson.loseNumber != null) ? eventJson.loseNumber : 0;
                 int gp = (eventJson.gainPoints != null) ? eventJson.gainPoints : 0;
