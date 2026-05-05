@@ -47,6 +47,12 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
         System.out.println("Lato client: update game");
     };
 
+
+    //metodo per mandare la lobby in caso di modifiche
+    public void showLobby(List<LobbyInfoDTO> lobby) throws RemoteException{
+        cController.showLobby(lobby);
+    }
+
     /**
      * Method that allows messages sent by the server to be displayed on the client side
      * @param message message to be displayed
@@ -57,8 +63,4 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
         cController.showMessage(message);
     }
 
-    //metodo per mandare la lobby in caso di modifiche
-    public void showLobby(List<LobbyInfoDTO> lobby) throws RemoteException{
-        cController.showLobby(lobby);
-    }
 }

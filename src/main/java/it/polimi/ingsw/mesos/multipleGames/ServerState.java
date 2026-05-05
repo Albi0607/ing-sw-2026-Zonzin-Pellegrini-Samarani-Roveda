@@ -1,20 +1,30 @@
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.multipleGames;
 
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 //classe da mettere nelle classi di rete per capire in base al nickname ricevuto in che controller fare l'azione
 public class ServerState {
 
-    public final Lobby lobby;
-    public final Map<String,VirtualView> connections;
+    private final Lobby lobby;
+    private final Map<String, VirtualView> connections;
     //permette di capire il giocatore a che controller è associato
-    public final Map<String, GameController> playerToGame;
+    private final Map<String, GameController> playerToGame;
     //permette di vedere il nome di tutti i giocatori connessi per non avere ripetizioni
-    public final Set<String> nicknames;
+    private final Set<String> nicknames;
+
+    //per eseguire i thread delle azioni di gioco da capire se usare e come e con che modifiche
+    private final ExecutorService executor = Executors.newFixedThreadPool(100);
+
+    public void execute(Runnable action){
+        executor.submit(action);
+    }
 
     public ServerState(){
         this.lobby = new Lobby(this);
@@ -24,6 +34,15 @@ public class ServerState {
 
     }
 
+    public synchronized void getLobby(VirtualView view){
+        String virtualViewId= view.getId();
+        connections.put(virtualViewId,view);
+        lobby.addViewer(virtualViewId);
+    }
+
+    public VirtualView getConnection(String virtualViewId){
+        return connections.get(virtualViewId);
+    }
 
     public synchronized boolean createNewGame(String nickname, int expectedNumPlayers, String virtualViewId){
         try{
@@ -34,7 +53,7 @@ public class ServerState {
                 return false;
             }
             VirtualView view = connections.get(virtualViewId);
-            if(view==null){
+            if(view==null||!lobby.containView(virtualViewId)){
                 return false;
             }
             view.setNickname(nickname);
@@ -57,7 +76,7 @@ public class ServerState {
                 return false;
             }
             VirtualView view = connections.get(virtualViewId);
-            if(view==null){
+            if(view==null||!lobby.containView(virtualViewId)){
                 return false;
             }
             view.setNickname(nickname);

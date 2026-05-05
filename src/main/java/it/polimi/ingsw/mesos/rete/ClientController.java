@@ -57,6 +57,11 @@ public class ClientController {
         view.showClientStateUpdate(clientState);
     }
 
+    //metodo per mostrare la lobby
+    public void showLobby(List<LobbyInfoDTO> lobby) {
+        this.lobby=lobby;
+        view.showLobby(lobby);
+    }
 
     /**
      * Method that allows the client to display general messages related to the connection and game progress
@@ -117,7 +122,7 @@ public class ClientController {
      * building
      */
     //definire meglio questa azione insieme a takeCard poiché avvengono entrambe nello stesso stato e quindi potrebbe
-    // non esserci differenziazione da parte del client
+    //non esserci differenziazione da parte del client
     public void skipOnExtraDraw(){
         if(myTurnInGame(GameState.RESOLVING_ACTIONS)){
             if(network.skipExtraDraw(nickname)){
@@ -142,11 +147,6 @@ public class ClientController {
         return game != null && game.currentState == state && game.currentPlayerNickname.equals(nickname) && clientState == ClientState.IN_GAME;
     }
 
-    //metodo per mostrare la lobby
-    public void showLobby(List<LobbyInfoDTO> lobby) {
-        this.lobby=lobby;
-        view.showLobby(lobby);
-    }
 
     //metodi da eseguire nella lobby
 

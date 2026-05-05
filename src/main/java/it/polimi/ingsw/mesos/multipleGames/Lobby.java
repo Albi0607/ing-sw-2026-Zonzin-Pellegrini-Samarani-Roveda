@@ -1,7 +1,8 @@
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.multipleGames;
 
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 //mettere anche la possibilità di creare game privati non visibili a tutti (non obbligatorio)
 public class Lobby {
 
-    private ServerState serverState;
-    private final Map<Integer, GameController> games = new ConcurrentHashMap<>();;
+    private final ServerState serverState;
+    private final Map<Integer, GameController> games = new ConcurrentHashMap<>();
     private int nextId;
     //aggiungere e togliere in maniera corretta i giocatori
     private final Set<String> viewers = ConcurrentHashMap.newKeySet();
@@ -21,11 +22,12 @@ public class Lobby {
     }
 
     public synchronized void addViewer(String virtualViewId){
-        viewers.add(virtualViewId);
-        VirtualView view = serverState.connections.get(virtualViewId);
+        VirtualView view = serverState.getConnection(virtualViewId);
         if(view==null){
+            removeViewer(virtualViewId);
             return;
         }
+        viewers.add(virtualViewId);
         view.sendLobby(buildLobby());
     }
 
@@ -40,7 +42,7 @@ public class Lobby {
     public synchronized GameController createNewGame(String nickname,int expectedNumPlayers,String virtualViewId){
         //controlli per gestione di eventuali errori e cambiare client.State al client
         try {
-            VirtualView view = serverState.connections.get(virtualViewId);
+            VirtualView view = serverState.getConnection(virtualViewId);
             if(view==null){
                 return null;
             }
@@ -63,7 +65,7 @@ public class Lobby {
     //l'errore da qua e restituire la lista di game per poter scegliere ulteriormente
     //Gestire i system out con un messaggio di ritorno al client
     public synchronized GameController joinGame(int id,String nickname,String virtualViewId){
-        VirtualView view = serverState.connections.get(virtualViewId);
+        VirtualView view = serverState.getConnection(virtualViewId);
         if(view==null){
             return null;
         }
@@ -114,7 +116,7 @@ public class Lobby {
         Iterator<String> iterator = viewers.iterator();
         while(iterator.hasNext()){
             String virtualViewId = iterator.next();
-            VirtualView view = serverState.connections.get(virtualViewId);
+            VirtualView view = serverState.getConnection(virtualViewId);
             try{
                 view.sendLobby(lobby);
             } catch (Exception e) {
@@ -129,14 +131,18 @@ public class Lobby {
         for(Map.Entry<Integer, GameController> game: games.entrySet()){
             GameController controller = game.getValue();
             LobbyInfoDTO dto = new LobbyInfoDTO();
-            //modificare e/o mettere metodi get nel gameController per ottenere questi parametri
+
             dto.id = game.getKey();
-            //dto.numPlayers=controller;
+            dto.numPlayers=controller.getNumPlayersConnected();
             dto.maxNumPlayers=controller.getExpectedNumPlayers();
             dto.started=(controller.getGame()!=null);
             lobbyGames.add(dto);
         }
         return lobbyGames;
+    }
+
+    public boolean containView(String virtualViewId){
+        return viewers.contains(virtualViewId);
     }
 
 

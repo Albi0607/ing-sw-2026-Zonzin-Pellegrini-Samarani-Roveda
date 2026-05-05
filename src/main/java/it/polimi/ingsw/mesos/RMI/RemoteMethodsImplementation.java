@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.RMI;
 
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ServerState;
+import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
@@ -100,15 +100,13 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     //gestire questo metodo con l'utilizzo di una view parziale senza nome
     public String getLobby(CallBack clientCallback) throws RemoteException{
         VirtualView view = new RMIVirtualView("", clientCallback);
-        String virtualViewId = view.getId();
-        serverState.connections.put(virtualViewId,view);
-        serverState.lobby.addViewer(virtualViewId);
+        serverState.getLobby(view);
         return view.getId();
     }
 
     public boolean createNewGame(String nickname, int expectedNumPlayers, String virtualViewId) throws  RemoteException{
         try {
-            //si deve riutilizzare la stessa view
+            //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
             return serverState.createNewGame(nickname,expectedNumPlayers,virtualViewId);
         } catch (Exception e) {
             return false;
@@ -117,7 +115,7 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
 
     public boolean joinGame(String nickname, int id, String virtualViewId) throws RemoteException{
         try {
-            //si deve riutilizzare la stessa view
+            //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
             return serverState.joinGame(nickname,id,virtualViewId);
         } catch (Exception e) {
             return false;

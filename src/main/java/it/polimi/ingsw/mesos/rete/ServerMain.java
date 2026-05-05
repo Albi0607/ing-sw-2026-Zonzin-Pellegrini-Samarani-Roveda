@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.rete;
 
 import it.polimi.ingsw.mesos.RMI.server_RMI;
-import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.socket.serverSocket;
 
 /**
@@ -34,7 +34,7 @@ public class ServerMain {
         new Thread(() -> {
             serverSocket socket = new serverSocket();
             // 1234 per il socket per non andare in conflitto con RMI (1099)
-            socket.start(serverState, 1234 );
+            //socket.start(serverState, 1234 );
         }).start();
 
         System.out.println("Server avviati e pronti a connessioni");

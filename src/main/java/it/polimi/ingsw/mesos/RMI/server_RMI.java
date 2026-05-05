@@ -1,9 +1,7 @@
 package it.polimi.ingsw.mesos.RMI;
 
-import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ServerState;
+import it.polimi.ingsw.mesos.multipleGames.ServerState;
 
-import java.rmi.*;
 import java.rmi.registry.*;
 
 //fare documentazione di questa classe
