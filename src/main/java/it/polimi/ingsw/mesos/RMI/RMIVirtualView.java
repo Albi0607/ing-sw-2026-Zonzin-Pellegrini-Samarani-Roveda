@@ -17,7 +17,7 @@ public class RMIVirtualView implements VirtualView {
 
     private String nickname;
     private final CallBack clientCallBack;
-    private final String id = UUID.randomUUID().toString();
+    private String id;
 
     /**
      * Constructor of the class that defines the associated client nickname and the object that allows the server,
@@ -28,6 +28,7 @@ public class RMIVirtualView implements VirtualView {
     public RMIVirtualView(String nickname,CallBack clientCallBack){
         this.nickname=nickname;
         this.clientCallBack=clientCallBack;
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -59,6 +60,15 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
+    //metodo per mandare la lobby in caso di modifiche
+    public void sendLobby(List<LobbyInfoDTO> lobby){
+        try {
+            clientCallBack.showLobby(lobby);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showMessage");
+        }
+    }
+
     /**
      * Method that allows the server to send error messages or general notifications to the client
      * @param message message to be displayed in the client view
@@ -87,15 +97,6 @@ public class RMIVirtualView implements VirtualView {
         this.nickname=nickname;
     }
 
-
-    //metodo per mandare la lobby in caso di modifiche
-    public void sendLobby(List<LobbyInfoDTO> lobby){
-        try {
-            clientCallBack.showLobby(lobby);
-        } catch (RemoteException e) {
-            System.out.println("Errore nel RMIVirtualView in showMessage");
-        }
-    }
     @Override
     public String getId(){
         return id;

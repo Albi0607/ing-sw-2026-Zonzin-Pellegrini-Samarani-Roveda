@@ -437,6 +437,7 @@ public class GameController {
         return tile;
     }
 
+    //TODO
     //il GameController dovrebbe mandare timer con richieste ogni 3 secondi cosi da capire se i client sono ancora
     //collegati oppure se rimuovere le connessioni
 
@@ -459,8 +460,12 @@ public class GameController {
         return expectedNumPlayers;
     }
 
+    //per passare alla lobby il numero di giocatori che sono attualmente in attesa della partita
+    //(principalmente per mostrarlo nella view)
+    public int getNumPlayersConnected(){
+        return pendingNicknames.size();
+    }
 
-    //mettere metodo che controlla che il giocatore che fa azioni abbia nickname che appartiene alla partita
 }
 
 
