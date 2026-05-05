@@ -1,5 +1,9 @@
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
+import it.polimi.ingsw.mesos.DB.GameResultDAO;
+import it.polimi.ingsw.mesos.DB.LeaderboardService;
+import it.polimi.ingsw.mesos.model.enums.Color;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Player;
@@ -13,8 +17,11 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static java.awt.Color.blue;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameControllerTest {
@@ -24,7 +31,6 @@ class GameControllerTest {
 
     @BeforeEach
     void setUp() {
-
         controller = new GameController();
         mockView = new VirtualView() {
             @Override public void sendGame(GameDTO gameDTO) {}
@@ -32,7 +38,6 @@ class GameControllerTest {
             @Override public void showMessage(String message) {}
             @Override public String getNickname() { return "Test"; }
         };
-
     }
 
     @Test
@@ -281,5 +286,6 @@ class GameControllerTest {
             assertTrue(success, "Il piazzamento del totem dovrebbe andare a buon fine");
         }
     }
+
 }
 
