@@ -2,8 +2,8 @@ package it.polimi.ingsw.mesos.model.card.event;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.EventType;
 
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
 //attenzione a regola dell'edificio sui doppi punti per più giocatori con stessi punti shamano

@@ -4,10 +4,8 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.CreateTurnOrderTrack;
 import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
-import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Color;
 import org.junit.jupiter.api.Test;
-
-import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

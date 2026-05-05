@@ -2,10 +2,8 @@ package it.polimi.ingsw.mesos.model.BoardTest;
 
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
-import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Color;
 import org.junit.jupiter.api.Test;
-
-import java.awt.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

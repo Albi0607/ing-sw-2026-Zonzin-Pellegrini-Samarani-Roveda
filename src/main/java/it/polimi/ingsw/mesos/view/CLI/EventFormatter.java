@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.model.deck.EventCardJson;
+import it.polimi.ingsw.mesos.common.EventCardJson;
 
 public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
 

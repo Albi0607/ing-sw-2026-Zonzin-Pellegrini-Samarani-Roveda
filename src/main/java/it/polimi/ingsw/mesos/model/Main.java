@@ -1,11 +1,10 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.*;
 
 import java.util.List;

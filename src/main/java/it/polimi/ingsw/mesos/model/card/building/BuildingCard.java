@@ -1,12 +1,8 @@
 package it.polimi.ingsw.mesos.model.card.building;
 
-import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.Tribe;
 import it.polimi.ingsw.mesos.model.card.Card;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**"Generic class for building cards"
  * @author Alberto Roveda

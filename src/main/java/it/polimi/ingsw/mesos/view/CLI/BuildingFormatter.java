@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.BuildingCardJson;
 
 public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJson> {
 

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.model.deck.CharacterCardJson;
+import it.polimi.ingsw.mesos.common.CharacterCardJson;
 
 public class CharacterFormatter implements Formatters.CardFormatter<CharacterCardJson> {
 

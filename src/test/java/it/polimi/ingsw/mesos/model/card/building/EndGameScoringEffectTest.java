@@ -1,9 +1,9 @@
 package it.polimi.ingsw.mesos.model.card.building;
 
+import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.character.*;
-import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -138,7 +138,7 @@ class EndGameScoringEffectTest {
         list.add(p4);
 
         Game game = new Game(list);
-        BuildingCard building = new BuildingCard(Era.ERA_III,8,8,new EndGameScoringEffect(0,3,false,CharacterType.HUNTER));
+        BuildingCard building = new BuildingCard(Era.ERA_III,8,8,new EndGameScoringEffect(0,3,false, CharacterType.HUNTER));
 
         Hunter hunter = new Hunter(Era.ERA_I,4,true);
 

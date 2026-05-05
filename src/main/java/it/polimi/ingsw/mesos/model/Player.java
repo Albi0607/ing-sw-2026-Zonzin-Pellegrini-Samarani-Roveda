@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Color;
 
 public class Player {
 

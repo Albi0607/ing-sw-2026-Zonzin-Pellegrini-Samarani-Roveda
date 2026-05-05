@@ -1,25 +1,18 @@
 package it.polimi.ingsw.mesos.model;
 
 import it.polimi.ingsw.mesos.model.board.*;
-import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.BuildingEffect;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 import it.polimi.ingsw.mesos.model.deck.Deck;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
-import it.polimi.ingsw.mesos.model.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.PlacingState;
-import it.polimi.ingsw.mesos.model.state.ResolvingState;
-import it.polimi.ingsw.mesos.model.state.SetupState;
-import jdk.jfr.Event;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public class Game {
 

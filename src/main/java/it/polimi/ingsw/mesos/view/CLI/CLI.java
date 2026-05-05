@@ -4,7 +4,7 @@ import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
 import it.polimi.ingsw.mesos.socket.clientSocket;
@@ -138,7 +138,7 @@ public class CLI implements View {
         } else if (choice.equals("2")) {
             System.out.println("Connessione Socket in corso...");
             try {
-                network = new clientSocket("127.0.0.1", 1234);
+                network = new clientSocket("127.0.0.1", 12345);
             } catch (Exception e) {
                 System.out.println(CLIPrinter.ANSI_RED + "❌ Errore Socket: " + e.getMessage() + CLIPrinter.ANSI_RESET);
                 chooseNetwork();

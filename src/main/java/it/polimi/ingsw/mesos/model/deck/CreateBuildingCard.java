@@ -1,8 +1,9 @@
 package it.polimi.ingsw.mesos.model.deck;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.OpenFileJson;
 import it.polimi.ingsw.mesos.model.card.building.*;
-import it.polimi.ingsw.mesos.model.card.character.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -2,8 +2,8 @@ package it.polimi.ingsw.mesos.model.card.building;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.enums.SpecialActionType;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.SpecialActionType;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 
 /**"Concrete class that handles the building effects:
  *

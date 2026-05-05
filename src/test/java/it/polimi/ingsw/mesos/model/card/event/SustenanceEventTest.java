@@ -1,12 +1,12 @@
 package it.polimi.ingsw.mesos.model.card.event;
 
+import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.EventModifierEffect;
 import it.polimi.ingsw.mesos.model.card.character.*;
 import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
-import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
