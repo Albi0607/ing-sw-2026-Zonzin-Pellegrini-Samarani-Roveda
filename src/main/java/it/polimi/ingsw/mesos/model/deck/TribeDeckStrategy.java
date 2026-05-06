@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.model.deck;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
 import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 import java.util.ArrayList;
 import java.util.Collections;

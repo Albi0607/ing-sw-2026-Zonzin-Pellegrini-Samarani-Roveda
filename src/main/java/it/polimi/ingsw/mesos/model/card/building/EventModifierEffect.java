@@ -2,9 +2,9 @@ package it.polimi.ingsw.mesos.model.card.building;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 /**Concrete class that handles the building effects:
 
  * 2:During the Sustenance Event, you receive a discount of 1 food on the total you would have to pay for each character

@@ -4,8 +4,8 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.character.Builder;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 /**"Concrete class that handles the building effects:
  * 9:At the end of the game, gain double the Prestige Points indicated on your Builder cards.
  * 11:At the end of the game, gain 6 Prestige Points for each set of 6 character cards of different types.

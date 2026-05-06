@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.model.state;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 
 
 /**

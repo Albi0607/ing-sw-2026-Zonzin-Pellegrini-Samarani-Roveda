@@ -2,7 +2,7 @@ package it.polimi.ingsw.mesos.rete;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 
 import java.util.List;
@@ -151,25 +151,30 @@ public class ClientController {
     //metodi da eseguire nella lobby
 
     //metodo iniziale per accedere alla lobby poi la lobby si aggiornerà automaticamente
-    public void getLobby(){
-        this.virtualViewId= network.getLobby(this);
+    public void getLobby(String nickname){
+        this.virtualViewId=network.getLobby(nickname,this);
+        this.nickname=nickname;
         this.clientState=ClientState.LOBBY;
     }
 
-    public void createNewGame(String nickname, int expectedNumPlayers){
+    public void createNewGame(int expectedNumPlayers){
         if(clientState!=ClientState.LOBBY){
             return;
         }
-        this.nickname=nickname;
+        if(virtualViewId==null){
+            return;
+        }
         //ti deve chiedere di inserire nickname e il numero di giocatori dalla view
         network.createNewGame(nickname,expectedNumPlayers,virtualViewId);
 
     }
-    public void joinGame(String nickname, int id){
+    public void joinGame(int id){
         if(clientState!=ClientState.LOBBY){
             return;
         }
-        this.nickname=nickname;
+        if(virtualViewId==null){
+            return;
+        }
         network.joinGame(nickname,id,virtualViewId);
     }
 

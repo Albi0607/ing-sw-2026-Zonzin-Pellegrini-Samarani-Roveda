@@ -38,7 +38,7 @@ public interface Network {
     boolean skipExtraDraw(String nickname);
 
 
-    String getLobby(ClientController controller);
+    String getLobby(String nickname,ClientController controller);
 
     //azioni del client sulla lobby
     boolean createNewGame(String nickname, int expectedNumPlayers, String viewId);

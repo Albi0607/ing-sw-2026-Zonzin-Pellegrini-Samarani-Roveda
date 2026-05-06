@@ -1,6 +1,9 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.model.deck.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.SpecialActionType;
 
 public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJson> {
 
@@ -55,14 +58,14 @@ public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJ
                         effectStr.append(boltIcon).append(evt).append(" (+").append(amt);
                         if (evt.equals("HUNT")) effectStr.append(foodIcon).append("/+1").append(prestigeIcon).append(" per ").append(ref).append(")");
                         else effectStr.append(foodIcon).append(" per ").append(ref).append(")");
-                    } else if ("INVENTOR".equals(buildJson.countRef)) {
+                    } else if (CharacterType.INVENTOR.equals(buildJson.countRef)) {
                         effectStr.append("Coppia INVENTOR: +").append(buildJson.amount).append(foodIcon);
                     } else {
                         effectStr.append("Set di 6: +").append(buildJson.amount).append(foodIcon);
                     }
                 }
                 case "EventModifierEffect" -> {
-                    if ("SUSTENANCE".equals(buildJson.eventContext)) {
+                    if (EventType.SUSTENANCE.equals(buildJson.eventContext)) {
                         String ref = (buildJson.countRef != null) ? buildJson.countRef.name() : "";
                         effectStr.append(boltIcon).append("SUSTENANCE: -").append(buildJson.discount).append(foodIcon).append("/").append(ref);
                     } else if (Boolean.TRUE.equals(buildJson.doublePrestige)) {
@@ -85,9 +88,9 @@ public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJ
                     }
                 }
                 case "SpecialActionEffect" -> {
-                    if ("FOOD_ON_TOTEM_SLOT".equals(buildJson.specialType)) {
+                    if (SpecialActionType.FOOD_ON_TOTEM_SLOT.equals(buildJson.specialType)) {
                         effectStr.append("Totem: +1").append(foodIcon).append(" se Cibo");
-                    } else if ("EXTRA_DRAW".equals(buildJson.specialType)) {
+                    } else if (SpecialActionType.EXTRA_DRAW.equals(buildJson.specialType)) {
                         effectStr.append("Azione Extra: ").append(cardsIcon).append(" Pescata");
                     }
                 }

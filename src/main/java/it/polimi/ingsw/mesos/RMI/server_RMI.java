@@ -11,15 +11,11 @@ public class server_RMI {
     public void start(ServerState serverState, int port) {
 
         try {
-            System.out.println("Instantiating remote object...");
-            //al posto di dargli il controller dovrei mettere un set in RemoteMethodsImplementation che metta il
-            //controller adeguato alla partita scelta
+            System.setProperty("java.rmi.server.hostname", "10.173.124.90");
             RemoteMethods remoteMethods = new RemoteMethodsImplementation(serverState);
-            System.out.println("Launching new registry...");
             Registry registry = LocateRegistry.createRegistry(port);
-            System.out.println("Binding remote object to registry…");
             registry.bind("remoteMethods", remoteMethods);
-            System.out.println("Waiting for invocations from clients...");
+            System.out.println("Server RMI pronto e in attesa di connessioni");
         } catch (Exception e) {
             e.printStackTrace();
         }

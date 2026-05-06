@@ -18,14 +18,11 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
-import it.polimi.ingsw.mesos.model.card.event.EventCard;
 import it.polimi.ingsw.mesos.model.deck.BuildingDeckStrategy;
 import it.polimi.ingsw.mesos.model.deck.Deck;
 import it.polimi.ingsw.mesos.model.deck.TribeDeckStrategy;
-import it.polimi.ingsw.mesos.model.enums.Era;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Board {

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.model.deck;
+package it.polimi.ingsw.mesos.common;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

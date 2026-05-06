@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.model.card.event;
 
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.EventType;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

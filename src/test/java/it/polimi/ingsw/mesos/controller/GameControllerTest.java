@@ -4,10 +4,8 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
-import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.Card;
-import it.polimi.ingsw.mesos.model.enums.GameState;
-import it.polimi.ingsw.mesos.model.state.PlacingState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +22,6 @@ class GameControllerTest {
 
     @BeforeEach
     void setUp() {
-
         controller = new GameController();
         mockView = new VirtualView() {
             @Override public void sendGame(GameDTO gameDTO) {}
@@ -32,7 +29,6 @@ class GameControllerTest {
             @Override public void showMessage(String message) {}
             @Override public String getNickname() { return "Test"; }
         };
-
     }
 
     @Test
@@ -281,5 +277,6 @@ class GameControllerTest {
             assertTrue(success, "Il piazzamento del totem dovrebbe andare a buon fine");
         }
     }
+
 }
 

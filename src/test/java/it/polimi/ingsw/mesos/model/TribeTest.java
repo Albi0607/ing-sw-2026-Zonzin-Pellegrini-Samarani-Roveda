@@ -1,9 +1,10 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.Tribe;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.*;
-import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;

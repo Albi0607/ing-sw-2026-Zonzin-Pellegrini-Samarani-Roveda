@@ -1,6 +1,7 @@
 
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.Tribe;
@@ -9,12 +10,12 @@ import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
-import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,8 @@ public class GameController {
     //private View view;
     private final  List<String> pendingNicknames;
     private int expectedNumPlayers=0;
+    private LeaderboardService leaderboardService;
+
     public GameController() {
         this.pendingNicknames = new ArrayList<>();
     }
@@ -179,10 +182,28 @@ public class GameController {
      * Ends the latest game.
      */
 
-    public void endGame() {
-        // capire cosa mettere qui
-        //  view.notifyGameEnded(game.getWinner());
-        //gestire disconnessioni da serverState e lobby delle partite e giocatori
+    public void endGame() throws SQLException {
+
+        List<Player> gamePlayers = game.getPlayers();
+
+        int numPlayers = gamePlayers.size();
+
+        for (Player p : gamePlayers) {
+            String nickname = p.getNickname();
+            int points = p.getPrestigePoints();
+
+            // salva su DB
+            leaderboardService.addResult(nickname, points, numPlayers);
+
+            // calcola posizione
+            int position = leaderboardService.getPosition(nickname, numPlayers);
+
+            // invia al client
+            VirtualView view = players.get(nickname);
+            if (view != null) {
+                view.showMessage("Hai finito in posizione: " + position);
+            }
+        }
     }
 
     // AZIONI DEL GIOCATORE
@@ -466,6 +487,12 @@ public class GameController {
         return pendingNicknames.size();
     }
 
+    public void setLeaderboardService(LeaderboardService service) {
+        this.leaderboardService = service;
+    }
+    public LeaderboardService getLeaderboardService() {
+        return this.leaderboardService;
+    }
 }
 
 

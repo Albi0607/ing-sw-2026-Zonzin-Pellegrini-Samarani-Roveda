@@ -46,9 +46,6 @@ public class ServerState {
 
     public synchronized boolean createNewGame(String nickname, int expectedNumPlayers, String virtualViewId){
         try{
-            if(isNicknameTaken(nickname)||nickname.isEmpty()){
-                return false;
-            }
             if(expectedNumPlayers<2||expectedNumPlayers>5){
                 return false;
             }
@@ -56,7 +53,6 @@ public class ServerState {
             if(view==null||!lobby.containView(virtualViewId)){
                 return false;
             }
-            view.setNickname(nickname);
             GameController controller = lobby.createNewGame(nickname,expectedNumPlayers,virtualViewId);
             if(controller == null){
                 return false;
@@ -72,14 +68,10 @@ public class ServerState {
 
     public synchronized boolean joinGame(String nickname, int id, String virtualViewId){
         try {
-            if(isNicknameTaken(nickname)||nickname.isEmpty()){
-                return false;
-            }
             VirtualView view = connections.get(virtualViewId);
             if(view==null||!lobby.containView(virtualViewId)){
                 return false;
             }
-            view.setNickname(nickname);
             GameController controller = lobby.joinGame(id, nickname, virtualViewId);
             if(controller == null){
                 return false;

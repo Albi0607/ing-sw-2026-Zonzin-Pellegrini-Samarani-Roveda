@@ -1,12 +1,13 @@
 package it.polimi.ingsw.mesos.model.card.building;
 
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.ResourceType;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.Inventor;
-import it.polimi.ingsw.mesos.model.enums.*;
-
-import static java.lang.Integer.sum;
 
 
 /**"Concrete class that handles the building effects:
