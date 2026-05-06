@@ -62,6 +62,25 @@
     </dependency>
 
 
+
+    <!-- ===================== -->
+    <!--       JAVA FX         -->
+    <!-- ===================== -->
+
+    <!-- JavaFX Controls -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>21.0.4</version>
+    </dependency>
+
+    <!-- JavaFX FXML -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>21.0.4</version>
+    </dependency>
+
   </dependencies>
 
   <repositories>
@@ -70,5 +89,4 @@
       <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
   </repositories>
-
 </project>
