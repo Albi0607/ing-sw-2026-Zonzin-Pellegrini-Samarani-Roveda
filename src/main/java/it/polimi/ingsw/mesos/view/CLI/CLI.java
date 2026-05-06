@@ -2,15 +2,13 @@ package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
-import it.polimi.ingsw.mesos.socket.clientSocket;
+//import it.polimi.ingsw.mesos.socket.clientSocket;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class CLI implements View {
@@ -21,12 +19,19 @@ public class CLI implements View {
     private GameDTO currentGameState;
     private ClientState currentClientState;
 
+    private List<LobbyInfoDTO> currentLobby;
+    private volatile boolean lobbyUpdated = false;
+
     private volatile boolean actionSent = false;
     private volatile boolean boardUpdated = false;
     private volatile boolean waitingPrinted = false;
 
     public CLI() {
         this.scanner = new Scanner(System.in);
+    }
+
+    public void setController(ClientController controller) {
+        this.controller = controller;
     }
 
     /**
@@ -61,6 +66,13 @@ public class CLI implements View {
         this.actionSent = false;
     }
 
+    @Override
+    public void showLobby(List<LobbyInfoDTO> lobby) {
+        this.currentLobby = lobby;
+        this.lobbyUpdated = true;
+        this.actionSent = false;
+    }
+
     /**
      * Main execution loop of the CLI. Handles connection setup and
      * manages the UI rendering and turn logic based on game updates.
@@ -69,7 +81,6 @@ public class CLI implements View {
         CLIPrinter.clearScreen();
         System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
 
-        chooseNetwork();
         setupGame();
 
         while (true) {
@@ -79,9 +90,15 @@ public class CLI implements View {
                 boardUpdated = false;
             }
 
-            if (currentClientState == ClientState.CHOOSE_PLAYERS) {
-                askForPlayers();
+            // GESTIONE LOBBY
+            if (lobbyUpdated && currentClientState != ClientState.IN_GAME) {
+                if (!actionSent) {
+                    handleLobby();
+                }
+                lobbyUpdated = false; // Resettiamo dopo averla mostrata
             }
+
+            // GESTIONE GIOCO
             else if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
                 if (currentGameState.currentState == GameState.FINISHED) {
                     if (!actionSent) {
@@ -100,7 +117,6 @@ public class CLI implements View {
                         }
                     }
                     else {
-
                         String activePlayer = currentGameState.currentPlayerNickname;
 
                         if (!waitingPrinted) {
@@ -116,52 +132,13 @@ public class CLI implements View {
     }
 
     /**
-     * Prompts the user to select a network protocol (RMI or Socket)
-     * and initializes the ClientController.
-     */
-    private void chooseNetwork() {
-        System.out.println("\nScegli il tipo di connessione:");
-        System.out.println("1. RMI");
-        System.out.println("2. Socket");
-        System.out.print("Scelta (1 o 2): ");
-
-        String choice = scanner.nextLine().trim();
-        Network network = null;
-
-        if (choice.equals("1")) {
-            System.out.println("Connessione RMI in corso...");
-            try {
-                network = new client_RMI();
-            } catch (Exception e) {
-                System.out.println(CLIPrinter.ANSI_RED + "❌ Errore RMI: " + e.getMessage() + CLIPrinter.ANSI_RESET);
-                chooseNetwork();
-                return;
-            }
-        } else if (choice.equals("2")) {
-            System.out.println("Connessione Socket in corso...");
-            try {
-                network = new clientSocket("127.0.0.1", 12345);
-            } catch (Exception e) {
-                System.out.println(CLIPrinter.ANSI_RED + "❌ Errore Socket: " + e.getMessage() + CLIPrinter.ANSI_RESET);
-                chooseNetwork();
-                return;
-            }
-        } else {
-            chooseNetwork();
-            return;
-        }
-
-        this.controller = new ClientController(this, network);
-    }
-
-    /**
      * Handles the initial player registration by asking for a nickname.
      */
     private void setupGame() {
         System.out.print("\nInserisci il tuo nickname: ");
         this.myNickname = scanner.nextLine().trim();
-        controller.register(myNickname);
-        System.out.println(CLIPrinter.ANSI_YELLOW + "In attesa degli altri giocatori o di comunicazioni dal Server..." + CLIPrinter.ANSI_RESET);
+        controller.getLobby(myNickname);
+        System.out.println(CLIPrinter.ANSI_YELLOW + "Accesso alla Lobby in corso..." + CLIPrinter.ANSI_RESET);
     }
 
     /**
@@ -187,19 +164,44 @@ public class CLI implements View {
                 currentGameState.currentPlayerNickname.equals(myNickname);
     }
 
-    /**
-     * Handles the specific logic for the first player to decide the
-     * total number of participants for the match.
-     */
-    private void askForPlayers() {
-        System.out.print(CLIPrinter.ANSI_CYAN + "Sei il primo giocatore! Scegli il numero di giocatori (2-5): " + CLIPrinter.ANSI_RESET);
-        try {
-            int num = Integer.parseInt(scanner.nextLine().trim());
+    private void handleLobby() {
+        CLIPrinter.clearScreen();
+        System.out.println(CLIPrinter.ANSI_CYAN + "=== SALA D'ATTESA (LOBBY) ===" + CLIPrinter.ANSI_RESET);
 
-            currentClientState = ClientState.WAITING_CONNECTION;
-            controller.choosePlayer(num);
+        // Stampa la lista delle partite
+        if (currentLobby == null || currentLobby.isEmpty()) {
+            System.out.println(CLIPrinter.ANSI_GRAY + "Nessuna partita disponibile. Creane una nuova!" + CLIPrinter.ANSI_RESET);
+        } else {
+            System.out.println("Partite attualmente disponibili:");
+            for (LobbyInfoDTO info : currentLobby) {
+                System.out.println("▶ ID Partita: " + CLIPrinter.ANSI_YELLOW + info.id + CLIPrinter.ANSI_RESET +
+                        " | Giocatori: " + info.numPlayers + "/" + info.maxNumPlayers);
+            }
+        }
+
+        System.out.println("\nCosa vuoi fare?");
+        System.out.println("1. Crea una nuova partita");
+        System.out.println("2. Unisciti a una partita esistente");
+        System.out.print("Scelta (1 o 2): ");
+
+        String choice = scanner.nextLine().trim();
+
+        try {
+            if (choice.equals("1")) {
+                System.out.print("Quanti giocatori parteciperanno? (2-5): ");
+                int num = Integer.parseInt(scanner.nextLine().trim());
+                actionSent = true;
+                controller.createNewGame(num);
+            } else if (choice.equals("2")) {
+                System.out.print("Inserisci l'ID della partita a cui unirti: ");
+                int gameId = Integer.parseInt(scanner.nextLine().trim());
+                actionSent = true;
+                controller.joinGame(gameId);
+            } else {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida." + CLIPrinter.ANSI_RESET);
+            }
         } catch (NumberFormatException e) {
-            System.out.println(CLIPrinter.ANSI_RED + "Inserisci un numero valido!" + CLIPrinter.ANSI_RESET);
+            System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: Inserisci un numero valido!" + CLIPrinter.ANSI_RESET);
         }
     }
 
