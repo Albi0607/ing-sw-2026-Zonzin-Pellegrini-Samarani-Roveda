@@ -79,10 +79,10 @@ public class client_RMI implements Network {
 
     //aggiunta metodi per la lobby
 
-    public String getLobby(ClientController controller){
+    public String getLobby(String nickname,ClientController controller){
         try {
             CallBack cb = new CallBackImplementation(controller);
-            return remote.getLobby(cb);
+            return remote.getLobby(nickname,cb);
         } catch (RemoteException e){
             return null;
         }

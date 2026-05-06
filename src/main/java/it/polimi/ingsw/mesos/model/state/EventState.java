@@ -5,9 +5,8 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
 import it.polimi.ingsw.mesos.model.card.event.EventCard;
-import it.polimi.ingsw.mesos.model.enums.EventType;
-import it.polimi.ingsw.mesos.model.enums.GameState;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 
 import java.util.ArrayList;
 import java.util.List;

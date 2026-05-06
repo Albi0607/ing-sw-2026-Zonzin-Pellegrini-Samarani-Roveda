@@ -1,10 +1,8 @@
 package it.polimi.ingsw.mesos.model.card.character;
 
-import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.Tribe;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Abstract class for all character cards
  * @author Alberto Roveda

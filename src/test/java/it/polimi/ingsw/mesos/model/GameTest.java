@@ -1,8 +1,7 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.GameStateLogic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.model.enums;
+package it.polimi.ingsw.mesos.common.enums;
 
 public enum SpecialActionType {
     FOOD_ON_TOTEM_SLOT,

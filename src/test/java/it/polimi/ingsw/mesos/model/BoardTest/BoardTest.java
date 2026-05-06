@@ -8,11 +8,9 @@ import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.EndGameScoringEffect;
 import it.polimi.ingsw.mesos.model.card.character.Artist;
-import it.polimi.ingsw.mesos.model.deck.Deck;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.EventType;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Era;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

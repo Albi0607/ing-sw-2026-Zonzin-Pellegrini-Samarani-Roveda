@@ -1,8 +1,8 @@
-package it.polimi.ingsw.mesos.model.deck;
+package it.polimi.ingsw.mesos.common;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.InventionIcon;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 
 /** Java class of type DTO that maps the attributes of the character.json file in order to determine which type of
  * character to construct, with the corresponding parameters that differ from one character to another

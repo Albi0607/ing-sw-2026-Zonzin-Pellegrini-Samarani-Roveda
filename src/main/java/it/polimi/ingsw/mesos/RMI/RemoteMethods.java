@@ -43,7 +43,7 @@ public interface RemoteMethods extends Remote {
 
 
     //metodi da usare nella lobby
-    String getLobby(CallBack clientCallback) throws RemoteException;
+    String getLobby(String nickname,CallBack clientCallback) throws RemoteException;
 
     boolean createNewGame(String nickname, int expectedNumPlayers, String viewId) throws  RemoteException;
 

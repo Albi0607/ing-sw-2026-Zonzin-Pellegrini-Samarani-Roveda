@@ -2,7 +2,7 @@ package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
-import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Color;
 
 import java.util.List;
 

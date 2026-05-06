@@ -2,16 +2,16 @@ package it.polimi.ingsw.mesos.model.card.building;
 
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
-import it.polimi.ingsw.mesos.model.enums.Color;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.TriggerType;
+import it.polimi.ingsw.mesos.common.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.TriggerType;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static it.polimi.ingsw.mesos.model.enums.SpecialActionType.EXTRA_DRAW;
-import static it.polimi.ingsw.mesos.model.enums.SpecialActionType.FOOD_ON_TOTEM_SLOT;
+import static it.polimi.ingsw.mesos.common.enums.SpecialActionType.EXTRA_DRAW;
+import static it.polimi.ingsw.mesos.common.enums.SpecialActionType.FOOD_ON_TOTEM_SLOT;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpecialActionEffectTest {

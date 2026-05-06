@@ -2,9 +2,11 @@ package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.model.enums.GameState;
+import it.polimi.ingsw.mesos.common.enums.GameState;
+import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
 import it.polimi.ingsw.mesos.socket.clientSocket;
@@ -138,7 +140,7 @@ public class CLI implements View {
         } else if (choice.equals("2")) {
             System.out.println("Connessione Socket in corso...");
             try {
-                network = new clientSocket("127.0.0.1", 1234);
+                network = new clientSocket("127.0.0.1", 12345);
             } catch (Exception e) {
                 System.out.println(CLIPrinter.ANSI_RED + "❌ Errore Socket: " + e.getMessage() + CLIPrinter.ANSI_RESET);
                 chooseNetwork();
@@ -226,19 +228,55 @@ public class CLI implements View {
             String nomeFila = isUpper ? "SUPERIORE (↑)" : "INFERIORE (↓)";
 
             System.out.println("Fase: " + CLIPrinter.ANSI_YELLOW + "RISOLUZIONE AZIONI" + CLIPrinter.ANSI_RESET);
-            System.out.println("Azione: Devi pescare dalla fila " + CLIPrinter.ANSI_YELLOW + nomeFila + CLIPrinter.ANSI_RESET);
-            System.out.print("Digita il NUMERO della carta: ");
-            String input = scanner.nextLine().trim();
 
-            try {
-                int cardIndex = Integer.parseInt(input) - 1;
-                actionSent = true;
+            if (canSkipExtraDraw()) {
+                System.out.println("Hai l'edificio speciale! Scegli un'azione:");
+                System.out.println("1. Pesca dalla fila " + CLIPrinter.ANSI_YELLOW + nomeFila + CLIPrinter.ANSI_RESET);
+                System.out.println("2. Salta la pescata extra");
+                System.out.print("Scelta (1 o 2): ");
 
-                controller.takeCard(cardIndex, isUpper);
+                String scelta = scanner.nextLine().trim();
 
-            } catch (NumberFormatException e) {
-                System.out.println(CLIPrinter.ANSI_RED + "❌ Numero non valido!" + CLIPrinter.ANSI_RESET);
+                if (scelta.equals("1")) {
+                    askDraw(isUpper);
+                } else if (scelta.equals("2")) {
+                    actionSent = true;
+                    controller.skipOnExtraDraw();
+                } else {
+                    System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida! Riprova." + CLIPrinter.ANSI_RESET);
+                }
+            } else {
+                System.out.println("Azione: Devi pescare dalla fila " + CLIPrinter.ANSI_YELLOW + nomeFila + CLIPrinter.ANSI_RESET);
+                askDraw(isUpper);
             }
+        }
+    }
+
+    private boolean canSkipExtraDraw() {
+        if (currentGameState == null || currentGameState.players == null) return false;
+
+        for (PlayerDTO player : currentGameState.players) {
+            if (player.nickname.equals(myNickname) && player.tribe != null && player.tribe.buildings != null) {
+                for (CardDTO building : player.tribe.buildings) {
+                    if (building.id.equals("BD_20")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void askDraw(boolean isUpper) {
+        System.out.print("Digita il NUMERO della carta: ");
+        String input = scanner.nextLine().trim();
+
+        try {
+            int cardIndex = Integer.parseInt(input) - 1;
+            actionSent = true;
+            controller.takeCard(cardIndex, isUpper);
+        } catch (NumberFormatException e) {
+            System.out.println(CLIPrinter.ANSI_RED + "❌ Numero non valido!" + CLIPrinter.ANSI_RESET);
         }
     }
 }

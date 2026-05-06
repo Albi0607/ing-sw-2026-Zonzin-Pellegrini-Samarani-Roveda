@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.enums.Color;
-import org.junit.jupiter.api.BeforeEach;
+import it.polimi.ingsw.mesos.common.enums.Color;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.model.card.character;
 
 import it.polimi.ingsw.mesos.model.deck.CreateCharacterCard;
-import it.polimi.ingsw.mesos.model.enums.Era;
-import it.polimi.ingsw.mesos.model.enums.InventionIcon;
+import it.polimi.ingsw.mesos.common.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

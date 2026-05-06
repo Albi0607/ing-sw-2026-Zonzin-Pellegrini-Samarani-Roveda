@@ -1,8 +1,13 @@
 package it.polimi.ingsw.mesos.rete;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
+import it.polimi.ingsw.mesos.DB.GameResultDAO;
+import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.RMI.server_RMI;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.socket.serverSocket;
+
+import java.sql.SQLException;
 
 /**
  * Class used to start the game server, which accepts clients and manages game creation.
@@ -12,7 +17,7 @@ import it.polimi.ingsw.mesos.socket.serverSocket;
 public class ServerMain {
 
     //capire come gestire la porta diversa anche lato client, forse in RMI non c'é bisogno di sapere la porta
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         //aggiungo serverState e lobby per la gestione delle partite
         ServerState serverState = new ServerState();
 
@@ -38,5 +43,12 @@ public class ServerMain {
         }).start();
 
         System.out.println("Server avviati e pronti a connessioni");
+
+        DBManager dbManager = new DBManager();
+        dbManager.init();
+
+        GameResultDAO dao = new GameResultDAO(dbManager.getConnection());
+        LeaderboardService service = new LeaderboardService(dao);
     }
+
 }

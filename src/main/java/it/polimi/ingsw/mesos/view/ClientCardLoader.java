@@ -1,7 +1,10 @@
 package it.polimi.ingsw.mesos.view;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import it.polimi.ingsw.mesos.model.deck.*;
+import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.CharacterCardJson;
+import it.polimi.ingsw.mesos.common.EventCardJson;
+import it.polimi.ingsw.mesos.common.*;
 
 import java.io.IOException;
 import java.util.List;

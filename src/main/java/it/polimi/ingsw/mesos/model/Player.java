@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.model;
 
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.Color;
+import it.polimi.ingsw.mesos.common.enums.Color;
 
 public class Player {
 
@@ -142,4 +141,5 @@ public class Player {
     public void setPrestigePoints(int prestigePoints){// da togliere solo per test
         this.prestigePoints = prestigePoints;
     }
+
 }

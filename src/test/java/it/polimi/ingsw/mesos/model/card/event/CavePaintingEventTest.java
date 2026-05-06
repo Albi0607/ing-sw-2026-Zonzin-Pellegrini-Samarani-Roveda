@@ -1,12 +1,12 @@
 package it.polimi.ingsw.mesos.model.card.event;
 
+import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
 import it.polimi.ingsw.mesos.model.card.character.Artist;
 import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
-import it.polimi.ingsw.mesos.model.enums.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -117,7 +117,7 @@ class CavePaintingEventTest {
 
         BuildingCard building = new BuildingCard(Era.ERA_II,5,6,new ResourceBonusEffect(EventType.PAINTING, CharacterType.ARTIST, ResourceType.FOOD,1));
 
-        building.getEffect().applyEffect(p1,game,TriggerType.ON_PAINTING_EVENT);
+        building.getEffect().applyEffect(p1,game, TriggerType.ON_PAINTING_EVENT);
         building.getEffect().applyEffect(p2,game,TriggerType.ON_PAINTING_EVENT);
 
         cavePaintingEvent.resolve(game);

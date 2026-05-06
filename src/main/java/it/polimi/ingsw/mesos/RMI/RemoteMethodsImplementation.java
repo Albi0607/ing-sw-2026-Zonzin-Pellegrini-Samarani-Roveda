@@ -98,8 +98,11 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     //metodi remoti da usare nella lobby
 
     //gestire questo metodo con l'utilizzo di una view parziale senza nome
-    public String getLobby(CallBack clientCallback) throws RemoteException{
-        VirtualView view = new RMIVirtualView("", clientCallback);
+    public String getLobby(String nickname,CallBack clientCallback) throws RemoteException{
+        if(serverState.isNicknameTaken(nickname)||nickname.isEmpty()){
+            return null;
+        }
+        VirtualView view = new RMIVirtualView(nickname, clientCallback);
         serverState.getLobby(view);
         return view.getId();
     }

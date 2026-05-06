@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.model.card.character;
 
 import it.polimi.ingsw.mesos.model.card.Card;
-import it.polimi.ingsw.mesos.model.enums.Era;
+import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Abstract class for all tribe cards
  * @author Alberto Roveda*/

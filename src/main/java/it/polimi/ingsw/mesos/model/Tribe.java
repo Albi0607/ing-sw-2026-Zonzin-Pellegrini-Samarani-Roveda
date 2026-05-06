@@ -5,8 +5,7 @@ import it.polimi.ingsw.mesos.model.card.character.Builder;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.model.card.character.Inventor;
 import it.polimi.ingsw.mesos.model.card.character.Shaman;
-import it.polimi.ingsw.mesos.model.enums.CharacterType;
-import it.polimi.ingsw.mesos.model.enums.InventionIcon;
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
 
 import java.util.ArrayList;
 import java.util.List;
