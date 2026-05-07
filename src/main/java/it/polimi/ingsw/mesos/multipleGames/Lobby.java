@@ -95,6 +95,7 @@ public class Lobby {
 
     //metodo per rimuovere i games quando vengono creati e tutti i partecipanti escono quindi non ci sono più persone
     //connesse
+    //da sistemare
     public synchronized void removeEmptyGames(){
         games.entrySet().removeIf(e ->
                 e.getValue() != null && e.getValue().getGame() == null
@@ -110,13 +111,17 @@ public class Lobby {
     }
 
     public synchronized void broadcast(){
-        removeEmptyGames();
+        //removeEmptyGames();
         List<LobbyInfoDTO> lobby = buildLobby();
 
         Iterator<String> iterator = viewers.iterator();
         while(iterator.hasNext()){
             String virtualViewId = iterator.next();
             VirtualView view = serverState.getConnection(virtualViewId);
+            if(view==null){
+                removeViewer(virtualViewId);
+                continue;
+            }
             try{
                 view.sendLobby(lobby);
             } catch (Exception e) {

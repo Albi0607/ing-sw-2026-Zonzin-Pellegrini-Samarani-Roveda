@@ -219,13 +219,20 @@ public class GameController {
      **/
 
     public boolean onPlaceTotem(String nickname, char tileId) {
+        VirtualView view = players.get(nickname);
+        if(view==null){
+            return false;
+        }
         try {
             requireState(GameState.PLACING_TOTEMS);
 
             Player player = requirePlayer(nickname);
             OfferTile tile = requireTile(tileId);
 
+            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.placeTotemOnOffer(player, tile);
+
+            view.showMessage("Totem piazzato correttamente");
 
             broadcastUpdate();
 
@@ -233,6 +240,7 @@ public class GameController {
 
         } catch (Exception e) {
 
+            view.showMessage("Errore: Totem non piazzato correttamente "+e.getMessage());
             System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
             e.printStackTrace();
             return false;
@@ -241,21 +249,23 @@ public class GameController {
 
     //aggiungo valore di ritorno booleano per capire se l'azione è andata a buon fine
     public boolean onTakeCard(String nickname, int cardIndex, boolean isUpper) {
-
+        VirtualView view = players.get(nickname);
+        if(view==null){
+            return false;
+        }
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             Player player = requirePlayer(nickname);
 
+            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.takeCard(player, cardIndex, isUpper);
+            view.showMessage("Carta scelta correttamente");
             broadcastUpdate();
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
 
-            VirtualView view = players.get(nickname);
-            if (view != null) {
-                view.showMessage("Mossa non valida: " + e.getMessage());
-            }
+            view.showMessage("Errore: Carta non scelta correttamente"+e.getMessage());
             return false;
         }
 
@@ -265,17 +275,21 @@ public class GameController {
     //attenzione che sia questo metodo sia onTakeCard si svolgono con lo stesso stato potrebbe essere necessario
     // distinguerli in qualche modo altrimenti il client non sa bene quale azione tocca fare
     public boolean onSkipExtraDraw(String nickname) {
+        VirtualView view = players.get(nickname);
+        if(view==null){
+            return false;
+        }
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             Player player = requirePlayer(nickname);
+
+            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.skipExtraDraw(player);
             broadcastUpdate();
+            view.showMessage("Azione skippata correttamente");
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            VirtualView view = players.get(nickname);
-            if (view != null) {
-                view.showMessage("Mossa non valida: " + e.getMessage());
-            }
+            view.showMessage("Errore: Azione non skippata correttamente "+e.getMessage());
             return false;
         }
     }
@@ -284,13 +298,15 @@ public class GameController {
     //metodo che dicevamo aggiornare tutte le altre view
     //capire cosa fare quando cade la rete
     //capire cosa fare quando un player si disconnette: chi fa le sue azioni? Si saltano?
-    protected void broadcastUpdate() {
+    protected synchronized void broadcastUpdate() {
         if (game == null) return;
         GameDTO dto = buildLastGameDTO();
         for (VirtualView view : players.values()) {
             try {
                 view.sendGame(dto);
-            } catch (Exception e) {} // per gestire l'eccezione quando cade la rete
+            } catch (Exception e) {
+                System.err.println("Errore: invio update al client");
+            } // per gestire l'eccezione quando cade la rete
         }
 
         game.clearLastResolvedEvents();
@@ -419,7 +435,9 @@ public class GameController {
         for  (VirtualView view : players.values()) {
             try {
                 view.sendClientState(state);
-            }catch (Exception e) {} // per gestire l'eccezione quando cade la rete
+            }catch (Exception e) {
+                System.err.println("Errore: invio clientState ai client");
+            } // per gestire l'eccezione quando cade la rete
         }
     }
 

@@ -19,7 +19,7 @@ public interface RemoteMethods extends Remote {
      * @return true if the action was performed successfully; otherwise, false
      * @throws RemoteException if there are network errors during the method invocation
      */
-    boolean placeTotem(String nickname,char position) throws RemoteException;
+    void placeTotem(String nickname,char position) throws RemoteException;
 
     /**
      * Method that allows the player to draw a card from the upper or lower row
@@ -29,7 +29,7 @@ public interface RemoteMethods extends Remote {
      * @return true if the action was performed successfully; otherwise, false
      * @throws RemoteException if there are network errors during the method invocation
      */
-    boolean takeCard(String nickname,int position,boolean isUpper) throws RemoteException;
+    void takeCard(String nickname,int position,boolean isUpper) throws RemoteException;
 
     /**
      * Method that allows the client not to draw the extra card at the end of the turn if they possess the triggering
@@ -39,14 +39,14 @@ public interface RemoteMethods extends Remote {
      * otherwise, false
      * @throws RemoteException if there are network errors during the method invocation
      */
-    boolean skipExtraDraw(String nickname) throws RemoteException;
+    void skipExtraDraw(String nickname) throws RemoteException;
 
 
     //metodi da usare nella lobby
     String getLobby(String nickname,CallBack clientCallback) throws RemoteException;
 
-    boolean createNewGame(String nickname, int expectedNumPlayers, String viewId) throws  RemoteException;
+    void createNewGame(String nickname, int expectedNumPlayers, String viewId) throws  RemoteException;
 
-    boolean joinGame(String nickname, int id, String viewId) throws  RemoteException;
+    void joinGame(String nickname, int id, String viewId) throws  RemoteException;
 
 }

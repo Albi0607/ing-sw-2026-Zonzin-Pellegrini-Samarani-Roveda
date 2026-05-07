@@ -6,8 +6,7 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 
 //classe da mettere nelle classi di rete per capire in base al nickname ricevuto in che controller fare l'azione
 public class ServerState {
@@ -19,13 +18,6 @@ public class ServerState {
     //permette di vedere il nome di tutti i giocatori connessi per non avere ripetizioni
     private final Set<String> nicknames;
 
-    //per eseguire i thread delle azioni di gioco da capire se usare e come e con che modifiche
-    private final ExecutorService executor = Executors.newFixedThreadPool(100);
-
-    public void execute(Runnable action){
-        executor.submit(action);
-    }
-
     public ServerState(){
         this.lobby = new Lobby(this);
         this.connections = new ConcurrentHashMap<>();
@@ -34,54 +26,74 @@ public class ServerState {
 
     }
 
-    public synchronized void getLobby(VirtualView view){
+    public synchronized void getLobby(String nickname,VirtualView view){
+        if(isNicknameTaken(nickname)||nickname.isEmpty()){
+            return;
+        }
         String virtualViewId= view.getId();
         connections.put(virtualViewId,view);
         lobby.addViewer(virtualViewId);
+        nicknames.add(nickname);
     }
 
     public VirtualView getConnection(String virtualViewId){
         return connections.get(virtualViewId);
     }
 
-    public synchronized boolean createNewGame(String nickname, int expectedNumPlayers, String virtualViewId){
+    public synchronized void createNewGame(String nickname, int expectedNumPlayers, String virtualViewId){
         try{
-            if(expectedNumPlayers<2||expectedNumPlayers>5){
-                return false;
-            }
             VirtualView view = connections.get(virtualViewId);
             if(view==null||!lobby.containView(virtualViewId)){
-                return false;
+                return;
             }
+            if(expectedNumPlayers<2||expectedNumPlayers>5){
+                view.showMessage("Partita non creata: Numero di giocatori non corretto");
+                return;
+            }
+
             GameController controller = lobby.createNewGame(nickname,expectedNumPlayers,virtualViewId);
             if(controller == null){
-                return false;
+                view.showMessage("Partita non creata: GameController non creato correttamente");
+                return;
             }
-            nicknames.add(nickname);
             playerToGame.put(nickname,controller);
-            return true;
+            view.showMessage("Partita creata correttamente");
 
         } catch (Exception e) {
-            return false;
+            VirtualView view = connections.get(virtualViewId);
+            if(view==null||!lobby.containView(virtualViewId)){
+                return;
+            }
+            view.showMessage("Partita non creata: Errore generico");
+
         }
     }
 
-    public synchronized boolean joinGame(String nickname, int id, String virtualViewId){
+    public synchronized void joinGame(String nickname, int id, String virtualViewId){
         try {
             VirtualView view = connections.get(virtualViewId);
             if(view==null||!lobby.containView(virtualViewId)){
-                return false;
+                return;
             }
             GameController controller = lobby.joinGame(id, nickname, virtualViewId);
             if(controller == null){
-                return false;
+                view.showMessage("Non sei entrato nella partita: Partita non trovata");
+                return;
             }
-            nicknames.add(nickname);
             playerToGame.put(nickname, controller);
-            return true;
         } catch (Exception e) {
-            return false;
+            VirtualView view = connections.get(virtualViewId);
+            if(view==null||!lobby.containView(virtualViewId)){
+                return;
+            }
+            view.showMessage("Non sei entrato nella partita: Errore generico");
         }
+    }
+
+    //per rimuovere connessione a tutto
+    public void removeConnection(String virtualViewId){
+        connections.remove(virtualViewId);
+        lobby.removeViewer(virtualViewId);
     }
 
     public GameController getController(String nickname){
