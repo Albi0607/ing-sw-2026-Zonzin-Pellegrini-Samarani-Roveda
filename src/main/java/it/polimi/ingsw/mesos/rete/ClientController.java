@@ -87,11 +87,9 @@ public class ClientController {
      */
     public void placeTotem(char position){
         if(myTurnInGame(GameState.PLACING_TOTEMS)) {
-            if(network.placeTotem(nickname, position)){
-                view.showMessage("Totem piazzato correttamente");
-            }
-            else{
-                view.showMessage(" Errore piazzamento totem: tessera occupata o mossa non valida! Riprova."); //aggiunto questo
+            //Per gestire subito un eventuale errore di connessione
+            if(!network.placeTotem(nickname, position)){
+                view.showMessage("Errore piazzamento totem: Errore di connessione con il server");
             }
         }
         else{
@@ -107,8 +105,9 @@ public class ClientController {
      */
     public void takeCard(int position,boolean isUpper){
         if(myTurnInGame(GameState.RESOLVING_ACTIONS)) {
-            if(network.takeCard(nickname,position,isUpper)){
-                view.showMessage("Carta presa correttamente");
+            //Per gestire subito un eventuale errore di connessione
+            if(!network.takeCard(nickname,position,isUpper)){
+                view.showMessage("Errore nel scegliere la carta: Errore di connessione con il server");
             }
         }
         else{
@@ -125,11 +124,9 @@ public class ClientController {
     //non esserci differenziazione da parte del client
     public void skipOnExtraDraw(){
         if(myTurnInGame(GameState.RESOLVING_ACTIONS)){
-            if(network.skipExtraDraw(nickname)){
-                view.showMessage("Azione di non pescare nessuna carta fatta in maniera corretta");
-            }
-            else{
-                view.showMessage("Errore nel non pescare la carta");
+            //Per gestire subito un eventuale errore di connessione
+            if(!network.skipExtraDraw(nickname)){
+                view.showMessage("Errore nel non pescare la carta: Errore di connessione con il server");
             }
         }
         else{
@@ -165,7 +162,10 @@ public class ClientController {
             return;
         }
         //ti deve chiedere di inserire nickname e il numero di giocatori dalla view
-        network.createNewGame(nickname,expectedNumPlayers,virtualViewId);
+        //Per gestire subito un eventuale errore di connessione
+        if(!network.createNewGame(nickname,expectedNumPlayers,virtualViewId)){
+            view.showMessage("Errore nel creare una nuova partita: Errore di connessione con il server");
+        }
 
     }
     public void joinGame(int id){
@@ -175,7 +175,10 @@ public class ClientController {
         if(virtualViewId==null){
             return;
         }
-        network.joinGame(nickname,id,virtualViewId);
+        if(!network.joinGame(nickname,id,virtualViewId)){
+            //Per gestire subito un eventuale errore di connessione
+            view.showMessage("Errore nel partecipare ad una partita: Errore di connessione con il server");
+        }
     }
 
 }

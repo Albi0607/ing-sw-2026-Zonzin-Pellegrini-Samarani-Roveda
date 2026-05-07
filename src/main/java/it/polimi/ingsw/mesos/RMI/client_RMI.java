@@ -43,7 +43,8 @@ public class client_RMI implements Network {
      */
     public boolean placeTotem(String nickname, char position){
         try {
-            return (remote.placeTotem(nickname, position));
+            remote.placeTotem(nickname, position);
+            return true;
 
         } catch (RemoteException e) {
             return false;
@@ -60,7 +61,8 @@ public class client_RMI implements Network {
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper){
         try {
-            return (remote.takeCard(nickname, position, isUpper));
+            remote.takeCard(nickname, position, isUpper);
+            return true;
         } catch (RemoteException e) {
             return false;
         }
@@ -69,7 +71,8 @@ public class client_RMI implements Network {
     @Override
     public boolean skipExtraDraw(String nickname){
         try{
-            return remote.skipExtraDraw(nickname);
+            remote.skipExtraDraw(nickname);
+            return true;
         }
         catch(RemoteException e){
             return false;
@@ -91,7 +94,8 @@ public class client_RMI implements Network {
     @Override
     public boolean createNewGame(String nickname, int expectedNumPlayers,String viewId){
         try {
-            return remote.createNewGame(nickname,expectedNumPlayers, viewId);
+            remote.createNewGame(nickname,expectedNumPlayers, viewId);
+            return true;
         } catch (RemoteException e){
             return false;
         }
@@ -100,7 +104,8 @@ public class client_RMI implements Network {
     @Override
     public boolean joinGame(String nickname, int id, String viewId){
         try {
-            return remote.joinGame(nickname,id,viewId);
+            remote.joinGame(nickname,id,viewId);
+            return true;
         } catch (RemoteException e){
             return false;
         }
