@@ -33,8 +33,12 @@ public class GameController {
     private int expectedNumPlayers=0;
     private LeaderboardService leaderboardService;
 
-    public GameController() {
+    //id del game che corrisponde a quello della lobby
+    private final int id;
+
+    public GameController(int id) {
         this.pendingNicknames = new ArrayList<>();
+        this.id=id;
     }
 
     /**

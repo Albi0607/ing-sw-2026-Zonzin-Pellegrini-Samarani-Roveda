@@ -46,9 +46,9 @@ public class Lobby {
             if(view==null){
                 return null;
             }
-            GameController controller = new GameController();
-            controller.setNumPlayers(expectedNumPlayers);
             int id = nextId++;
+            GameController controller = new GameController(id);
+            controller.setNumPlayers(expectedNumPlayers);
             games.put(id, controller);
             System.out.println("Nuovo game creato con questo id: " + id);
             games.get(id).addPlayer(nickname, view);
