@@ -2,13 +2,16 @@ package it.polimi.ingsw.mesos.socket;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.ClientStateMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageServer.LobbyUpdateMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.UpdateGameMessage;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 /**
  * Implementazione di VirtualView per il protocollo Socket.
@@ -21,8 +24,10 @@ import java.io.ObjectOutputStream;
  */
 public class SocketVirtualView implements VirtualView {
 
-    private final String nickname;
+    private String nickname;
     private final ObjectOutputStream out;
+
+    private final String id = java.util.UUID.randomUUID().toString();
 
     public SocketVirtualView(String nickname, ObjectOutputStream out) {
         this.nickname = nickname;
@@ -75,5 +80,21 @@ public class SocketVirtualView implements VirtualView {
     @Override
     public String getNickname() {
         return this.nickname;
+    }
+
+    @Override
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+
+    }
+
+    @Override
+    public synchronized void sendLobby(List<LobbyInfoDTO> lobby) {
+        send(new LobbyUpdateMessage(lobby));
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 }

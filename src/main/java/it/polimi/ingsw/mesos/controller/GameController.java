@@ -12,6 +12,10 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.common.enums.GameState;
+import it.polimi.ingsw.mesos.persistence.DummyVirtualView;
+import it.polimi.ingsw.mesos.persistence.GameMove;
+import it.polimi.ingsw.mesos.persistence.GameRestorer;
+import it.polimi.ingsw.mesos.persistence.MoveLogger;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
@@ -32,13 +36,19 @@ public class GameController {
     private final  List<String> pendingNicknames;
     private int expectedNumPlayers=0;
     private LeaderboardService leaderboardService;
+    //persistenza
+    private MoveLogger moveLogger;
+    private boolean replayMode = false;  // true durante il replay, disabilita broadcast
+    private GameRestorer restorer = null;
+
 
     //id del game che corrisponde a quello della lobby
-    private final int id;
+    private final int gameId;
 
-    public GameController(int id) {
+    public GameController(int gameId) {
+        this.gameId = gameId;
         this.pendingNicknames = new ArrayList<>();
-        this.id=id;
+        this.moveLogger = new MoveLogger("mesos_game_" + gameId + ".log");
     }
 
     /**
@@ -95,6 +105,43 @@ public class GameController {
      */
 
     public synchronized void addPlayer(String nickname, VirtualView view) {
+
+        // Caso ripristino: il gioco era già stato creato, il giocatore si riconnette
+        if (restorer != null && game != null) {
+            reconnectPlayer(nickname, view);
+
+            // Se tutti i giocatori si sono riconnessi, termina il replay
+            boolean allReconnected = players.values().stream()
+                    .noneMatch(v -> v instanceof DummyVirtualView);
+            if (allReconnected) {
+                broadcastUpdate();
+                sendClientStateToAll(ClientState.IN_GAME);
+            }
+            return;
+        }
+
+        // Caso ripristino: il gioco non è ancora stato creato
+        // (il log esiste ma il replay non è ancora partito)
+        if (restorer != null && game == null) {
+            // Registra la VirtualView reale del giocatore
+            players.put(nickname, view);
+
+            // Leggi quanti giocatori si aspettava la partita dal log
+            List<GameMove> moves = restorer.getMoveLogger().readAll();
+            long expectedFromLog = moves.stream()
+                    .filter(m -> m.type == GameMove.MoveType.ADD_PLAYER)
+                    .count();
+
+            if (players.size() == expectedFromLog) {
+                // Tutti riconnessi: esegui il replay
+                restorer.restore(this, players);
+                restorer = null; // ripristino completato
+            } else {
+                view.sendClientState(ClientState.WAITING_PLAYERS);
+            }
+            return;
+        }
+
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
         }
@@ -114,6 +161,7 @@ public class GameController {
 
         pendingNicknames.add(nickname);
         players.put(nickname,view);
+        if (moveLogger != null) moveLogger.append(GameMove.addPlayer(nickname));
 
         /* Non si fa piu questo controllo poiché esiste un metodo apposta per creare i game
         if (expectedNumPlayers == 0 && pendingNicknames.size() == 1) {
@@ -179,6 +227,7 @@ public class GameController {
             throw new IllegalStateException("Game not created");
         }
         game.startGame();
+        if (moveLogger != null) moveLogger.append(GameMove.startGame());
         broadcastUpdate();
     }
 
@@ -208,6 +257,9 @@ public class GameController {
                 view.showMessage("Hai finito in posizione: " + position);
             }
         }
+        sendClientStateToAll(ClientState.END_GAME);
+        broadcastUpdate();
+        if (moveLogger != null) moveLogger.delete();
     }
 
     // AZIONI DEL GIOCATORE
@@ -236,6 +288,8 @@ public class GameController {
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.placeTotemOnOffer(player, tile);
 
+            if (moveLogger != null) moveLogger.append(GameMove.placeTotem(nickname, tileId));
+
             view.showMessage("Totem piazzato correttamente");
 
             broadcastUpdate();
@@ -263,6 +317,7 @@ public class GameController {
 
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.takeCard(player, cardIndex, isUpper);
+            if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
             view.showMessage("Carta scelta correttamente");
             broadcastUpdate();
             return true;
@@ -289,6 +344,7 @@ public class GameController {
 
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.skipExtraDraw(player);
+            if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
             view.showMessage("Azione skippata correttamente");
             return true;
@@ -302,8 +358,8 @@ public class GameController {
     //metodo che dicevamo aggiornare tutte le altre view
     //capire cosa fare quando cade la rete
     //capire cosa fare quando un player si disconnette: chi fa le sue azioni? Si saltano?
-    protected synchronized void broadcastUpdate() {
-        if (game == null) return;
+    public synchronized void broadcastUpdate() {
+        if (game == null || replayMode) return;
         GameDTO dto = buildLastGameDTO();
         for (VirtualView view : players.values()) {
             try {
@@ -492,6 +548,33 @@ public class GameController {
     }
 
     // manca un metodo che rispedisce la notifica dal controller al client
+
+    // persistenza
+    public void setReplayMode(boolean replayMode) {
+        this.replayMode = replayMode;
+    }
+
+    public void setRestorer(GameRestorer restorer) {
+        this.restorer = restorer;
+    }
+
+    public synchronized void reconnectPlayer(String nickname, VirtualView newView) {
+        if (!players.containsKey(nickname)) {
+            throw new IllegalArgumentException("Giocatore non trovato: " + nickname);
+        }
+        players.put(nickname, newView); // sostituisce la DummyVirtualView
+        newView.sendGame(buildLastGameDTO());
+        newView.sendClientState(ClientState.IN_GAME);
+        System.out.println("[GameController] Giocatore riconnesso: " + nickname);
+    }
+
+    public MoveLogger getMoveLogger() {
+        return moveLogger;
+    }
+
+    public boolean hasRestorer() {
+        return restorer != null;
+    }
 
     // GETTERS
 

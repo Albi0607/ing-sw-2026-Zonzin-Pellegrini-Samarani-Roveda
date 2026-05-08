@@ -6,7 +6,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
-//import it.polimi.ingsw.mesos.socket.clientSocket;
+import it.polimi.ingsw.mesos.socket.clientSocket;
 
 import java.util.List;
 import java.util.Scanner;

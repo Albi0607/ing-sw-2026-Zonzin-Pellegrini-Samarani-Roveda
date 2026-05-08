@@ -26,7 +26,7 @@ public class clientSocket implements Network {
     private ObjectInputStream in;
 
     private ClientController controller;
-
+    
     /**
      * Creates a new client socket and connects to the specified server.
      * <p>
@@ -45,20 +45,6 @@ public class clientSocket implements Network {
         in = new ObjectInputStream(socket.getInputStream());
 
         new Thread(this::listenFromServer).start();
-    }
-
-    /**
-     * Registers a new client with the server using the given nickname.
-     *
-     * @param nickname  the nickname chosen by the client
-     * @param controller the client-side controller used to handle incoming messages
-     * @return always returns {@code true} (message is sent asynchronously)
-     */
-    @Override
-    public boolean register(String nickname, ClientController controller) {
-        this.controller = controller;
-        sendMessage(new RegisterMessage(nickname));
-        return true;
     }
 
     /**
@@ -89,18 +75,6 @@ public class clientSocket implements Network {
     }
 
     /**
-     * Sends a request to choose the number of players for the game.
-     *
-     * @param numPlayers the number of players selected
-     * @return always returns {@code true} (message is sent asynchronously)
-     */
-    @Override
-    public boolean choosePlayers(int numPlayers) {
-        sendMessage(new ChoosePlayersMessage(numPlayers));
-        return true;
-    }
-
-    /**
      * Sends a request to skip an extra draw phase.
      *
      * @param nickname the nickname of the player requesting to skip
@@ -109,6 +83,25 @@ public class clientSocket implements Network {
     @Override
     public boolean skipExtraDraw(String nickname) {
         sendMessage(new SkipExtraDrawMessage(nickname));
+        return true;
+    }
+
+    @Override
+    public String getLobby(String nickname, ClientController controller) {
+        this.controller = controller;
+        sendMessage(new GetLobbyMessage(nickname));
+        return "";
+    }
+
+    @Override
+    public boolean createNewGame(String nickname, int expectedNumPlayers, String viewId) {
+        sendMessage(new CreateGameMessage(expectedNumPlayers));
+        return true;
+    }
+
+    @Override
+    public boolean joinGame(String nickname, int id, String viewId) {
+        sendMessage(new JoinGameMessage(id));
         return true;
     }
 
@@ -135,6 +128,7 @@ public class clientSocket implements Network {
     private void listenFromServer() {
         try {
             while (true) {
+
                 Message message = (Message) in.readObject();
                 message.executeClientSide(controller);
             }
