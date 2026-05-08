@@ -20,8 +20,9 @@ public class ServerMain {
     public static void main(String[] args) throws SQLException {
         //aggiungo serverState e lobby per la gestione delle partite
         ServerState serverState = new ServerState();
+        //scansione del disco prima dell'avvio di un server per il ripristino delle partite interrotte
+        serverState.initializeFromDisk();
 
-        //porta di default;
         int port = 1099;
 
         if(args.length>0){
@@ -39,7 +40,7 @@ public class ServerMain {
         new Thread(() -> {
             serverSocket socket = new serverSocket();
             // 1234 per il socket per non andare in conflitto con RMI (1099)
-            //socket.start(serverState, 1234 );
+            socket.start(serverState, 1234 );
         }).start();
 
         System.out.println("Server avviati e pronti a connessioni");

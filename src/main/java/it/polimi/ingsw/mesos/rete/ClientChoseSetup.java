@@ -9,11 +9,11 @@ public class ClientChoseSetup {
         try {
             return switch (choice) {
                 case "RMI" -> new client_RMI();
-                //case "SOCKET" -> new clientSocket();
+                case "SOCKET" -> new clientSocket("127.0.0.1", 1234);
                 default -> throw new IllegalArgumentException();
             };
         } catch (Exception e) {
-            throw new RuntimeException("Errore nella creazione della rete in ClietnChoseSetup: " + choice, e);
+            throw new RuntimeException("Errore nella creazione della rete in ClientChoseSetup: " + choice, e);
         }
     }
 /*

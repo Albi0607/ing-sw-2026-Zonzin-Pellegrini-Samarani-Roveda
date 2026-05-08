@@ -1,7 +1,11 @@
 package it.polimi.ingsw.mesos.socket;
 
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.socket.Message.Message;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.CreateGameMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.GetLobbyMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.JoinGameMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageClient.RegisterMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;
 
@@ -24,24 +28,24 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
 
     private final Socket clientSocket;
-    private final GameController controller;
+    private final ServerState serverState;
 
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
     private String nickname;
-
+    private String virtualViewId;
     private SocketVirtualView virtualView;
 
     /**
      * Creates a new handler for a connected client.
      *
      * @param clientSocket the socket associated with the connected client
-     * @param controller the server-side game controller
+     * @param serverState the server-side list of lobbies
      */
-    public ClientHandler(Socket clientSocket, GameController controller) {
+    public ClientHandler(Socket clientSocket, ServerState serverState) {
         this.clientSocket = clientSocket;
-        this.controller = controller;
+        this.serverState = serverState;
     }
 
     /**
@@ -100,52 +104,65 @@ public class ClientHandler implements Runnable {
      * @throws IOException if sending responses to the client fails
      */
     private void handleMessage(Message message) throws IOException {
-        if (message instanceof RegisterMessage reg) {
-            handleRegister(reg);
+
+        // Registrazione alla lobby (primo messaggio obbligatorio)
+        if (message instanceof GetLobbyMessage glm) {
+            handleGetLobby(glm);
             return;
         }
 
-        if (nickname == null) {
-            // Client non ancora registrato → ignora qualsiasi altro messaggio
+        if (nickname == null || virtualView == null) {
             System.err.println("Messaggio ricevuto prima della registrazione, ignorato.");
             return;
         }
 
+        // Azioni lobby
+        if (message instanceof CreateGameMessage cgm) {
+            serverState.createNewGame(nickname, cgm.getNumPlayers(), virtualViewId);
+            return;
+        }
+
+        if (message instanceof JoinGameMessage jgm) {
+            serverState.joinGame(nickname, jgm.getGameId(), virtualViewId);
+            return;
+        }
+
+        // Azioni di gioco, direziona al giusto controller
         try {
+            // Cerca il controller associato a questo giocatore
+            // (viene associato quando entra in una partita)
+            var controller = serverState.getController(nickname);
+            if (controller == null) {
+                virtualView.showMessage("Non sei in nessuna partita.");
+                return;
+            }
             message.executeServerSide(controller);
         } catch (IllegalArgumentException | IllegalStateException | IndexOutOfBoundsException e) {
-            // Errore di logica di gioco → risponde solo a questo client, non broadcast
-            if (virtualView != null) {
-                virtualView.showMessage(e.getMessage());
-            }
+            virtualView.showMessage(e.getMessage());
         }
     }
 
     /**
-     * Handles client registration by creating a {@link SocketVirtualView}
-     * and registering the player in the {@link GameController}.
-     * <p>
-     * If registration fails (e.g., nickname already taken), an error message
-     * is sent to the client and the connection is closed.
-     *
-     * @param reg the registration message containing the player's nickname
-     * @throws IOException if communication with the client fails or socket closure fails
+     * Gestisce la registrazione alla lobby.
+     * Analogo a RemoteMethodsImplementation.getLobby().
      */
-    private void handleRegister(RegisterMessage reg) throws IOException {
+    private void handleGetLobby(GetLobbyMessage msg) throws IOException {
         try {
-            this.nickname    = reg.getNickname();
+            this.nickname    = msg.getNickname();
             this.virtualView = new SocketVirtualView(nickname, out);
-            controller.addPlayer(nickname, virtualView);
-            System.out.println( "Registrato: " + nickname);
+            this.virtualViewId = virtualView.getId();
+
+            // Delega a ServerState
+            serverState.getLobby(nickname, virtualView);
+
+            System.out.println("Registrato in lobby: " + nickname);
         } catch (Exception e) {
-            System.err.println("Errore registrazione '"
-                    + reg.getNickname() + "': " + e.getMessage());
-            // Manda errore e chiude — il client dovrà riconnettersi
+            System.err.println("Errore registrazione lobby '" + msg.getNickname() + "': " + e.getMessage());
             try {
                 out.writeObject(new ErrorMessage(e.getMessage()));
                 out.flush();
             } catch (IOException ignored) {}
-            clientSocket.close(); // motivo del throws nella firma, potrebbe generare un'ecc inaspettata
+            clientSocket.close();
         }
     }
 
