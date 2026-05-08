@@ -1,33 +1,35 @@
 package it.polimi.ingsw.mesos.view;
+import it.polimi.ingsw.mesos.common.CardJson;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class CardRegistry {
+    private static final Map<String, CardJson> database = new HashMap<>();
 
-    private static final Map<String, Object> database = new HashMap<>();
-
-    /**
-     * Registra le informazioni di una carta.
-     * @param id L'identificativo univoco della carta
-     * @param cardJsonObject L'oggetto JSON mappato da Jackson (es. EventCardJson)
-     */
-    public static void registerCard(String id, Object cardJsonObject) {
-        if (id != null && cardJsonObject != null) {
-            database.put(id, cardJsonObject);
+    public static void registerCard(CardJson card) {
+        if (card != null && card.getId() != null) {
+            database.put(card.getId(), card);
         }
     }
 
-    /**
-     * Recupera le informazioni della carta.
-     * Il Client userà questo metodo e farà il cast alla classe giusta (es. (EventCardJson) registry.getCardInfo(id))
-     */
-    public static Object getCardInfo(String id) {
+    public static CardJson getCard(String id) {
         return database.get(id);
     }
 
-    // Utilità per controllare se il DB è pieno
+    public static <T extends CardJson> T getCard(String id, Class<T> cls) {
+        CardJson card = database.get(id);
+
+        if (cls.isInstance(card)) {
+            return cls.cast(card);
+        }
+
+        return null;
+    }
+
     public static int size() {
         return database.size();
     }
 }
+

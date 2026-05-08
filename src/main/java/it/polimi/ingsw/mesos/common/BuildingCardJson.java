@@ -7,7 +7,7 @@ import it.polimi.ingsw.mesos.common.enums.*;
  *  @author Alberto Roveda
  *  */
 
-public class BuildingCardJson {
+public class BuildingCardJson implements CardJson{
     public String id;
     public Era era;
     public int cost;
@@ -34,5 +34,10 @@ public class BuildingCardJson {
 
     //SpecialActionEffect
     public SpecialActionType specialType;
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
 }
 

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.common.CardJson;
 import it.polimi.ingsw.mesos.common.CharacterCardJson;
 import it.polimi.ingsw.mesos.common.EventCardJson;
 
@@ -8,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FormattersRegistry {
-    private static final Map<Class<?>, Formatters.CardFormatter<?>> registry = new HashMap<>();
+    private static final Map<Class<? extends CardJson>, Formatters.CardFormatter<? extends CardJson>> registry = new HashMap<>();
 
     static {
         registry.put(CharacterCardJson.class, new CharacterFormatter());
@@ -23,7 +24,7 @@ public class FormattersRegistry {
      * @return The corresponding CardFormatter instance, or null if not registered.
      */
     @SuppressWarnings("unchecked")
-    public static <T> Formatters.CardFormatter<T> getFormatter(Class<?> cls) {
+    public static <T extends CardJson> Formatters.CardFormatter<T> getFormatter(Class<? extends CardJson> cls) {
         return (Formatters.CardFormatter<T>) registry.get(cls);
     }
 }

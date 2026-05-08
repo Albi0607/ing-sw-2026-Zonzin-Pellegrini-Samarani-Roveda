@@ -6,7 +6,7 @@ import it.polimi.ingsw.mesos.common.enums.EventType;
  * assign the corresponding parameters required for different event types
  * @author Alberto Roveda*/
 
-public class EventCardJson {
+public class EventCardJson implements CardJson{
     public String id;
     public EventType type;
     public Era era;
@@ -17,4 +17,9 @@ public class EventCardJson {
     public Integer gainNumber;
     public Integer losePoints;
     public Integer gainPoints;
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
 }

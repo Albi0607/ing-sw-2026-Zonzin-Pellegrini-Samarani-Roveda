@@ -9,6 +9,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PlayerStatusLogic {
@@ -31,9 +32,9 @@ public class PlayerStatusLogic {
         String colorReset = VisualTheme.getColor("RESET");
 
         return p.tribe.buildings.stream()
-                .map(b -> CardRegistry.getCardInfo(b.id))
-                .filter(info -> info instanceof BuildingCardJson)
-                .map(info -> (BuildingCardJson) info)
+
+                .map(b -> CardRegistry.getCard(b.id, BuildingCardJson.class))
+                .filter(Objects::nonNull)
                 .map(bJson -> colorYellow + hutIcon + " [" + buildFormatter.getBuildingEffectString(bJson) + "]" + colorReset)
                 .collect(Collectors.joining(" | "));
     }
@@ -50,9 +51,9 @@ public class PlayerStatusLogic {
         }
 
         List<CharacterCardJson> chars = p.tribe.characters.stream()
-                .map(c -> CardRegistry.getCardInfo(c.id))
-                .filter(info -> info instanceof CharacterCardJson)
-                .map(info -> (CharacterCardJson) info)
+
+                .map(c -> CardRegistry.getCard(c.id, CharacterCardJson.class))
+                .filter(Objects::nonNull)
                 .toList();
 
         List<String> statusParts = new ArrayList<>();

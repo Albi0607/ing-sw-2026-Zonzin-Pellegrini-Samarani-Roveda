@@ -32,7 +32,7 @@ public class ClientCardLoader {
         );
 
         for (EventCardJson j : list) {
-            CardRegistry.registerCard(j.id, j);
+            CardRegistry.registerCard(j);
         }
     }
 
@@ -43,7 +43,7 @@ public class ClientCardLoader {
         );
 
         for (CharacterCardJson j : list) {
-            CardRegistry.registerCard(j.id, j);
+            CardRegistry.registerCard(j);
         }
     }
 
@@ -54,7 +54,7 @@ public class ClientCardLoader {
         );
 
         for (BuildingCardJson j : list) {
-            CardRegistry.registerCard(j.id, j);
+            CardRegistry.registerCard(j);
         }
     }
 }

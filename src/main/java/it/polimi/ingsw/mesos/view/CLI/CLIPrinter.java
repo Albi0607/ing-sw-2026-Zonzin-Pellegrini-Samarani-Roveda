@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.common.CardJson;
 import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.common.enums.Color;
@@ -96,13 +97,21 @@ public class CLIPrinter {
             CardDTO c = row.get(i);
             System.out.print("(" + (i + 1) + ") ");
 
-            Object cardInfo = CardRegistry.getCardInfo(c.id);
+            CardJson cardInfo = CardRegistry.getCard(c.id);
 
             if (cardInfo != null) {
-                Formatters.CardFormatter<Object> formatter = FormattersRegistry.getFormatter(cardInfo.getClass());
+
+                Formatters.CardFormatter<CardJson> formatter =
+                        (Formatters.CardFormatter<CardJson>) FormattersRegistry.getFormatter(cardInfo.getClass());
+
                 if (formatter != null) {
                     System.out.print(formatter.format(cardInfo) + "  ");
+                }else {
+
+                    String className = cardInfo.getClass().getSimpleName();
+                    System.out.print("[" + ANSI_YELLOW + className + ": " + c.id + ANSI_RESET + "]  ");
                 }
+
             } else {
                 System.out.print("[Carta Sconosciuta (ID: " + c.id + ")]  ");
             }
