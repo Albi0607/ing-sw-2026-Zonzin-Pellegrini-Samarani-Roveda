@@ -7,7 +7,7 @@ import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 /** Java class of type DTO that maps the attributes of the character.json file in order to determine which type of
  * character to construct, with the corresponding parameters that differ from one character to another
  * @author Alberto Roveda*/
-public class CharacterCardJson {
+public class CharacterCardJson implements CardJson{
     public String id;
     public CharacterType type;
     public Era era;
@@ -19,4 +19,9 @@ public class CharacterCardJson {
     public Boolean hasIcon;
     public InventionIcon icon;
     public Integer numberOfIcons;
+
+    @Override
+    public String getId() {
+        return this.id;
+    }
 }
