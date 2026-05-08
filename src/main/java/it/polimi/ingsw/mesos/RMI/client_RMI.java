@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.rete.Network;
 import java.rmi.*;
 import java.rmi.registry.*;
 
+//commento da cancellare per recupero di questa classe
 
 /**
  * Class responsible for establishing an RMI connection with the RMI server and handling all client-side remote method
