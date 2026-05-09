@@ -2,7 +2,11 @@ package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.common.CharacterCardJson;
 
+
+
 public class CharacterFormatter implements Formatters.CardFormatter<CharacterCardJson> {
+
+    public CharacterFormatter() {}
 
     /**
      * Formats a character card's data into a color-coded string for CLI display,
@@ -12,14 +16,22 @@ public class CharacterFormatter implements Formatters.CardFormatter<CharacterCar
      */
     @Override
     public String format(CharacterCardJson charJson) {
-        String colorCyan = VisualTheme.getColor("CYAN");
         String colorReset = VisualTheme.getColor("RESET");
 
-        if (charJson.type == null) return colorCyan + "Sconosciuto" + colorReset;
+        // Leggiamo l'era direttamente dalla carta!
+        String cardEra = (charJson.era != null) ? charJson.era.toString() : "ERA_I";
+
+        String charColor = switch (cardEra) {
+            case "ERA_II" -> VisualTheme.getColor("GREEN");
+            case "ERA_III" -> VisualTheme.getColor("PURPLE");
+            default -> VisualTheme.getColor("CYAN");
+        };
+
+        if (charJson.type == null) return charColor + "Sconosciuto" + colorReset;
         String typeName = charJson.type.name();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(colorCyan).append(typeName).append(colorReset);
+        sb.append(charColor).append(typeName).append(colorReset);
 
         StringBuilder details = new StringBuilder();
 

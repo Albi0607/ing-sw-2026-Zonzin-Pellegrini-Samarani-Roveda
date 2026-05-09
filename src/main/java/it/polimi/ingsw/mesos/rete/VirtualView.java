@@ -45,4 +45,7 @@ public interface VirtualView {
     void sendLobby(List<LobbyInfoDTO> lobby);
 
     String getId();
+
+    void showActionRejected(String reason);
+    void showActionAccepted(String message);
 }

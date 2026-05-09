@@ -17,6 +17,7 @@ public class CLIPrinter {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_GRAY = "\u001B[90m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
 
     /**
      * Converts a player's color enum into the corresponding ANSI escape code for CLI display.
@@ -36,6 +37,7 @@ public class CLIPrinter {
     }
 
     public static void clearScreen() {
+        System.out.println();
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
@@ -283,5 +285,4 @@ public class CLIPrinter {
         if (modifier < 0) return ANSI_RED + modifier + " 🍗 / " + (modifier * 2) + " ⭐" + ANSI_RESET;
         return ANSI_GRAY + "  -  " + ANSI_RESET;
     }
-
 }

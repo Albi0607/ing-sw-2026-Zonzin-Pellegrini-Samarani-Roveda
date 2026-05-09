@@ -63,4 +63,14 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
         cController.showMessage(message);
     }
 
+    @Override
+    public void showActionRejected(String reason) throws RemoteException {
+        cController.showActionRejected(reason);
+    }
+
+    @Override
+    public void showActionAccepted(String message) throws RemoteException {
+        cController.showActionAccepted(message);
+    }
+
 }

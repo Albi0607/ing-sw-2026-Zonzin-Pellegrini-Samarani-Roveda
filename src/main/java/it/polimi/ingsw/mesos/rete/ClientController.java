@@ -79,7 +79,13 @@ public class ClientController {
         view.showMessage(error);
     }
 
+    public void showActionRejected(String reason) {
+        view.showActionRejected(reason);
+    }
 
+    public void showActionAccepted(String message) {
+        view.showActionAccepted(message);
+    }
 
     /**
      * Method that allows the client to place the totem on the OfferTile

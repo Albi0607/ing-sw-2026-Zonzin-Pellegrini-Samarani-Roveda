@@ -83,6 +83,24 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
+    @Override
+    public void showActionRejected(String reason) {
+        try {
+            clientCallBack.showActionRejected(reason);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showActionRejected: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void showActionAccepted(String message) {
+        try {
+            clientCallBack.showActionAccepted(message);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showActionAccepted: " + e.getMessage());
+        }
+    }
+
     /**
      * Method used to retrieve the client's name
      * @return client nickname

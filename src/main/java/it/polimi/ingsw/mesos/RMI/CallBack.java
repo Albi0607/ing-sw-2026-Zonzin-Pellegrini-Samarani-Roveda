@@ -37,4 +37,7 @@ public interface CallBack extends Remote {
 
     //metodo per mandare la lobby in caso di modifiche
     void showLobby(List<LobbyInfoDTO> lobby) throws RemoteException;
+
+    void showActionRejected(String reason) throws RemoteException;
+    void showActionAccepted(String message) throws RemoteException;
 }

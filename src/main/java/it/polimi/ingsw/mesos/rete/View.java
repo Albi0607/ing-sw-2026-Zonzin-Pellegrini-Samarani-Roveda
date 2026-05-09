@@ -34,4 +34,8 @@ public interface View {
 
     //metodo per mostrare la lobby a schermo
     void showLobby(List<LobbyInfoDTO> lobby);
+
+    void showActionRejected(String reason);
+
+    void showActionAccepted(String message);
 }
