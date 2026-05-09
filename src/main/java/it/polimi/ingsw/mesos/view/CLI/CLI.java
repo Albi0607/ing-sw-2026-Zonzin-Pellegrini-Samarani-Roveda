@@ -230,24 +230,35 @@ public class CLI implements View {
         System.out.println("2. Unisciti a una partita esistente");
         System.out.print("Scelta (1 o 2): ");
 
-        String choice = scanner.nextLine().trim();
+        boolean validChoice = false;
+        while (!validChoice) {
+            System.out.print("Scelta (1 o 2): ");
+            String choice = scanner.nextLine().trim();
 
-        try {
-            if (choice.equals("1")) {
-                System.out.print("Quanti giocatori parteciperanno? (2-5): ");
-                int num = Integer.parseInt(scanner.nextLine().trim());
-                actionSent = true;
-                controller.createNewGame(num);
-            } else if (choice.equals("2")) {
-                System.out.print("Inserisci l'ID della partita a cui unirti: ");
-                int gameId = Integer.parseInt(scanner.nextLine().trim());
-                actionSent = true;
-                controller.joinGame(gameId);
-            } else {
-                System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida." + CLIPrinter.ANSI_RESET);
+            try {
+                if (choice.equals("1")) {
+                    System.out.print("Quanti giocatori parteciperanno? (2-5): ");
+                    int num = Integer.parseInt(scanner.nextLine().trim());
+
+                    if (num >= 2 && num <= 5) {
+                        actionSent = true;
+                        controller.createNewGame(num);
+                        validChoice = true;
+                    } else {
+                        System.out.println(CLIPrinter.ANSI_RED + "❌ Numero non consentito. Scegli tra 2 e 5." + CLIPrinter.ANSI_RESET);
+                    }
+                } else if (choice.equals("2")) {
+                    System.out.print("Inserisci l'ID della partita a cui unirti: ");
+                    int gameId = Integer.parseInt(scanner.nextLine().trim());
+                    actionSent = true;
+                    controller.joinGame(gameId);
+                    validChoice = true;
+                } else {
+                    System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida. Scrivi 1 o 2." + CLIPrinter.ANSI_RESET);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: Inserisci un numero valido!" + CLIPrinter.ANSI_RESET);
             }
-        } catch (NumberFormatException e) {
-            System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: Inserisci un numero valido!" + CLIPrinter.ANSI_RESET);
         }
     }
 
