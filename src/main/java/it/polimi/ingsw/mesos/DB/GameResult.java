@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.DB;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 public class GameResult {
     private String nickname;
@@ -21,6 +22,10 @@ public class GameResult {
 
     public void setGameDate(Timestamp gameDate) {
         this.gameDate = gameDate;
+    }
+
+    public Timestamp getDate() {
+        return gameDate;
     }
 }
 

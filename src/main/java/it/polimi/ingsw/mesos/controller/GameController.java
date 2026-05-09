@@ -1,6 +1,7 @@
 
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
@@ -49,6 +50,7 @@ public class GameController {
         this.gameId = gameId;
         this.pendingNicknames = new ArrayList<>();
         this.moveLogger = new MoveLogger("mesos_game_" + gameId + ".log");
+        this.leaderboardService = new LeaderboardService(new GameResultDAO());
     }
 
     /**
@@ -207,6 +209,14 @@ public class GameController {
 
         this.game = new Game(players);
 
+        this.game.setOnGameEnd(() -> {
+            try {
+                endGame();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
         // Clear temporary data after game creation
         pendingNicknames.clear();
         //alternativa a clear se il controller è inteso come unico
@@ -216,6 +226,8 @@ public class GameController {
         //  pendingNicknames.remove(i);
         // }
         //broadcastUpdate();
+
+
     }
 
     /**

@@ -48,7 +48,7 @@ public class ServerMain {
         DBManager dbManager = new DBManager();
         dbManager.init();
 
-        GameResultDAO dao = new GameResultDAO(dbManager.getConnection());
+        GameResultDAO dao = new GameResultDAO();
         LeaderboardService service = new LeaderboardService(dao);
     }
 

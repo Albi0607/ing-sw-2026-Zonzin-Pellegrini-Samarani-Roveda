@@ -6,22 +6,27 @@ import java.util.List;
 
 public class GameResultDAO {
 
-    private final Connection connection;
+    public GameResultDAO() {
+        // costruttore vuoto
+    }
 
-    public GameResultDAO(Connection connection) {
-        this.connection = connection;
+    private Connection getConnection() throws SQLException {
+        return DBManager.getConnection();
     }
 
     // save the result
     public void save(GameResult result) throws SQLException {
-        String sql = "INSERT INTO game_results (nickname, points, num_players) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO game_results (nickname, points, num_players, game_date) VALUES (?, ?, ?, NOW())";
 
-        PreparedStatement ps = connection.prepareStatement(sql);
-        ps.setString(1, result.getNickname());
-        ps.setInt(2, result.getPoints());
-        ps.setInt(3, result.getNumPlayers());
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.executeUpdate();
+            ps.setString(1, result.getNickname());
+            ps.setInt(2, result.getPoints());
+            ps.setInt(3, result.getNumPlayers());
+
+            ps.executeUpdate();
+        }
     }
 
     // rank
@@ -35,20 +40,22 @@ public class GameResultDAO {
             ORDER BY points DESC
         """;
 
-        PreparedStatement ps = connection.prepareStatement(sql);
-        ps.setInt(1, numPlayers);
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ResultSet rs = ps.executeQuery();
+            ps.setInt(1, numPlayers);
+            ResultSet rs = ps.executeQuery();
 
-        while (rs.next()) {
-            GameResult gr = new GameResult(
-                    rs.getString("nickname"),
-                    rs.getInt("points"),
-                    rs.getInt("num_players")
-            );
+            while (rs.next()) {
+                GameResult gr = new GameResult(
+                        rs.getString("nickname"),
+                        rs.getInt("points"),
+                        rs.getInt("num_players")
+                );
 
-            gr.setGameDate(rs.getTimestamp("game_date"));
-            list.add(gr);
+                gr.setGameDate(rs.getTimestamp("game_date"));
+                list.add(gr);
+            }
         }
 
         return list;
@@ -63,27 +70,33 @@ public class GameResultDAO {
             ORDER BY points DESC
         """;
 
-        PreparedStatement ps = connection.prepareStatement(sql);
-        ps.setInt(1, numPlayers);
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ResultSet rs = ps.executeQuery();
+            ps.setInt(1, numPlayers);
+            ResultSet rs = ps.executeQuery();
 
-        int position = 1;
+            int position = 1;
 
-        while (rs.next()) {
-            if (rs.getString("nickname").equals(nickname)) {
-                return position;
+            while (rs.next()) {
+                if (rs.getString("nickname").equals(nickname)) {
+                    return position;
+                }
+                position++;
             }
-            position++;
         }
 
         return -1;
     }
+
     public void clearAll() throws SQLException {
         String sql = "DELETE FROM game_results";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.executeUpdate();
         }
     }
-
 }
+

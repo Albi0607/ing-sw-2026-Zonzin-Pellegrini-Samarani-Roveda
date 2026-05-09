@@ -14,9 +14,9 @@ public class DBManager {
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
 
-    private Connection connection;
+    private static Connection connection;
 
-    public void init() throws SQLException {
+    public static void init() throws SQLException {
 
         // 1) Connessione al server MySQL SENZA DB
         Connection rootConn = DriverManager.getConnection(HOST_URL, USER, PASSWORD);
@@ -45,7 +45,7 @@ public class DBManager {
         }
     }
 
-    public Connection getConnection() {
-        return connection;
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, USER, PASSWORD);
     }
 }

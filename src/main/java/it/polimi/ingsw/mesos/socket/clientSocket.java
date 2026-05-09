@@ -56,8 +56,7 @@ public class clientSocket implements Network {
      */
     @Override
     public boolean placeTotem(String nickname, char position) {
-        sendMessage(new PlaceTotemMessage(nickname, position));
-        return true;
+        return sendMessage(new PlaceTotemMessage(nickname, position));
     }
 
     /**
@@ -70,8 +69,7 @@ public class clientSocket implements Network {
      */
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper) {
-        sendMessage(new TakeCardMessage(nickname, position, isUpper));
-        return true;
+        return sendMessage(new TakeCardMessage(nickname, position, isUpper));
     }
 
     /**
@@ -82,8 +80,7 @@ public class clientSocket implements Network {
      */
     @Override
     public boolean skipExtraDraw(String nickname) {
-        sendMessage(new SkipExtraDrawMessage(nickname));
-        return true;
+        return sendMessage(new SkipExtraDrawMessage(nickname));
     }
 
     @Override
@@ -95,14 +92,12 @@ public class clientSocket implements Network {
 
     @Override
     public boolean createNewGame(String nickname, int expectedNumPlayers, String viewId) {
-        sendMessage(new CreateGameMessage(expectedNumPlayers));
-        return true;
+        return sendMessage(new CreateGameMessage(expectedNumPlayers));
     }
 
     @Override
     public boolean joinGame(String nickname, int id, String viewId) {
-        sendMessage(new JoinGameMessage(id));
-        return true;
+        return  sendMessage(new JoinGameMessage(id));
     }
 
     /**
@@ -110,12 +105,14 @@ public class clientSocket implements Network {
      *
      * @param message the message to be sent
      */
-    private void sendMessage(Message message) {
+    private boolean sendMessage(Message message) {
         try {
             out.writeObject(message);
             out.flush();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 

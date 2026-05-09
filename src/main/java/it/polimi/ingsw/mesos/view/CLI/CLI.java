@@ -1,5 +1,8 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
+import it.polimi.ingsw.mesos.DB.GameResultDAO;
+import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
@@ -102,7 +105,7 @@ public class CLI implements View {
             else if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
                 if (currentGameState.currentState == GameState.FINISHED) {
                     if (!actionSent) {
-                        CLIPrinter.printGameOver(currentGameState);
+                        printDBLeaderboard();                        CLIPrinter.printGameOver(currentGameState);
                         actionSent = true;
                     }
                 }
@@ -130,6 +133,49 @@ public class CLI implements View {
             try { Thread.sleep(200); } catch (InterruptedException e) {}
         }
     }
+
+    private void printDBLeaderboard() {
+        try {
+            GameResultDAO dao = new GameResultDAO();
+            LeaderboardService service = new LeaderboardService(dao);
+
+            // numero di giocatori della partita corrente
+            int numPlayers = currentGameState.players.size();
+
+            // classifica filtrata per numero di giocatori
+            List<GameResult> leaderboard = service.getLeaderboard(numPlayers);
+
+            System.out.println(CLIPrinter.ANSI_YELLOW +
+                    "\n===== CLASSIFICA COMPLETA (" + numPlayers + " GIOCATORI) ====="
+                    + CLIPrinter.ANSI_RESET);
+
+            int pos = 1;
+            for (GameResult r : leaderboard) {
+                System.out.printf(
+                        "%d) %s - %d punti | %d giocatori | (%s)\n",
+                        pos,
+                        r.getNickname(),
+                        r.getPoints(),
+                        r.getDate().toString()
+                );
+                pos++;
+            }
+
+            // posizione personale
+            int myPos = service.getPosition(myNickname, numPlayers);
+
+            System.out.println("\nLa tua posizione nella classifica globale: " + myPos);
+            System.out.println(CLIPrinter.ANSI_YELLOW +
+                    "===========================================\n"
+                    + CLIPrinter.ANSI_RESET);
+
+        } catch (Exception e) {
+            System.out.println(CLIPrinter.ANSI_RED +
+                    "Errore nel caricamento della classifica dal DB: " + e.getMessage()
+                    + CLIPrinter.ANSI_RESET);
+        }
+    }
+
 
     /**
      * Handles the initial player registration by asking for a nickname.

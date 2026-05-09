@@ -24,6 +24,7 @@ public class Game {
     private Era currentEra;
     private GameStateLogic currentState;
     private List<String> lastResolvedEvents = new ArrayList<>();
+    public Runnable onGameEnd;
 
     /**
      * Initializes a new Game instance with the provided list of players.
@@ -157,6 +158,11 @@ public class Game {
 
         // 2. Aggiorniamo il puntatore allo stato corrente
         this.currentState = newState;
+
+        if (isGameFinished() && onGameEnd != null) {
+            onGameEnd.run();
+            return;
+        }
 
         System.out.println("\n--> [TRANSITION] Il gioco passa allo stato: " + this.getCurrentState());
 
@@ -368,6 +374,7 @@ public class Game {
     }
 
     public boolean isGameFinished() {
+
         return currentRound >= MAX_ROUNDS || board.getTribeDeck().isEmpty();
     }
 
@@ -397,5 +404,9 @@ public class Game {
 
     public void setCurrentEra(Era era){
         this.currentEra = era;
+    }
+
+    public void setOnGameEnd(Runnable r) {
+        this.onGameEnd = r;
     }
 }
