@@ -15,16 +15,14 @@ import java.util.List;
 
 /**
  * Implementazione di VirtualView per il protocollo Socket.
- *
  * Traduce i metodi del controller in messaggi
  * serializzati sull'ObjectOutputStream.
- *
  * Creata dal ClientHandler dopo aver ricevuto RegisterMessage,
  * quando il nickname è noto e gli stream sono pronti.
  */
 public class SocketVirtualView implements VirtualView {
 
-    private String nickname;
+    private final String nickname;
     private final ObjectOutputStream out;
 
     private final String id = java.util.UUID.randomUUID().toString();
@@ -82,11 +80,6 @@ public class SocketVirtualView implements VirtualView {
         return this.nickname;
     }
 
-    @Override
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-
-    }
 
     @Override
     public synchronized void sendLobby(List<LobbyInfoDTO> lobby) {

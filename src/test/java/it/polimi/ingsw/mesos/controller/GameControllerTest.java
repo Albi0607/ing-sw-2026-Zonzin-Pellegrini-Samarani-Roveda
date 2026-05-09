@@ -7,6 +7,7 @@ import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
+import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,12 +23,14 @@ class GameControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new GameController();
+        controller = new GameController(1);
         mockView = new VirtualView() {
             @Override public void sendGame(GameDTO gameDTO) {}
             @Override public void sendClientState(ClientState clientState) {}
             @Override public void showMessage(String message) {}
             @Override public String getNickname() { return "Test"; }
+            @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
+            @Override public String getId() {return "";}
         };
     }
 

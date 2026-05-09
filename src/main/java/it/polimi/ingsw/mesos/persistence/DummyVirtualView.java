@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * VirtualView fittizia usata durante il replay per i giocatori
  * che non si sono ancora riconnessi.
- *
  * il giocatore riceverà lo stato aggiornato quando si riconnette e il controller
  * sostituisce questa DummyVirtualView con la sua vera VirtualView.
  */
@@ -27,9 +26,6 @@ public class DummyVirtualView implements VirtualView {
     @Override public void showMessage(String message)     { /* scarta */ }
     @Override public String getNickname()                 { return nickname; }
 
-    @Override
-    public void setNickname(String nickname) {
-    }
 
     @Override
     public void sendLobby(List<LobbyInfoDTO> lobby) {
