@@ -40,9 +40,6 @@ public interface VirtualView {
      */
     String getNickname();
 
-    //per settare il nickname quando si crea una partita o si fa join poiché come primissima cosa viene creata una
-    //virtualView gestita dalla lobby senza nome
-    void setNickname(String nickname);
 
     //metodo per mandare la lobby in caso di modifiche
     void sendLobby(List<LobbyInfoDTO> lobby);

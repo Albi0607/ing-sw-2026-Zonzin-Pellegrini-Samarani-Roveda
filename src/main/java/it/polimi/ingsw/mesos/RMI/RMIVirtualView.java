@@ -15,9 +15,9 @@ import java.util.UUID;
  */
 public class RMIVirtualView implements VirtualView {
 
-    private String nickname;
+    private final String nickname;
     private final CallBack clientCallBack;
-    private String id;
+    private final String id;
 
     /**
      * Constructor of the class that defines the associated client nickname and the object that allows the server,
@@ -90,11 +90,6 @@ public class RMIVirtualView implements VirtualView {
     @Override
     public String getNickname() {
         return this.nickname;
-    }
-
-    @Override
-    public void setNickname(String nickname) {
-        this.nickname=nickname;
     }
 
     @Override
