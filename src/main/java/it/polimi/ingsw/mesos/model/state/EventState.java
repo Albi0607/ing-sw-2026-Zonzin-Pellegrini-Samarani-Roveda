@@ -38,6 +38,9 @@ public class EventState implements GameStateLogic {
             System.out.println(" ULTIMO ROUND: Risoluzione finale di TUTTI gli eventi visibili!");
             resolveAllVisibleEvents(g); // Fila sopra + Fila sotto
             g.changeState(new FinishedState());
+            if (g.onGameEnd != null) {
+                g.onGameEnd.run();
+            }
 
         } else {
 

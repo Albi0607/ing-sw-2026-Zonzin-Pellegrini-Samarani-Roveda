@@ -3,14 +3,13 @@ package it.polimi.ingsw.mesos.DB;
 public class DBTest {
     public static void main(String[] args) throws Exception {
 
-        DBManager db = new DBManager();
-        db.init();
+        DBManager.init(); // inizializza DB e crea tabella
 
-        GameResultDAO dao = new GameResultDAO(db.getConnection());
+        GameResultDAO dao = new GameResultDAO(); // costruttore corretto
         LeaderboardService service = new LeaderboardService(dao);
 
         System.out.println("=== RESET TABELLA ===");
-        dao.clearAll(); // devi aggiungere questo metodo nel DAO
+        dao.clearAll();
         System.out.println("Tabella pulita.\n");
 
         System.out.println("=== INSERIMENTO DATI ===");
@@ -38,4 +37,3 @@ public class DBTest {
         System.out.println("\n=== TEST COMPLETATO ===");
     }
 }
-

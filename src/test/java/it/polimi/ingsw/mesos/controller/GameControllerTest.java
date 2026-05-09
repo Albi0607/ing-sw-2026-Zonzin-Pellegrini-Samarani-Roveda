@@ -1,5 +1,10 @@
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
+import it.polimi.ingsw.mesos.DB.GameResultDAO;
+import it.polimi.ingsw.mesos.DB.LeaderboardService;
+import it.polimi.ingsw.mesos.model.state.EventState;
+import it.polimi.ingsw.mesos.model.state.FinishedState;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.model.Player;
@@ -12,6 +17,7 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -281,5 +287,96 @@ class GameControllerTest {
         }
     }
 
+    class FakeView implements VirtualView {
+        private final List<String> messages = new ArrayList<>();
+
+        @Override public void sendGame(GameDTO gameDTO) {}
+        @Override public void sendClientState(ClientState clientState) {}
+        @Override public void showMessage(String message) { messages.add(message); }
+        @Override public String getNickname() { return "fake"; }
+        @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
+        @Override public String getId() { return ""; }
+
+        public List<String> getMessages() { return messages; }
+    }
+
+    @Test
+    void testEndGame_SavesResultsAndSendsMessages() throws Exception {
+
+        DBManager.init();
+        GameResultDAO dao = new GameResultDAO();
+        LeaderboardService service = new LeaderboardService(dao);
+        dao.clearAll();
+
+        GameController controller = new GameController(1);
+        controller.setLeaderboardService(service);
+
+        FakeView v1 = new FakeView();
+        FakeView v2 = new FakeView();
+        FakeView v3 = new FakeView();
+
+        controller.setNumPlayers(3);
+        controller.addPlayer("Alice", v1);
+        controller.addPlayer("Bob", v2);
+        controller.addPlayer("Carlo", v3);
+
+        controller.startGame();
+
+        // Imposto punteggi finali
+        controller.getGame().getPlayers().stream()
+                .filter(p -> p.getNickname().equals("Alice"))
+                .findFirst().get().setPrestigePoints(100);
+
+        controller.getGame().getPlayers().stream()
+                .filter(p -> p.getNickname().equals("Bob"))
+                .findFirst().get().setPrestigePoints(80);
+
+        controller.getGame().getPlayers().stream()
+                .filter(p -> p.getNickname().equals("Carlo"))
+                .findFirst().get().setPrestigePoints(120);
+
+        controller.endGame();
+
+        assertTrue(v1.getMessages().stream().anyMatch(m -> m.contains("posizione: 2")));
+        assertTrue(v2.getMessages().stream().anyMatch(m -> m.contains("posizione: 3")));
+        assertTrue(v3.getMessages().stream().anyMatch(m -> m.contains("posizione: 1")));
+
+        var leaderboard = service.getLeaderboard(3);
+        assertEquals(3, leaderboard.size());
+    }
+
+    @Test
+    void testEndGame_UniversalTrigger() throws Exception {
+
+        DBManager.init();
+        GameResultDAO dao = new GameResultDAO();
+        LeaderboardService service = new LeaderboardService(dao);
+        dao.clearAll();
+
+        GameController controller = new GameController(1);
+        controller.setLeaderboardService(service);
+
+        FakeView v1 = new FakeView();
+        FakeView v2 = new FakeView();
+
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", v1);
+        controller.addPlayer("Bob", v2);
+
+        controller.startGame();
+
+        // --- Condizione di fine partita ---
+        controller.getGame().setCurrentRound(10);
+
+        // --- TRIGGER NATURALE ---
+        controller.getGame().changeState(controller.getGame().getCurrentState());
+
+        // --- Verifica ---
+        assertTrue(v1.getMessages().stream().anyMatch(m -> m.contains("posizione")));
+        assertTrue(v2.getMessages().stream().anyMatch(m -> m.contains("posizione")));
+
+        var leaderboard = service.getLeaderboard(2);
+        assertEquals(2, leaderboard.size());
+    }
 }
 
