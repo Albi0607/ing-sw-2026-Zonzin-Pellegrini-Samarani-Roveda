@@ -20,7 +20,7 @@ class ShamanicRitualEventTest {
         ShamanicRitualEvent card1=null;
         ShamanicRitualEvent card2=null;
         ShamanicRitualEvent card3=null;
-        List<EventCard> deck = new CreateEventCard("events.json").getAllEventCards();
+        List<EventCard> deck = new CreateEventCard("cards/events.json").getAllEventCards();
         for (EventCard c : deck) {
             if (c instanceof ShamanicRitualEvent && c.getEra()== Era.ERA_I) {
                 card1 = (ShamanicRitualEvent) c;

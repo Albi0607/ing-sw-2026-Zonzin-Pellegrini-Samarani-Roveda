@@ -11,7 +11,7 @@ public class server_RMI {
     public void start(ServerState serverState, int port) {
 
         try {
-            System.setProperty("java.rmi.server.hostname", "10.173.124.90");
+            //System.setProperty("java.rmi.server.hostname", "192.168.0.1");
             RemoteMethods remoteMethods = new RemoteMethodsImplementation(serverState);
             Registry registry = LocateRegistry.createRegistry(port);
             registry.bind("remoteMethods", remoteMethods);

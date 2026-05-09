@@ -21,7 +21,7 @@ class SustenanceEventTest {
         SustenanceEvent card1=null;
         SustenanceEvent card2=null;
         SustenanceEvent card3=null;
-        List<EventCard> deck = new CreateEventCard("events.json").getAllEventCards();
+        List<EventCard> deck = new CreateEventCard("cards/events.json").getAllEventCards();
         for (EventCard c : deck) {
             if (c instanceof SustenanceEvent && c.getEra()== Era.ERA_I) {
                 card1 = (SustenanceEvent) c;

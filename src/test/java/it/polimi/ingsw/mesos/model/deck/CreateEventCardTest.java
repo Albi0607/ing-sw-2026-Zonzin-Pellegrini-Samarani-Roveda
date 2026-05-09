@@ -11,13 +11,13 @@ class CreateEventCardTest {
 
     @Test
     void testCorrectNumberOfEvent(){
-        List<EventCard> list = new CreateEventCard("events.json").getAllEventCards();
+        List<EventCard> list = new CreateEventCard("cards/events.json").getAllEventCards();
         assertEquals(12,list.size());
     }
 
     @Test
     void testWrongInputFromJson(){
-        assertThrows(RuntimeException.class,()->new CreateEventCard("wrongEventsForTest.json"));
+        assertThrows(RuntimeException.class,()->new CreateEventCard("cards/wrongEventsForTest.json"));
     }
 
     @Test

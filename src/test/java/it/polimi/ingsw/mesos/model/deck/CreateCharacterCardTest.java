@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class CreateCharacterCardTest {
     @Test
     void testCorrectNumberOfCardFor5Players() {
-        List<CharacterCard> list = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> list = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         assertEquals(84, list.size());
     }
 
     @Test
     void testWrongInputFromJson(){
-        assertThrows(RuntimeException.class,()->new CreateCharacterCard("wrongCharactersForTest.json"));
+        assertThrows(RuntimeException.class,()->new CreateCharacterCard("cards/wrongCharactersForTest.json"));
     }
 
     @Test

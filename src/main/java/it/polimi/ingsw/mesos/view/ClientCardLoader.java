@@ -27,7 +27,7 @@ public class ClientCardLoader {
 
     private static void loadEventCards() throws IOException {
         List<EventCardJson> list = OpenFileJson.loadList(
-                "events.json",
+                "cards/events.json",
                 new TypeReference<List<EventCardJson>>() {}
         );
 
@@ -38,7 +38,7 @@ public class ClientCardLoader {
 
     private static void loadCharacterCards() throws IOException{
         List<CharacterCardJson> list = OpenFileJson.loadList(
-                "characters.json",
+                "cards/characters.json",
                 new TypeReference<List<CharacterCardJson>>() {}
         );
 
@@ -49,7 +49,7 @@ public class ClientCardLoader {
 
     private static void loadBuildingCards() throws IOException{
         List<BuildingCardJson> list = OpenFileJson.loadList(
-                "buildings.json",
+                "cards/buildings.json",
                 new TypeReference<List<BuildingCardJson>>() {}
         );
 

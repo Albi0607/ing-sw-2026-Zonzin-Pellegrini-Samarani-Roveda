@@ -28,7 +28,7 @@ class ShamanTest {
         List<Shaman> list1 = new ArrayList<>();
         List<Shaman> list2 = new ArrayList<>();
         List<Shaman> list3 = new ArrayList<>();
-        List<CharacterCard> deck = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> deck = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         for (CharacterCard c : deck) {
             if (c instanceof Shaman && c.getEra()==Era.ERA_I) {
                 list1.add((Shaman) c);

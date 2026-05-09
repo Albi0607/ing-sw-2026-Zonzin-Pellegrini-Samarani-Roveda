@@ -21,7 +21,7 @@ class GathererTest {
         List<Gatherer> list1 = new ArrayList<>();
         List<Gatherer> list2 = new ArrayList<>();
         List<Gatherer> list3 = new ArrayList<>();
-        List<CharacterCard> deck = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> deck = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         for (CharacterCard c : deck) {
             if (c instanceof Gatherer && c.getEra()==Era.ERA_I) {
                 list1.add((Gatherer) c);

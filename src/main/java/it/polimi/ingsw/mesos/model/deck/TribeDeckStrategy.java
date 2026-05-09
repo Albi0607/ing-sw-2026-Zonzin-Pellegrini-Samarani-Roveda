@@ -26,8 +26,8 @@ public class TribeDeckStrategy implements CreateStrategy<TribeCard>{
             throw new IllegalArgumentException("Numero di giocatori non valido");
         }
 
-        List<CharacterCard> cCard = new CreateCharacterCard("characters.json").getAllCharacterCards();
-        List<EventCard> eCard = new CreateEventCard("events.json").getAllEventCards();
+        List<CharacterCard> cCard = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
+        List<EventCard> eCard = new CreateEventCard("cards/events.json").getAllEventCards();
 
         List<TribeCard> tempDeck = new ArrayList<>();
         List<EventCard> finalCards = new ArrayList<>();

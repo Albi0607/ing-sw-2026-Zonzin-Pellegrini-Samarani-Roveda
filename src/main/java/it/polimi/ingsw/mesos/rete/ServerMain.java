@@ -21,7 +21,7 @@ public class ServerMain {
         //aggiungo serverState e lobby per la gestione delle partite
         ServerState serverState = new ServerState();
         //scansione del disco prima dell'avvio di un server per il ripristino delle partite interrotte
-        serverState.initializeFromDisk();
+        //serverState.initializeFromDisk();
 
         int port = 1099;
 

@@ -67,7 +67,7 @@ class HunterTest {
         List<Hunter> list1 = new ArrayList<>();
         List<Hunter> list2 = new ArrayList<>();
         List<Hunter> list3 = new ArrayList<>();
-        List<CharacterCard> deck = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> deck = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         for (CharacterCard c : deck) {
             if (c instanceof Hunter && c.getEra()==Era.ERA_I) {
                 list1.add((Hunter) c);

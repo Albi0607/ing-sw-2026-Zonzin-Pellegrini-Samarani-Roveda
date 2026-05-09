@@ -21,7 +21,7 @@ class HuntEventTest {
         HuntEvent card1=null;
         HuntEvent card2=null;
         HuntEvent card3=null;
-        List<EventCard> deck = new CreateEventCard("events.json").getAllEventCards();
+        List<EventCard> deck = new CreateEventCard("cards/events.json").getAllEventCards();
         for (EventCard c : deck) {
             if (c instanceof HuntEvent && c.getEra()== Era.ERA_I) {
                 card1 = (HuntEvent)c;
