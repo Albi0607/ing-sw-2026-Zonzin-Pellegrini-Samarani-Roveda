@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox alignment="CENTER" layoutX="340.0" layoutY="160.0" prefHeight="400.0" prefWidth="600.0" spacing="10.0" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 20; -fx-background-color: #e8e8e8; -fx-border-color: #cfcfcf; -fx-border-width: 1;" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="340.0" AnchorPane.topAnchor="160.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="49.0" prefWidth="410.0" style="-fx-text-fill: red; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, black, 10, 0.5, 2, 2);" text="BENVENUTO IN MESOS" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets top="-20.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Arial Bold" size="35.0" />
+               </font>
+            </Label>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="26.0" prefWidth="221.0" style="-fx-text-fill: #555555;" text="Inserisci un nickname univoco" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="nicknameTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="250.0" promptText="Inserisci nickname" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
+            <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-text-fill: #555555;" text="Scegli la modalità di rete" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <ComboBox fx:id="networkComboBox" prefHeight="25.0" prefWidth="100.0" promptText="SOCKET" />
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="241.0" style="-fx-text-fill: #555555;" text="Inserisci indirizzo IP e porta del server" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="300.0">
+               <children>
+                  <TextField fx:id="ipTextField" alignment="CENTER" prefHeight="26.0" prefWidth="158.0" promptText="Indirizzo IP" />
+                  <TextField fx:id="portTextField" alignment="CENTER" prefHeight="26.0" prefWidth="85.0" promptText="Porta" />
+               </children>
+            </HBox>
+            <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="200.0" style="-fx-text-fill: red;" textAlignment="CENTER" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="-10.0" />
+               </VBox.margin></Label>
+            <Button fx:id="connectToLobbyButton" mnemonicParsing="false" onAction="#handleConnect" style="-fx-background-radius: 10; -fx-padding: 8 20 8 20; -fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold;" text="Connetti alla lobby" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class CreateBuildingCardTest {
     @Test
     void testCorrectNumberOfBuilding(){
-        List<BuildingCard> buildingDeck = new CreateBuildingCard("buildings.json").getAllBuildingCards();
+        List<BuildingCard> buildingDeck = new CreateBuildingCard("cards/buildings.json").getAllBuildingCards();
         assertEquals(21,buildingDeck.size());
     }
 
     @Test
     void testWrongInputFromJson(){
-        assertThrows(IllegalArgumentException.class,()->new CreateBuildingCard("wrongBuildingsForTest.json"));
+        assertThrows(IllegalArgumentException.class,()->new CreateBuildingCard("cards/wrongBuildingsForTest.json"));
     }
     @Test
     void testWrongFile(){

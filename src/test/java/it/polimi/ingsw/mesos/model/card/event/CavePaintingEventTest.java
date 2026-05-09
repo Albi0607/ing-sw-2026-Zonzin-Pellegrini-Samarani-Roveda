@@ -21,7 +21,7 @@ class CavePaintingEventTest {
         CavePaintingEvent card1=null;
         CavePaintingEvent card2=null;
         CavePaintingEvent card3=null;
-        List<EventCard> deck = new CreateEventCard("events.json").getAllEventCards();
+        List<EventCard> deck = new CreateEventCard("cards/events.json").getAllEventCards();
         for (EventCard c : deck) {
             if (c instanceof CavePaintingEvent && c.getEra()== Era.ERA_I) {
                 card1 = (CavePaintingEvent) c;

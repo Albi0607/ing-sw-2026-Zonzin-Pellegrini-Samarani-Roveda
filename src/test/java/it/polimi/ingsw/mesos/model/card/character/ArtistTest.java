@@ -16,7 +16,7 @@ class ArtistTest {
         List<Artist> list1 = new ArrayList<>();
         List<Artist> list2 = new ArrayList<>();
         List<Artist> list3 = new ArrayList<>();
-        List<CharacterCard> deck = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> deck = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         for (CharacterCard c : deck) {
             if (c instanceof Artist && c.getEra()== Era.ERA_I) {
                 list1.add((Artist) c);

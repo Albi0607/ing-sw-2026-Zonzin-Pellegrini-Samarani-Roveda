@@ -24,7 +24,7 @@ class InventorTest {
         List<Inventor> list1 = new ArrayList<>();
         List<Inventor> list2 = new ArrayList<>();
         List<Inventor> list3 = new ArrayList<>();
-        List<CharacterCard> deck = new CreateCharacterCard("characters.json").getAllCharacterCards();
+        List<CharacterCard> deck = new CreateCharacterCard("cards/characters.json").getAllCharacterCards();
         for (CharacterCard c : deck) {
             if (c instanceof Inventor && c.getEra()==Era.ERA_I) {
                 list1.add((Inventor) c);
