@@ -6,6 +6,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.View;
+import it.polimi.ingsw.mesos.view.CLI.UIEvent;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -38,5 +39,13 @@ public class GUI extends Application implements View {
 
     @Override
     public void showClientStateUpdate(ClientState currentState){
+    }
+
+    @Override
+    public void showActionRejected(String reason) {
+    }
+
+    @Override
+    public void showActionAccepted(String message) {
     }
 }

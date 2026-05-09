@@ -4,6 +4,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.view.CLI.UIEvent;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ public class DummyVirtualView implements VirtualView {
     @Override public void sendClientState(ClientState s)  { /* scarta */ }
     @Override public void showMessage(String message)     { /* scarta */ }
     @Override public String getNickname()                 { return nickname; }
+    @Override public void showActionRejected(String reason) {}
+    @Override public void showActionAccepted(String message) {}
 
 
     @Override

@@ -7,6 +7,8 @@ import it.polimi.ingsw.mesos.common.enums.SpecialActionType;
 
 public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJson> {
 
+    public BuildingFormatter() {}
+
     /**
      * Formats a building card's data into a color-coded string for CLI display,
      * including its cost and specific effects.
@@ -17,25 +19,29 @@ public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJ
     public String format(BuildingCardJson buildJson) {
         String colorYellow = VisualTheme.getColor("YELLOW");
         String colorReset = VisualTheme.getColor("RESET");
-        String hutIcon = VisualTheme.getSymbol("building_hut");
         String foodIcon = VisualTheme.getSymbol("food");
 
+        // --- SCELTA DINAMICA DELL'ICONA EDIFICIO IN BASE ALL'ERA DELLA CARTA ---
+        String cardEra = (buildJson.era != null) ? buildJson.era.toString() : "ERA_I";
+
+        String buildingIcon = switch (cardEra) {
+            case "ERA_II" -> "🏠";
+            case "ERA_III" -> "🏛️";
+            default -> "🛖";
+        };
+
         String effectStr = getBuildingEffectString(buildJson);
-        return colorYellow + hutIcon + " Edificio [Costo: " + buildJson.cost + foodIcon + "]" +
+        return colorYellow + buildingIcon + " Edificio [Costo: " + buildJson.cost + foodIcon + "]" +
                 (effectStr.isEmpty() ? "" : " (" + effectStr + ")") + colorReset;
     }
 
     /**
-     * Parses the building's logic (Resource Bonuses, Event Modifiers, End Game Scoring,
-     * or Special Actions) and converts it into a descriptive string with icons.
-     * @param buildJson The JSON data object containing the building's effect details.
-     * @return A string describing the card's special abilities and victory points.
+     * Parses the building's logic and converts it into a descriptive string.
+     * Rimosso il boltIcon per pulizia visiva come richiesto.
      */
     public String getBuildingEffectString(BuildingCardJson buildJson) {
-
         String foodIcon = VisualTheme.getSymbol("food");
         String prestigeIcon = VisualTheme.getSymbol("prestige");
-        String boltIcon = VisualTheme.getSymbol("event_bolt");
         String shamanStar = VisualTheme.getSymbol("shaman_star");
         String shieldIcon = VisualTheme.getSymbol("shield");
         String cardsIcon = VisualTheme.getSymbol("cards");
@@ -55,7 +61,7 @@ public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJ
                         String evt = buildJson.eventContext.name();
                         String ref = (buildJson.countRef != null) ? buildJson.countRef.name() : "";
                         int amt = (buildJson.amount != null) ? buildJson.amount : 0;
-                        effectStr.append(boltIcon).append(evt).append(" (+").append(amt);
+                        effectStr.append(evt).append(" (+").append(amt);
                         if (evt.equals("HUNT")) effectStr.append(foodIcon).append("/+1").append(prestigeIcon).append(" per ").append(ref).append(")");
                         else effectStr.append(foodIcon).append(" per ").append(ref).append(")");
                     } else if (CharacterType.INVENTOR.equals(buildJson.countRef)) {
@@ -67,13 +73,13 @@ public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJ
                 case "EventModifierEffect" -> {
                     if (EventType.SUSTENANCE.equals(buildJson.eventContext)) {
                         String ref = (buildJson.countRef != null) ? buildJson.countRef.name() : "";
-                        effectStr.append(boltIcon).append("SUSTENANCE: -").append(buildJson.discount).append(foodIcon).append("/").append(ref);
+                        effectStr.append("SUSTENANCE: -").append(buildJson.discount).append(foodIcon).append("/").append(ref);
                     } else if (Boolean.TRUE.equals(buildJson.doublePrestige)) {
-                        effectStr.append(boltIcon).append("SHAMANIC: 2x").append(prestigeIcon);
+                        effectStr.append("SHAMANIC: 2x").append(prestigeIcon);
                     } else if (Boolean.TRUE.equals(buildJson.noLosePrestige)) {
-                        effectStr.append(boltIcon).append("SHAMANIC: ").append(shieldIcon).append(" No -").append(prestigeIcon);
+                        effectStr.append("SHAMANIC: ").append(shieldIcon).append(" No -").append(prestigeIcon);
                     } else if (buildJson.virtualIcons != null && buildJson.virtualIcons > 0) {
-                        effectStr.append(boltIcon).append("SHAMANIC: +").append(buildJson.virtualIcons).append(shamanStar);
+                        effectStr.append("SHAMANIC: +").append(buildJson.virtualIcons).append(shamanStar);
                     }
                 }
                 case "EndGameScoringEffect" -> {

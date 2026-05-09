@@ -4,10 +4,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
-import it.polimi.ingsw.mesos.socket.Message.messageServer.ClientStateMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageServer.LobbyUpdateMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageServer.UpdateGameMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageServer.*;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -56,6 +53,16 @@ public class SocketVirtualView implements VirtualView {
     @Override
     public synchronized void showMessage(String message) {
         send(new ErrorMessage(message));
+    }
+
+    @Override
+    public synchronized void showActionRejected(String reason) {
+        send(new ActionRejectedMessage(reason));
+    }
+
+    @Override
+    public synchronized void showActionAccepted(String message) {
+        send(new ActionAcceptedMessage(message));
     }
 
     /**

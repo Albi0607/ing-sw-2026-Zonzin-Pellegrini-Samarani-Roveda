@@ -4,6 +4,8 @@ import it.polimi.ingsw.mesos.common.EventCardJson;
 
 public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
 
+    public EventFormatter() {}
+
     /**
      * Formats an event card's data into a color-coded string for CLI display,
      * mapping specific event types to their respective rules and resource icons.
@@ -14,9 +16,17 @@ public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
     public String format(EventCardJson eventJson) {
         String colorRed = VisualTheme.getColor("RED");
         String colorReset = VisualTheme.getColor("RESET");
-        String boltIcon = VisualTheme.getSymbol("event_bolt");
         String foodIcon = VisualTheme.getSymbol("food");
         String prestigeIcon = VisualTheme.getSymbol("prestige");
+
+        // --- LOGICA DINAMICA DEI FULMINI IN BASE ALL'ERA ---
+        String cardEra = (eventJson.era != null) ? eventJson.era.toString() : "ERA_I";
+
+        String boltIcon = switch (cardEra) {
+            case "ERA_II" -> "⚡⚡";
+            case "ERA_III" -> "⚡⚡⚡";
+            default -> "⚡";
+        };
 
         if (eventJson.type == null) return colorRed + boltIcon + " Sconosciuto" + colorReset;
         String typeName = eventJson.type.name();

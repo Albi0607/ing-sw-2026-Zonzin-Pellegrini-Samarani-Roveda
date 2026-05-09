@@ -1,11 +1,9 @@
 
-package it.polimi.ingsw.mesos.view;
+package it.polimi.ingsw.mesos.view.CLI;
 import it.polimi.ingsw.mesos.rete.ClientChoseSetup;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.Network;
-import it.polimi.ingsw.mesos.view.CLI.CLI;
-import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
-import it.polimi.ingsw.mesos.view.CLI.VisualTheme;
+import it.polimi.ingsw.mesos.view.ClientCardLoader;
 
 import java.util.Scanner;
 

@@ -302,7 +302,7 @@ public class GameController {
 
             if (moveLogger != null) moveLogger.append(GameMove.placeTotem(nickname, tileId));
 
-            view.showMessage("Totem piazzato correttamente");
+            view.showActionAccepted("Totem piazzato con successo!");
 
             broadcastUpdate();
 
@@ -310,7 +310,7 @@ public class GameController {
 
         } catch (Exception e) {
 
-            view.showMessage("Errore: Totem non piazzato correttamente "+e.getMessage());
+            view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
             System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
             e.printStackTrace();
             return false;
@@ -330,13 +330,13 @@ public class GameController {
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.takeCard(player, cardIndex, isUpper);
             if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
-            view.showMessage("Carta scelta correttamente");
+            view.showActionAccepted("Carta scelta con successo!");
             broadcastUpdate();
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
 
-            view.showMessage("Errore: Carta non scelta correttamente"+e.getMessage());
+            view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
             return false;
         }
 
@@ -358,10 +358,10 @@ public class GameController {
             game.skipExtraDraw(player);
             if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
-            view.showMessage("Azione skippata correttamente");
+            view.showActionAccepted("Azione saltata con successo!");
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            view.showMessage("Errore: Azione non skippata correttamente "+e.getMessage());
+            view.showActionRejected("Azione non saltata correttamente: " + e.getMessage());
             return false;
         }
     }
