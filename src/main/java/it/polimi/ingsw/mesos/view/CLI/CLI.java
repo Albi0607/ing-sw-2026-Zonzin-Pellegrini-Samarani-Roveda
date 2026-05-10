@@ -489,7 +489,12 @@ public class CLI implements View {
             System.out.println(CLIPrinter.ANSI_YELLOW + "\n===== CLASSIFICA COMPLETA (" + numPlayers + " GIOCATORI) =====" + CLIPrinter.ANSI_RESET);
             int pos = 1;
             for (GameResult r : leaderboard) {
-                System.out.printf("%d) %s - %d punti | %d giocatori | (%s)\n", pos, r.getNickname(), r.getPoints(), r.getDate().toString());
+                System.out.printf("%d) %s - %d punti | %d giocatori | (%s)\n",
+                        pos,
+                        r.getNickname(),
+                        r.getPoints(),
+                        r.getNumPlayers(),
+                        r.getDate().toString());
                 pos++;
             }
             int myPos = service.getPosition(myNickname, numPlayers);
