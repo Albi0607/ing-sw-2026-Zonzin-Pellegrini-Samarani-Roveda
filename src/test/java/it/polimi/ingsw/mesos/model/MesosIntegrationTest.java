@@ -2,6 +2,7 @@ package it.polimi.ingsw.mesos.model;
 import it.polimi.ingsw.mesos.common.enums.*;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.building.ResourceBonusEffect;
@@ -385,6 +386,9 @@ class MesosIntegrationTest {
         OfferTile tileC = board.getTile('C');
         tileC.setHost(marco);
 
+        board.getTurnOrderTrack().removePlayer(sofia);
+        board.getTurnOrderTrack().removePlayer(marco);
+
         marco.setExtraDraw();
 
         ResolvingState state = new ResolvingState();
@@ -653,10 +657,12 @@ class MesosIntegrationTest {
         // Mettiamo Marco sulla tessera B
         OfferTile tileB = board.getTile('E');
         tileB.setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
 
         // 3. SETUP SOFIA: Lei è sulla tessera C
         OfferTile tileC = board.getTile('F');
         tileC.setHost(sofia);
+        board.getTurnOrderTrack().removePlayer(sofia);
 
         game.changeState(new ResolvingState());
 
@@ -722,6 +728,8 @@ class MesosIntegrationTest {
         Player firstPlayer = game.getPlayers().get(0);
         board.getTile('E').setHost(firstPlayer);
 
+        board.getTurnOrderTrack().removePlayer(firstPlayer);
+
 
         // 2. INIZIALIZZIAMO LO STATO
         ResolvingState rs = new ResolvingState();
@@ -780,10 +788,16 @@ class MesosIntegrationTest {
         // --- 2. PIAZZAMENTO TESSERE ---
 
         board.getTile('E').setHost(marco);
+        board.getTile('F').setHost(sofia);
+
+
         assertEquals(0, marco.getFood());
 
-        board.getTile('F').setHost(sofia);
+
         assertEquals(5, sofia.getFood());
+
+        board.getTurnOrderTrack().removePlayer(marco);
+        board.getTurnOrderTrack().removePlayer(sofia);
 
         // --- 3. ESECUZIONE ---
         ResolvingState rs = new ResolvingState();
@@ -830,5 +844,201 @@ class MesosIntegrationTest {
             }
         }
         return -1; // Se non c'è nessuna carta che può pagare, restituisce -1
+    }
+
+
+    @Test
+    void playerWithNoValidCardsIsSkipped() {
+
+        Board board = game.getBoard();
+
+        marco.setFood(0);
+
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        // Solo eventi o carte troppo costose
+        board.getUpperRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+        board.getLowerRow().add(new BuildingCard(Era.ERA_I, 10, 5, null));
+
+        board.getTile('F').setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
+
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        assertNull(
+                rs.getActivePlayer(game),
+                "Marco dovrebbe essere skippato automaticamente"
+        );
+    }
+
+
+
+    @Test
+    void extraDrawWithOnlyEventsEndsCorrectly() {
+
+        Board board = game.getBoard();
+
+        marco.setExtraDraw();
+        marco.addFood(20);
+
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        // Carta standard per il turno normale
+        board.getUpperRow().add(new Hunter(Era.ERA_I, 0, false));
+
+        board.getTile('E').setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
+
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        // Turno standard
+        rs.takeCard(game, marco, 0, true);
+
+        // Ora sopra non resta nulla -> la fase extra deve chiudersi
+        assertNull(rs.getActivePlayer(game));
+
+        assertNotEquals(
+                GameState.RESOLVING_ACTIONS,
+                game.getCurrentState().getStateId()
+        );
+    }
+
+
+    @Test
+    void playersReturnImmediatelyToTurnTrack() {
+
+        Board board = game.getBoard();
+
+        for (Player p : game.getPlayers()) {
+            p.addFood(20);
+        }
+
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        board.getLowerRow().add(new Hunter(Era.ERA_I, 0, false));
+        board.getLowerRow().add(new Hunter(Era.ERA_I, 0, false));
+
+        board.getTile('B').setHost(sofia);
+        board.getTurnOrderTrack().removePlayer(sofia);
+
+        board.getTile('C').setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
+
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        // Sofia agisce
+        rs.takeCard(game, sofia, 0, false);
+
+        TurnOrderTrack track = board.getTurnOrderTrack();
+
+        assertEquals(
+                sofia,
+                track.getPlayerAt(0),
+                "Sofia dovrebbe tornare immediatamente nella prima posizione"
+        );
+    }
+
+    @Test
+    void resolvingEndsImmediatelyIfNoCardsExist() {
+
+        Board board = game.getBoard();
+
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        board.getUpperRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+        board.getLowerRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+
+        board.getTile('E').setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
+
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        assertNull(rs.getActivePlayer(game));
+
+        assertNotEquals(
+                GameState.RESOLVING_ACTIONS,
+                game.getCurrentState().getStateId()
+        );
+    }
+
+
+    @Test
+    void playerCannotTakeEventCard() {
+        Board board = game.getBoard();
+
+        // Riempiamo di cibo per non essere skippati per povertà
+        for (Player p : game.getPlayers()) {
+            p.addFood(20);
+        }
+
+        board.getUpperRow().clear();
+        board.getLowerRow().clear();
+
+        // 1. Mettiamo la carta vietata (Evento) all'indice 0 superiore
+        board.getUpperRow().add(new HuntEvent(Era.ERA_I, 2, false, 2));
+
+        // 2. Mettiamo una carta VALIDA all'indice 1 superiore
+        // (Questo impedisce al ResolvingState di skippare il giocatore!)
+        board.getUpperRow().add(new Artist(Era.ERA_I, 2));
+
+        Player activePlayer = game.getPlayers().get(0);
+
+        // Mettiamo il giocatore su una tessera che ha ALMENO 1 upper target
+        OfferTile tileWithUpperPick = board.getTiles().stream()
+                .filter(t -> t.getUpperCount() > 0)
+                .findFirst().orElseThrow();
+
+        tileWithUpperPick.setHost(activePlayer);
+        board.getTurnOrderTrack().removePlayer(activePlayer);
+
+        // Avviamo la risoluzione
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        // Ora current non sarà null, perché il Server sa che possiamo pescare il GATHERER
+        Player current = rs.getActivePlayer(game);
+        assertNotNull(current, "Il current player non dovrebbe essere null!");
+
+        // 3. Noi ignoriamo il Gatherer lecito e proviamo a pescare l'Evento all'indice 0!
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> rs.takeCard(game, current, 0, true) // 0 = L'Evento vietato
+        );
+    }
+
+
+    @Test
+    void playerCannotActOutOfTurn() {
+
+        Board board = game.getBoard();
+
+        marco.addFood(20);
+        sofia.addFood(20);
+
+        board.getLowerRow().clear();
+
+        board.getLowerRow().add(new Hunter(Era.ERA_I, 0, false));
+
+        board.getTile('B').setHost(sofia);
+        board.getTurnOrderTrack().removePlayer(sofia);
+
+        board.getTile('C').setHost(marco);
+        board.getTurnOrderTrack().removePlayer(marco);
+
+        ResolvingState rs = new ResolvingState();
+        game.changeState(rs);
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> rs.takeCard(game, marco, 0, false)
+        );
     }
 }
