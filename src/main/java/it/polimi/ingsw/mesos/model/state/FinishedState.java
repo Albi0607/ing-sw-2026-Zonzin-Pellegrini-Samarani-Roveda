@@ -52,6 +52,11 @@ public class FinishedState implements GameStateLogic {
             System.out.println("Cibo rimanente: " + winner.getFood());
         }
 
+        /*
+        if (g.onGameEnd != null) {
+            g.onGameEnd.run();
+        }
+         */
     }
 
     private int calculateFinalPrestige(Tribe tribe) {

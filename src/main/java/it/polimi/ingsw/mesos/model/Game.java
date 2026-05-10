@@ -159,10 +159,12 @@ public class Game {
         // 2. Aggiorniamo il puntatore allo stato corrente
         this.currentState = newState;
 
-        if (isGameFinished() && onGameEnd != null) {
+       /*
+       if (isGameFinished() && onGameEnd != null) {
             onGameEnd.run();
             return;
         }
+        */
 
         System.out.println("\n--> [TRANSITION] Il gioco passa allo stato: " + this.getCurrentState());
 

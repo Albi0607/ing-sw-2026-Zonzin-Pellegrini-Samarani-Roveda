@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class CLI implements View {
     private ClientController controller;
@@ -31,7 +33,7 @@ public class CLI implements View {
     // --- FLAG DI RENDERING ---
     private boolean fullDirty = true;
     private boolean softDirty = false;
-    private String lastNotification = null;
+    private final Queue<String> notifications = new LinkedList<>();
     private boolean gameOverRendered = false;
 
     public enum InputMode {
@@ -72,9 +74,7 @@ public class CLI implements View {
     }
 
     @Override
-    public void showClientStateUpdate(ClientState state) {
-        eventQueue.offer(new UIEvent.ClientStateUpdatedEvent(state));
-    }
+    public void showClientStateUpdate(ClientState state) {eventQueue.offer(new UIEvent.ClientStateUpdatedEvent(state));}
 
     @Override
     public void showMessage(String message) {
@@ -153,6 +153,7 @@ public class CLI implements View {
     private void handleEvent(UIEvent event) {
         if (event instanceof UIEvent.GameUpdatedEvent e) {
             this.currentGameState = e.game();
+
             this.awaitingServerResponse = false;
             syncInputModeWithGameState();
             this.fullDirty = true;
@@ -176,19 +177,31 @@ public class CLI implements View {
             this.fullDirty = true;
         }
         else if (event instanceof UIEvent.ActionRejectedEvent e) {
-            this.lastNotification = "❌ " + e.reason();
             if (currentInputMode == InputMode.WAITING && currentClientState == ClientState.IN_GAME && isMyTurn()) {
                 this.awaitingServerResponse = false;
                 syncInputModeWithGameState();
             }
+            if (currentGameState != null &&
+                    currentGameState.currentState == GameState.FINISHED) {
+                return;
+            }
+            notifications.offer("❌ " + e.reason());
             this.softDirty = true;
         }
         else if (event instanceof UIEvent.ActionAcceptedEvent e) {
-            this.lastNotification = "✔ " + e.message();
+            if (currentGameState != null &&
+                    currentGameState.currentState == GameState.FINISHED) {
+                return;
+            }
+            notifications.offer("✔ " + e.message());
             this.softDirty = true;
         }
         else if (event instanceof UIEvent.MessageEvent e) {
-            this.lastNotification = "ℹ️ " + e.message();
+            if (currentGameState != null &&
+                    currentGameState.currentState == GameState.FINISHED) {
+                return;
+            }
+            notifications.offer("ℹ️ " + e.message());
             this.softDirty = true;
         }
         else if (event instanceof UIEvent.UserInputEvent e) {
@@ -198,6 +211,10 @@ public class CLI implements View {
 
     private void renderIfNeeded() {
         if ((!fullDirty && !softDirty) || currentClientState == null) return;
+
+        if (currentClientState == ClientState.IN_GAME && currentGameState != null && currentGameState.currentState == GameState.FINISHED) {
+            return;
+        }
 
         if (fullDirty) {
             switch (currentClientState) {
@@ -215,16 +232,45 @@ public class CLI implements View {
                         drawUI();
                     }
                     break;
+                case END_GAME:
+                    if (!gameOverRendered && currentGameState != null) {
+
+                        drawUI();
+
+                        while (!notifications.isEmpty()) {
+                            System.out.println();
+                            System.out.println(
+                                    CLIPrinter.ANSI_RED +
+                                            "🔔 NOTIFICA: " +
+                                            notifications.poll() +
+                                            CLIPrinter.ANSI_RESET
+                            );
+                        }
+
+                        System.out.println("\n✨ Calcolo dei punteggi finali in corso... ✨\n");
+                        try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
+                        CLIPrinter.clearScreen();
+                        printDBLeaderboard();
+                        CLIPrinter.printGameOver(currentGameState);
+                        gameOverRendered = true;
+                        this.currentInputMode = InputMode.WAITING;
+                    }
+                    break;
             }
         }
 
-        if (lastNotification != null) {
+        while (!notifications.isEmpty()) {
             System.out.println();
-            System.out.println(CLIPrinter.ANSI_RED + "🔔 NOTIFICA: " + lastNotification + CLIPrinter.ANSI_RESET);
-            lastNotification = null;
+            System.out.println(
+                    CLIPrinter.ANSI_RED +
+                            "🔔 NOTIFICA: " +
+                            notifications.poll() +
+                            CLIPrinter.ANSI_RESET
+            );
         }
 
         if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
+            /*
             if (currentGameState.currentState == GameState.FINISHED) {
                 if (!gameOverRendered) {
                     printDBLeaderboard();
@@ -233,7 +279,13 @@ public class CLI implements View {
                 }
                 this.currentInputMode = InputMode.WAITING;
             }
-            else if (isMyTurn()) {
+
+            */
+            if (currentGameState.currentState == GameState.FINISHED) {
+                // Silenzio assoluto. Non stampare nulla e non chiedere input.
+                // Stiamo solo aspettando il segnale END_GAME dal server.
+            }
+            if (isMyTurn()) {
                 if (awaitingServerResponse) {
                     // Stampa "Mossa inviata" solo se la plancia è stata appena ridisegnata,
                     if (fullDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
@@ -243,7 +295,7 @@ public class CLI implements View {
             }
             else {
                 // Stampa l'attesa solo in caso di full redraw
-                if (fullDirty) System.out.println("\n⌛ In attesa che " + currentGameState.currentPlayerNickname + " faccia la sua mossa...");
+                if (fullDirty && currentGameState.currentPlayerNickname != null) System.out.println("\n⌛ In attesa che " + currentGameState.currentPlayerNickname + " faccia la sua mossa...");
             }
         }
 
@@ -295,6 +347,8 @@ public class CLI implements View {
             System.out.print("\nInserisci il tuo nickname: ");
         }
     }
+
+
 
     private void processLobbyInput(String input) {
         if (currentInputMode == InputMode.LOBBY_MENU) {
@@ -445,7 +499,7 @@ public class CLI implements View {
         System.out.println(CLIPrinter.ANSI_CYAN + "\n TOCCA A TE! " + CLIPrinter.ANSI_RESET);
 
         if (currentInputMode == InputMode.PLACING_TOTEM) {
-            System.out.print("Scegli la tessera per il totem (A, B, C, D, E, F): ");
+            System.out.print("Scegli la tessera per il totem (A, B, C, D, E, F, G): ");
         }
         else if (currentInputMode == InputMode.CHOOSING_CARD_ACTION) {
             boolean isUpper = currentGameState.isUpper;
@@ -470,9 +524,15 @@ public class CLI implements View {
     private void drawUI() {
         if (currentGameState == null) return;
         CLIPrinter.clearScreen();
+
         if (currentGameState.lastResolvedEvents != null && !currentGameState.lastResolvedEvents.isEmpty()) {
             CLIPrinter.printEventPhase(currentGameState);
         }
+
+        if (currentGameState.currentState == GameState.FINISHED) {
+            return;
+        }
+
         CLIPrinter.printHeader(currentGameState, false);
         CLIPrinter.printBoard(currentGameState);
         CLIPrinter.printAllPlayersStatus(currentGameState);
