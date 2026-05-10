@@ -38,9 +38,11 @@ public class EventState implements GameStateLogic {
             System.out.println(" ULTIMO ROUND: Risoluzione finale di TUTTI gli eventi visibili!");
             resolveAllVisibleEvents(g); // Fila sopra + Fila sotto
             g.changeState(new FinishedState());
+            /*
             if (g.onGameEnd != null) {
                 g.onGameEnd.run();
             }
+             */
 
         } else {
 
@@ -76,11 +78,20 @@ public class EventState implements GameStateLogic {
             return e1.getEra().compareTo(e2.getEra());
         });
 
-        // 3. Risoluzione e Notifica
-        for (EventCard e : allEvents) {
-            System.out.println("Risoluzione Finale: " + e.getType());
-            e.resolve(g);
+        List<String> resolvedNames = new ArrayList<>();
+
+        if (allEvents.isEmpty()) {
+            resolvedNames.add("Nessun evento risolto.");
+        } else {
+            for (EventCard e : allEvents) {
+                System.out.println("Risoluzione Finale: " + e.getType());
+                resolvedNames.add(e.getType().toString()); // <-- Aggiungiamo alla lista!
+                e.resolve(g);
+            }
         }
+
+        g.setLastResolvedEvents(resolvedNames);
+
     }
 
 

@@ -13,6 +13,7 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.common.enums.GameState;
+import it.polimi.ingsw.mesos.model.state.FinishedState;
 import it.polimi.ingsw.mesos.persistence.*;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
@@ -267,13 +268,16 @@ public class GameController {
             int position = leaderboardService.getPosition(nickname, numPlayers);
 
             // invia al client
+            //modificato perchè c'è un bug a fine partita
+            /*
             VirtualView view = players.get(nickname);
             if (view != null) {
                 view.showMessage("Hai finito in posizione: " + position);
             }
+             */
         }
+        //broadcastUpdate();
         sendClientStateToAll(ClientState.END_GAME);
-        broadcastUpdate();
         if (moveLogger != null) moveLogger.delete();
         deckSerializer.delete();
     }
@@ -323,26 +327,34 @@ public class GameController {
     //aggiungo valore di ritorno booleano per capire se l'azione è andata a buon fine
     public boolean onTakeCard(String nickname, int cardIndex, boolean isUpper) {
         VirtualView view = players.get(nickname);
-        if(view==null){
+        if (view == null) {
             return false;
         }
+
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             Player player = requirePlayer(nickname);
 
-            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
+            // forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
+
             game.takeCard(player, cardIndex, isUpper);
-            if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
             view.showActionAccepted("Carta scelta con successo!");
+
+            if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
+
             broadcastUpdate();
+
+            if (game.getCurrentState() instanceof FinishedState) {
+                if (game.onGameEnd != null) {
+                    game.onGameEnd.run();
+                }
+            }
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-
             view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
             return false;
         }
-
     }
 
     //meglio metterlo booleano così il client sa se l'azione è stata svolta correttamente

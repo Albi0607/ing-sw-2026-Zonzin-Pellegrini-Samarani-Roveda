@@ -19,7 +19,6 @@ public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
         String foodIcon = VisualTheme.getSymbol("food");
         String prestigeIcon = VisualTheme.getSymbol("prestige");
 
-        // --- LOGICA DINAMICA DEI FULMINI IN BASE ALL'ERA ---
         String cardEra = (eventJson.era != null) ? eventJson.era.toString() : "ERA_I";
 
         String boltIcon = switch (cardEra) {
