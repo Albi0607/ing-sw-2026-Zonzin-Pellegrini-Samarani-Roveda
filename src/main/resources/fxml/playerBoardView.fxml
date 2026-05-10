@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox fx:id="playerBoardRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="180.0" prefWidth="600.0" spacing="10.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets top="10.0" />
+   </padding>
+   <children>
+      <HBox fx:id="headerBox" alignment="CENTER_LEFT" prefHeight="18.0" prefWidth="600.0" spacing="40.0">
+         <children>
+            <Label fx:id="playerNameLabel" text="Player" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <HBox fx:id="pointsBox" prefHeight="100.0" prefWidth="200.0" spacing="40.0">
+               <children>
+                  <Label fx:id="foodPointsLabel" text="🍖">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="prestigePointsLabel" text="⭐">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <HBox fx:id="cardsContainer" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+         <children>
+            <StackPane fx:id="cardSlot1" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage1" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount1" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot2" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage2" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount2" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot3" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage3" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount3" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot4" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage4" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount4" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot5" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage5" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount5" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot6" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage6" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount6" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+            <StackPane fx:id="cardSlot7" prefHeight="140.0" prefWidth="80.0">
+               <children>
+                  <ImageView fx:id="cardImage7" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                  <Label fx:id="cardCount7" alignment="TOP_CENTER" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_CENTER" />
+               </children>
+            </StackPane>
+         </children>
+      </HBox>
+   </children>
+</VBox>

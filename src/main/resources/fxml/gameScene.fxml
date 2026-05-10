@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox fx:id="centerBoard" prefHeight="200.0" prefWidth="1118.0" scaleX="0.9" scaleY="0.9" spacing="5.0">
+         <children>
+            <HBox fx:id="topRowCards" alignment="CENTER" fillHeight="false" prefHeight="150.0" prefWidth="1278.0" spacing="5.0">
+               <children>
+                  <StackPane fx:id="topCardSlot1" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage1" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot2" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage2" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot3" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage3" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot4" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage4" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot5" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="150.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage5" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot6" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage6" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot7" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage7" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot8" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage8" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot9" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage9" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot10" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage10" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot11" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage11" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot12" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage12" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot13" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage13" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="topCardSlot14" onMouseClicked="#handleTopCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="topCardImage14" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+               </children></HBox>
+            <HBox fx:id="centerBoardArea" alignment="CENTER" prefHeight="150.0" prefWidth="200.0" spacing="40.0" style="-fx-background-color: transparent;">
+               <children>
+                  <StackPane fx:id="deckSlot" prefHeight="140.0" prefWidth="90.0" style="-fx-background-color: #ffffff22; -fx-background-radius: 10; -fx-border-color: #aaaaaa; -fx-border-radius: 10;">
+                     <children>
+                        <ImageView fx:id="deckImage" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <HBox fx:id="offerTrackArea" alignment="CENTER_LEFT" prefHeight="142.0" prefWidth="564.0" spacing="2.0" style="-fx-background-color: #ffffff11; -fx-background-radius: 10; -fx-padding: 10;">
+                     <children>
+                        <StackPane fx:id="turnOrderTrack" prefHeight="140.0" prefWidth="80.0" style="-fx-background-color: #ffffff22; -fx-background-radius: 10; -fx-border-color: #bbbbbb; -fx-border-radius: 10;">
+                           <children>
+                              <ImageView fx:id="turnOrderTrackImage" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <Pane fx:id="totemContainer" prefHeight="140.0" prefWidth="80.0" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot1" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage1" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage1" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot2" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage2" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage2" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot3" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage3" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage3" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot4" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage4" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage4" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot5" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage5" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage5" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot6" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage6" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage6" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                        <StackPane fx:id="offerSlot7" onMouseClicked="#handleOfferSelection" prefHeight="140.0" prefWidth="80.0">
+                           <children>
+                              <ImageView fx:id="offerImage7" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                              <ImageView fx:id="offerTotemImage7" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </StackPane>
+                     </children></HBox>
+               </children>
+            </HBox>
+            <HBox fx:id="bottomRowCards" alignment="CENTER" fillHeight="false" prefHeight="150.0" prefWidth="1278.0" spacing="5.0">
+               <children>
+                  <StackPane fx:id="bottomCardSlot1" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage1" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot2" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage2" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot3" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage3" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot4" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage4" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot5" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage5" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot6" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage6" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot7" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage7" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot8" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage8" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot9" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage9" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot10" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage10" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot11" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage11" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot12" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage12" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <StackPane fx:id="bottomCardSlot13" onMouseClicked="#handleBottomCardSelection" onMouseEntered="#handleCardHover" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0">
+                     <children>
+                        <ImageView fx:id="bottomCardImage13" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+               </children></HBox>
+         </children>
+      </VBox>
+   </center>
+   <top>
+      <Pane fx:id="topArea" prefHeight="180.0" prefWidth="1500.0" BorderPane.alignment="CENTER">
+         <children>
+            <StackPane fx:id="topLeftPlayerArea" alignment="TOP_CENTER" prefHeight="180.0" prefWidth="600.0">
+               <children>
+                  <StackPane fx:id="topLeftPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
+               </children></StackPane>
+            <StackPane fx:id="topCenterPlayerArea" alignment="TOP_CENTER" layoutX="425.0" prefHeight="180.0" prefWidth="600.0">
+               <children>
+                  <StackPane fx:id="topCenterPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
+               </children></StackPane>
+            <StackPane fx:id="topRightPlayerArea" alignment="TOP_CENTER" layoutX="850.0" prefHeight="180.0" prefWidth="600.0">
+               <children>
+                  <StackPane fx:id="topRightPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
+               </children></StackPane>
+         </children>
+      </Pane>
+   </top>
+   <left>
+      <VBox fx:id="leftPlayerArea" prefHeight="600.0" prefWidth="180.0" spacing="5.0" BorderPane.alignment="BOTTOM_CENTER">
+         <children>
+            <StackPane fx:id="leftPlayerContainer" prefHeight="600.0" prefWidth="150.0" />
+         </children></VBox>
+   </left>
+   <right>
+      <VBox fx:id="rightPlayerArea" prefHeight="600.0" prefWidth="180.0" spacing="5.0" BorderPane.alignment="BOTTOM_CENTER">
+         <children>
+            <StackPane fx:id="rightPlayerContainer" prefHeight="600.0" prefWidth="180.0" />
+         </children></VBox>
+   </right>
+   <bottom>
+      <HBox fx:id="bottomPlayerArea" alignment="BOTTOM_CENTER" prefHeight="180.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <StackPane fx:id="bottomPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>
