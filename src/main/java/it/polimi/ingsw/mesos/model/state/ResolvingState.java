@@ -4,12 +4,14 @@ import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.board.Board;
 import it.polimi.ingsw.mesos.model.board.OfferTile;
+import it.polimi.ingsw.mesos.model.board.TurnOrderTrack;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.common.enums.TriggerType;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents the phase where actions on the board are resolved.
@@ -107,6 +109,13 @@ public class ResolvingState implements GameStateLogic {
 
                 // Se dopo tutto questo non ha mosse legali, lo saltiamo
                 if (this.remainingUpper == 0 && this.remainingLower == 0) {
+                    System.out.println("Nessuna mossa legale per " + p.getNickname() + ". Fine automatica del suo turno.");
+
+                    TurnOrderTrack track = g.getBoard().getTurnOrderTrack();
+                    int slot = track.getFirstFreeSlot();
+                    track.setPlayerAt(slot, p);
+
+                    tile.reset();
                     currentTileIndex++;
                     continue;
                 }
@@ -231,6 +240,24 @@ public class ResolvingState implements GameStateLogic {
             extraQueueIndex++;
             moveToNextOccupiedTile(g);
         } else if (remainingUpper == 0 && remainingLower == 0) {
+
+            OfferTile tile = g.getBoard().getTiles().get(currentTileIndex);
+            Player finishedPlayer = tile.getHost();
+
+            TurnOrderTrack track = g.getBoard().getTurnOrderTrack();
+
+            if (track.getPositions().stream().noneMatch(Objects::isNull)) {
+                throw new IllegalStateException(
+                        "TurnOrderTrack piena durante la risoluzione. " +
+                                "Probabilmente il player non è stato rimosso durante il placing."
+                );
+            }
+
+            int slot = track.getFirstFreeSlot();
+            track.setPlayerAt(slot, finishedPlayer);
+
+            tile.reset();
+
             currentTileIndex++;
             moveToNextOccupiedTile(g);
         }

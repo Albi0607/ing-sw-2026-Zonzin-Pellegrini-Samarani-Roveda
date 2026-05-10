@@ -37,8 +37,8 @@ class GameControllerTest {
             @Override public String getNickname() { return "Test"; }
             @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
             @Override public String getId() {return "";}
-            @Override public void showActionRejected(String reason) {}
-            @Override public void showActionAccepted(String message) {}
+            @Override public void showActionRejected(String reason) {};
+            @Override public void showActionAccepted(String message) {};
         };
     }
 
@@ -298,7 +298,7 @@ class GameControllerTest {
         @Override public String getNickname() { return "fake"; }
         @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
         @Override public String getId() { return ""; }
-        @Override public void showActionRejected(String reason) {}
+        @Override public void showActionRejected(String reason) {};
         @Override public void showActionAccepted(String message) {}
 
         public List<String> getMessages() { return messages; }
