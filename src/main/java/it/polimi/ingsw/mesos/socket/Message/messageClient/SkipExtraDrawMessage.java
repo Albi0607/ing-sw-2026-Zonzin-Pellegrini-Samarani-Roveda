@@ -45,6 +45,7 @@ public class SkipExtraDrawMessage extends Message {
      */
     @Override
     public void executeServerSide(GameController gameController) {
+        gameController.onSkipExtraDraw(nickname);
     }
 
 

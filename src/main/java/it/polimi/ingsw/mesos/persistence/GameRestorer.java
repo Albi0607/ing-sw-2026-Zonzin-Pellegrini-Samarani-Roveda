@@ -93,7 +93,25 @@ public class GameRestorer {
                 controller.addPlayer(move.nickname, view);
             }
 
-            case START_GAME -> controller.startGame();
+            case START_GAME -> {
+                controller.startGame();
+                DeckSerializer ds = controller.getDeckSerializer();
+
+                if(ds.hasSavedDecks()) {
+                    ds.restoreDeck(
+                            controller.getGame().getBoard().getTribeDeck(),
+                            null,
+                            true
+                    );
+                }
+                if(ds.hasSavedDecks()) {
+                    ds.restoreDeck(
+                            controller.getGame().getBoard().getBuildingDeck(),
+                            null,
+                            false
+                    );
+                }
+            }
 
             case PLACE_TOTEM -> controller.onPlaceTotem(move.nickname, move.charPayload);
 

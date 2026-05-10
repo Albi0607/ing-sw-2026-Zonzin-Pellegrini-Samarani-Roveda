@@ -13,10 +13,7 @@ import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.persistence.DummyVirtualView;
-import it.polimi.ingsw.mesos.persistence.GameMove;
-import it.polimi.ingsw.mesos.persistence.GameRestorer;
-import it.polimi.ingsw.mesos.persistence.MoveLogger;
+import it.polimi.ingsw.mesos.persistence.*;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
@@ -39,6 +36,7 @@ public class GameController {
     private LeaderboardService leaderboardService;
     //persistenza
     private MoveLogger moveLogger;
+    private DeckSerializer deckSerializer;
     private boolean replayMode = false;  // true durante il replay, disabilita broadcast
     private GameRestorer restorer = null;
 
@@ -50,6 +48,7 @@ public class GameController {
         this.gameId = gameId;
         this.pendingNicknames = new ArrayList<>();
         this.moveLogger = new MoveLogger("mesos_game_" + gameId + ".log");
+        this.deckSerializer = new DeckSerializer(gameId);
         this.leaderboardService = new LeaderboardService(new GameResultDAO());
     }
 
@@ -235,11 +234,15 @@ public class GameController {
      */
 
     public void startGame() {
-        if (game == null) {
-            throw new IllegalStateException("Game not created");
-        }
+        if (game == null) throw new IllegalStateException("Game not created");
         game.startGame();
-        if (moveLogger != null) moveLogger.append(GameMove.startGame());
+
+        if (moveLogger != null && !replayMode) {
+            deckSerializer.saveDeck(game.getBoard().getTribeDeck(), true);
+            deckSerializer.saveDeck(game.getBoard().getBuildingDeck(), false);
+            moveLogger.append(GameMove.startGame());
+        }
+
         broadcastUpdate();
     }
 
@@ -272,6 +275,7 @@ public class GameController {
         sendClientStateToAll(ClientState.END_GAME);
         broadcastUpdate();
         if (moveLogger != null) moveLogger.delete();
+        deckSerializer.delete();
     }
 
     // AZIONI DEL GIOCATORE
@@ -582,6 +586,10 @@ public class GameController {
 
     public MoveLogger getMoveLogger() {
         return moveLogger;
+    }
+
+    public DeckSerializer getDeckSerializer() {
+        return deckSerializer;
     }
 
     public boolean hasRestorer() {

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.mesos.persistence;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Rappresenta una singola mossa di gioco, salvata su disco.
@@ -29,21 +31,20 @@ public class GameMove implements Serializable {
     public final char    charPayload;   // tileId
     public final boolean boolPayload;   // isUpper
 
-    private GameMove(MoveType type, String nickname, int intPayload,
-                     char charPayload, boolean boolPayload) {
-        this.type        = type;
-        this.nickname    = nickname;
-        this.intPayload  = intPayload;
+    private GameMove(MoveType type, String nickname, int intPayload, char charPayload, boolean boolPayload) {
+        this.type = type;
+        this.nickname = nickname;
+        this.intPayload = intPayload;
         this.charPayload = charPayload;
         this.boolPayload = boolPayload;
     }
 
     public static GameMove setNumPlayers(int numPlayers) {
-        return new GameMove(MoveType.SET_NUM_PLAYERS, null, numPlayers, '\0', false);
+        return new GameMove(MoveType.SET_NUM_PLAYERS,null,  numPlayers, '\0', false);
     }
 
     public static GameMove addPlayer(String nickname) {
-        return new GameMove(MoveType.ADD_PLAYER, nickname, 0, '\0', false);
+        return new GameMove(MoveType.ADD_PLAYER, nickname,0, '\0', false);
     }
 
     public static GameMove startGame() {
@@ -66,10 +67,10 @@ public class GameMove implements Serializable {
     public String toString() {
         return switch (type) {
             case SET_NUM_PLAYERS -> "SET_NUM_PLAYERS(" + intPayload + ")";
-            case ADD_PLAYER      -> "ADD_PLAYER(" + nickname + ")";
-            case START_GAME      -> "START_GAME";
-            case PLACE_TOTEM     -> "PLACE_TOTEM(" + nickname + ", " + charPayload + ")";
-            case TAKE_CARD       -> "TAKE_CARD(" + nickname + ", " + intPayload + ", upper=" + boolPayload + ")";
+            case ADD_PLAYER -> "ADD_PLAYER(" + nickname + ")";
+            case START_GAME -> "START_GAME";
+            case PLACE_TOTEM -> "PLACE_TOTEM(" + nickname + ", " + charPayload + ")";
+            case TAKE_CARD -> "TAKE_CARD(" + nickname + ", " + intPayload + ", upper=" + boolPayload + ")";
             case SKIP_EXTRA_DRAW -> "SKIP_EXTRA_DRAW(" + nickname + ")";
         };
     }
