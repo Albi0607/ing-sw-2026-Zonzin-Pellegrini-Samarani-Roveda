@@ -316,7 +316,6 @@ public class GameController {
 
             view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
             System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
