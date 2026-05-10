@@ -163,7 +163,7 @@ public class ServerState {
 
             // Aggiunge la partita alla lobby con l'ID originale
             // (così il nextId della Lobby non sovrascrive un ID già usato)
-            lobby.restoreGame(gameId, controller);
+            //lobby.restoreGame(gameId, controller);
 
             System.out.println("[ServerState] Partita " + gameId +
                     " ripristinabile. Giocatori attesi: " + originalNicknames);
