@@ -22,7 +22,7 @@ public class serverSocket {
 
         // ricorda: notazione confusionaria, esiste serverSocket di tipo ServerSocket e serverSocket l'attuale classe, due cose diverse
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Listening. Waiting for players...");
+            System.out.println("Server Socket pronto in attesa di connessioni");
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();

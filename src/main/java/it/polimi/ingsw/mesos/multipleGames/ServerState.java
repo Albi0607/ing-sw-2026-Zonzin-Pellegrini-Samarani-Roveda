@@ -1,11 +1,18 @@
 package it.polimi.ingsw.mesos.multipleGames;
 
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.persistence.GameMove;
+import it.polimi.ingsw.mesos.persistence.GameRestorer;
+import it.polimi.ingsw.mesos.persistence.MoveLogger;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
+import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 //classe da mettere nelle classi di rete per capire in base al nickname ricevuto in che controller fare l'azione
@@ -23,7 +30,6 @@ public class ServerState {
         this.connections = new ConcurrentHashMap<>();
         this.playerToGame = new ConcurrentHashMap<>();
         this.nicknames  = ConcurrentHashMap.newKeySet();
-
     }
 
     public synchronized void getLobby(String nickname,VirtualView view){
@@ -94,6 +100,74 @@ public class ServerState {
     public void removeConnection(String virtualViewId){
         connections.remove(virtualViewId);
         lobby.removeViewer(virtualViewId);
+    }
+
+    /**
+     * Scansiona la directory corrente alla ricerca di file di log di partite
+     * interrotte (pattern: mesos_game_{id}.log) e le registra come partite
+     * ripristinabili.
+     *
+     * Va chiamato UNA VOLTA in ServerMain.main() prima di avviare i server
+     * RMI e Socket:
+     *
+     *   serverState.initializeFromDisk();
+     *
+     * Le partite ripristinabili appaiono in lobby come "started=true" —
+     * i giocatori originali possono riconnettersi con lo stesso nickname
+     * e trovare la partita al punto in cui era.
+     */
+    public synchronized void initializeFromDisk() {
+        File dir = new File(".");
+        File[] logFiles = dir.listFiles(
+                (d, name) -> name.matches("mesos_game_\\d+\\.log")
+        );
+
+        if (logFiles == null || logFiles.length == 0) {
+            System.out.println("[ServerState] Nessuna partita interrotta trovata su disco.");
+            return;
+        }
+
+        Pattern pattern = Pattern.compile("mesos_game_(\\d+)\\.log");
+
+        for (File logFile : logFiles) {
+            Matcher matcher = pattern.matcher(logFile.getName());
+            if (!matcher.matches()) continue;
+
+            int gameId = Integer.parseInt(matcher.group(1));
+            MoveLogger logger = new MoveLogger(logFile.getName());
+
+            if (!logger.hasSavedGame()) continue;
+
+            // Ricava i nickname che partecipavano alla partita dal log
+            // (sono le mosse ADD_PLAYER)
+            List<String> originalNicknames = logger.readAll().stream()
+                    .filter(m -> m.type == GameMove.MoveType.ADD_PLAYER)
+                    .map(m -> m.nickname)
+                    .toList();
+
+            if (originalNicknames.isEmpty()) continue;
+
+            // Crea un GameController con lo stesso ID (usa lo stesso log file)
+            GameController controller = new GameController(gameId);
+
+            // Registra il restorer nel controller —
+            // partirà non appena tutti i nickname originali si riconnetteranno
+            GameRestorer restorer = new GameRestorer(logger);
+            controller.setRestorer(restorer);
+
+            // Registra i nickname come "attesi" così non possono essere usati
+            // da altri giocatori di altre partite
+            for (String nick : originalNicknames) {
+                nicknames.add(nick);
+            }
+
+            // Aggiunge la partita alla lobby con l'ID originale
+            // (così il nextId della Lobby non sovrascrive un ID già usato)
+            lobby.restoreGame(gameId, controller);
+
+            System.out.println("[ServerState] Partita " + gameId +
+                    " ripristinabile. Giocatori attesi: " + originalNicknames);
+        }
     }
 
     public GameController getController(String nickname){
