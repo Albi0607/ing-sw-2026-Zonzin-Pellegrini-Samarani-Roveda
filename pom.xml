@@ -97,7 +97,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>it.polimi.ingsw.mesos.view.GuiLauncher</mainClass>
+          <mainClass>it.polimi.ingsw.mesos.view.GUI.Core.GUI</mainClass>
         </configuration>
       </plugin>
     </plugins>

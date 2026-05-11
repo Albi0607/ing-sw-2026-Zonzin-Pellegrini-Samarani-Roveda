@@ -17,22 +17,7 @@
             </Label>
             <HBox fx:id="playersCountBox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
                <children>
-                  <Label fx:id="waitingTextLabel" contentDisplay="CENTER" prefHeight="54.0" prefWidth="440.0" text="IN ATTESA DI GIOCATORI:" textAlignment="CENTER" textFill="#fa2576">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="currentPlayersLabel" text="0" textFill="#fa2576">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Label>
-                  <Label text="/" textFill="#fa2576">
-                     <font>
-                        <Font size="36.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="maxPlayersLabel" text="0" textFill="#fa2576">
+                  <Label text="IN ATTESA DI GIOCATORI" textFill="#fa2576">
                      <font>
                         <Font size="36.0" />
                      </font>

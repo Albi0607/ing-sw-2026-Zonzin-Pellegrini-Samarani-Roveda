@@ -8,10 +8,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class ObservableGameModel {
+
     private final ObservableList<CardDTO> boardCards = FXCollections.observableArrayList();
+
     private final ObservableList<PlayerDTO> players = FXCollections.observableArrayList();
+
     private final ObservableList<OfferTileDTO> offerTiles = FXCollections.observableArrayList();
+
     private final ObservableList<TurnOrderSlotDTO> turnOrderTrack = FXCollections.observableArrayList();
+
     private final ObjectProperty<GameState> gameState = new SimpleObjectProperty<>();
 
     // Getter per le property (necessari per il binding) ...

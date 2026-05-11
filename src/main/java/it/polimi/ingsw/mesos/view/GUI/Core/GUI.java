@@ -1,25 +1,35 @@
 package it.polimi.ingsw.mesos.view.GUI.Core;
 
 
+import it.polimi.ingsw.mesos.rete.ClientChoseSetup;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
-import it.polimi.ingsw.mesos.view.CLI.UIEvent;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.util.List;
 
 public class GUI extends Application implements View {
+    private Stage primaryStage;
     private SceneManager sceneManager;
-    private ClientController controller;
+    private ClientController clientController;
     private ObservableGameModel gameModel;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        // Inizializzazione SceneManager e caricamento prima scena
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+        this.gameModel = new ObservableGameModel();
+        sceneManager = new SceneManager(primaryStage, this, gameModel);
+        sceneManager.loadLoginScene();
+        primaryStage.setTitle("Mesos");
+        primaryStage.show();
     }
 
     @Override
@@ -35,6 +45,9 @@ public class GUI extends Application implements View {
     @Override
     public void showLobby(List<LobbyInfoDTO> lobby) {
         // DA IMPLEMENTARE: Platform.runLater() -> aggiorna scena lobby
+        javafx.application.Platform.runLater(()->{
+            sceneManager.updateLobby(lobby);
+        });
     }
 
     @Override
@@ -48,4 +61,17 @@ public class GUI extends Application implements View {
     @Override
     public void showActionAccepted(String message) {
     }
+
+    //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
+    public void handleLogin(String nickname,String ip,int port,String networkChoice){
+        try {
+            Network network = ClientChoseSetup.createNetwork(networkChoice);
+            this.clientController = new ClientController(this, network);
+            sceneManager.loadLobbyScene(clientController);
+            clientController.getLobby(nickname);
+        } catch (Exception e) {
+            showMessage("Errore: nel fare l'accesso e/o nell'andare nella lobby");
+        }
+    }
+
 }
