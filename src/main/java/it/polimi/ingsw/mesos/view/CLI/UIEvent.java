@@ -23,6 +23,9 @@ public interface UIEvent {
     record ActionRejectedEvent(String reason) implements UIEvent {}
 
     record ActionAcceptedEvent(String message) implements UIEvent {}
+
     record ResolutionTimeoutEvent() implements UIEvent {}
+
+    record GameRestoredEvent(GameDTO game) implements UIEvent {}
 
 }

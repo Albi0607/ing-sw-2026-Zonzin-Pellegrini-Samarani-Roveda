@@ -203,6 +203,12 @@ public class CLI implements View {
         if (event instanceof UIEvent.GameUpdatedEvent e) {
             this.currentGameState = e.game();
 
+            if (this.currentClientState == null || this.currentClientState == ClientState.LOBBY || this.currentClientState == ClientState.WAITING_PLAYERS) {
+                this.currentClientState = ClientState.IN_GAME;
+                this.notifications.clear();
+                this.resolutionTimeoutScheduled = false;
+            }
+
             this.awaitingServerResponse = false;
             syncInputModeWithGameState();
             this.fullDirty = true;
@@ -219,7 +225,12 @@ public class CLI implements View {
             this.currentClientState = e.state();
             if (e.state() == ClientState.LOBBY) {
                 this.currentInputMode = InputMode.LOBBY_MENU;
+
                 this.resolutionTimeoutScheduled = false;
+
+                this.notifications.clear();
+                this.currentGameState = null;
+
             } else if (e.state() == ClientState.WAITING_PLAYERS) {
                 this.currentInputMode = InputMode.WAITING;
             }
@@ -268,6 +279,23 @@ public class CLI implements View {
 
             this.fullDirty = false;
             this.softDirty = false;
+
+        }else if (event instanceof UIEvent.GameRestoredEvent e) {
+
+            this.currentGameState = e.game();
+
+            if (this.currentClientState != ClientState.END_GAME) {
+                this.currentClientState = ClientState.IN_GAME;
+            }
+
+            this.notifications.clear();
+            this.awaitingServerResponse = false;
+            this.resolutionTimeoutScheduled = false;
+
+            syncInputModeWithGameState();
+            this.fullDirty = true;
+
+            System.out.println(CLIPrinter.ANSI_GREEN + "\n💾 [SISTEMA] Partita ripristinata correttamente dal salvataggio." + CLIPrinter.ANSI_RESET);
         }
     }
 
