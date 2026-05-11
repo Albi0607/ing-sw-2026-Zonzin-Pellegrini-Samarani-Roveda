@@ -13,11 +13,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class CLI implements View {
     private ClientController controller;
     private final Scanner scanner;
     private String myNickname;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // --- LA CODA DEGLI EVENTI CENTRALIZZATA ---
     private final BlockingQueue<UIEvent> eventQueue = new LinkedBlockingQueue<>();
@@ -34,7 +38,7 @@ public class CLI implements View {
     private boolean fullDirty = true;
     private boolean softDirty = false;
     private final Queue<String> notifications = new LinkedList<>();
-    private boolean gameOverRendered = false;
+    private boolean resolutionTimeoutScheduled = false;
 
     public enum InputMode {
         LOGIN, LOBBY_MENU, CHOOSING_NUM_PLAYERS, JOINING_GAME,
@@ -124,6 +128,7 @@ public class CLI implements View {
                 break;
             }
         }
+        scheduler.shutdownNow();
     }
 
     private void syncInputModeWithGameState() {
@@ -170,7 +175,7 @@ public class CLI implements View {
             this.currentClientState = e.state();
             if (e.state() == ClientState.LOBBY) {
                 this.currentInputMode = InputMode.LOBBY_MENU;
-                this.gameOverRendered = false;
+                this.resolutionTimeoutScheduled = false;
             } else if (e.state() == ClientState.WAITING_PLAYERS) {
                 this.currentInputMode = InputMode.WAITING;
             }
@@ -206,6 +211,16 @@ public class CLI implements View {
         }
         else if (event instanceof UIEvent.UserInputEvent e) {
             processInput(e.input());
+        }else if (event instanceof UIEvent.ResolutionTimeoutEvent) {
+
+            CLIPrinter.clearScreen();
+            printDBLeaderboard();
+
+            if (currentGameState != null) {
+                CLIPrinter.printGameOver(currentGameState);
+            }
+
+            this.currentInputMode = InputMode.WAITING;
         }
     }
 
@@ -233,7 +248,7 @@ public class CLI implements View {
                     }
                     break;
                 case END_GAME:
-                    if (!gameOverRendered && currentGameState != null) {
+                    if (!resolutionTimeoutScheduled && currentGameState != null) {
 
                         drawUI();
 
@@ -248,11 +263,14 @@ public class CLI implements View {
                         }
 
                         System.out.println("\n✨ Calcolo dei punteggi finali in corso... ✨\n");
-                        try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
-                        CLIPrinter.clearScreen();
-                        printDBLeaderboard();
-                        CLIPrinter.printGameOver(currentGameState);
-                        gameOverRendered = true;
+
+                        scheduler.schedule(
+                                () -> eventQueue.offer(new UIEvent.ResolutionTimeoutEvent()),
+                                3,
+                                TimeUnit.SECONDS
+                        );
+
+                        resolutionTimeoutScheduled = true;
                         this.currentInputMode = InputMode.WAITING;
                     }
                     break;
@@ -529,9 +547,11 @@ public class CLI implements View {
             CLIPrinter.printEventPhase(currentGameState);
         }
 
+        /*
         if (currentGameState.currentState == GameState.FINISHED) {
             return;
         }
+        */
 
         CLIPrinter.printHeader(currentGameState, false);
         CLIPrinter.printBoard(currentGameState);
