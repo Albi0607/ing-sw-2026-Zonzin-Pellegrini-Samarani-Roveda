@@ -49,6 +49,10 @@ public class CLI implements View {
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Starts a daemon thread that continuously listens for system console input
+     * and wraps it into UserInputEvents for the central queue.
+     */
     private void startInputThread() {
         Thread inputThread = new Thread(() -> {
             while (running) {
@@ -64,6 +68,10 @@ public class CLI implements View {
         inputThread.start();
     }
 
+    /**
+     * Sets the network controller to allow the CLI to send commands to the server.
+     * @param controller The ClientController instance.
+     */
     public void setController(ClientController controller) {
         this.controller = controller;
     }
@@ -72,29 +80,53 @@ public class CLI implements View {
     // METODI CHIAMATI DALLA RETE (Inseriscono solo eventi)
     // ==========================================================
 
+    /**
+     * Receives a game state update from the network and enqueues a GameUpdatedEvent.
+     * @param game The Data Transfer Object containing the current game state.
+     */
     @Override
     public void showLastUpdate(GameDTO game) {
         eventQueue.offer(new UIEvent.GameUpdatedEvent(game));
     }
 
+    /**
+     * Receives a client state transition and enqueues a ClientStateUpdatedEvent.
+     * @param state The new state of the client (LOBBY, IN_GAME, etc.).
+     */
     @Override
     public void showClientStateUpdate(ClientState state) {eventQueue.offer(new UIEvent.ClientStateUpdatedEvent(state));}
 
+    /**
+     * Enqueues a generic informative message to be displayed as a notification.
+     * @param message The text to display.
+     */
     @Override
     public void showMessage(String message) {
         eventQueue.offer(new UIEvent.MessageEvent(message));
     }
 
+    /**
+     * Receives the list of available game lobbies and enqueues a LobbyUpdatedEvent.
+     * @param lobby A list of DTOs representing available game sessions.
+     */
     @Override
     public void showLobby(List<LobbyInfoDTO> lobby) {
         eventQueue.offer(new UIEvent.LobbyUpdatedEvent(lobby));
     }
 
+    /**
+     * Enqueues an error notification when a requested action is denied by the server.
+     * @param reason The explanation for the rejection.
+     */
     @Override
     public void showActionRejected(String reason) {
         eventQueue.offer(new UIEvent.ActionRejectedEvent(reason));
     }
 
+    /**
+     * Enqueues a success notification when an action is successfully processed.
+     * @param message The success message.
+     */
     @Override
     public void showActionAccepted(String message) {
         eventQueue.offer(new UIEvent.ActionAcceptedEvent(message));
@@ -104,6 +136,10 @@ public class CLI implements View {
     // IL MOTORE PRINCIPALE (EDT - Event Dispatch Thread)
     // ==========================================================
 
+    /**
+     * Main execution loop of the CLI. Initializes the input thread and
+     * processes events from the blocking queue until the application stops.
+     */
     public void start() {
         CLIPrinter.clearScreen();
         System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
@@ -131,6 +167,10 @@ public class CLI implements View {
         scheduler.shutdownNow();
     }
 
+    /**
+     * Updates the internal input mode based on the current game phase
+     * and whether it is the local player's turn.
+     */
     private void syncInputModeWithGameState() {
         if (currentGameState.currentState == GameState.FINISHED) {
             this.currentInputMode = InputMode.WAITING;
@@ -140,7 +180,6 @@ public class CLI implements View {
                 this.currentInputMode = InputMode.PLACING_TOTEM;
             }
             else if (currentGameState.currentState == GameState.RESOLVING_ACTIONS) {
-                // Rispettiamo i sottomenu! Se siamo già scesi di un livello, non resettiamo.
                 if (this.currentInputMode != InputMode.CHOOSING_CARD_ID && this.currentInputMode != InputMode.CHOOSING_CARD_ACTION) {
                     if (canSkipExtraDraw()) {
                         this.currentInputMode = InputMode.CHOOSING_CARD_ACTION;
@@ -155,6 +194,11 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Core logic for handling different types of UIEvent. Updates internal
+     * state variables and manages transitions between game phases.
+     * @param event The UIEvent to process.
+     */
     private void handleEvent(UIEvent event) {
         if (event instanceof UIEvent.GameUpdatedEvent e) {
             this.currentGameState = e.game();
@@ -221,9 +265,16 @@ public class CLI implements View {
             }
 
             this.currentInputMode = InputMode.WAITING;
+
+            this.fullDirty = false;
+            this.softDirty = false;
         }
     }
 
+    /**
+     * Determines if a redraw is necessary and renders the appropriate
+     * screen (Lobby, Waiting Room, Game Board, or End Game) based on state flags.
+     */
     private void renderIfNeeded() {
         if ((!fullDirty && !softDirty) || currentClientState == null) return;
 
@@ -325,6 +376,10 @@ public class CLI implements View {
     // LOGICA DI GESTIONE INPUT
     // ========================
 
+    /**
+     * Routes user strings to specific processing methods based on the current InputMode.
+     * @param input The raw string entered by the user.
+     */
     private void processInput(String input) {
         switch (currentInputMode) {
             case LOGIN:
@@ -347,6 +402,10 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Processes input during the initial login phase to set the player's nickname.
+     * @param input The nickname string.
+     */
     private void processLoginInput(String input) {
         if (input.isEmpty()) {
             System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: Il nickname non può essere vuoto. Riprova." + CLIPrinter.ANSI_RESET);
@@ -366,8 +425,10 @@ public class CLI implements View {
         }
     }
 
-
-
+    /**
+     * Handles navigation and game creation/joining commands while in the lobby.
+     * @param input The menu choice or game ID.
+     */
     private void processLobbyInput(String input) {
         if (currentInputMode == InputMode.LOBBY_MENU) {
             if (input.equals("1")) {
@@ -410,10 +471,19 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Removes all pending UserInputEvents from the queue to prevent
+     * accidental command execution during state transitions.
+     */
     private void clearBufferedUserInputs() {
         eventQueue.removeIf(event -> event instanceof UIEvent.UserInputEvent);
     }
 
+    /**
+     * Translates user commands into game actions (placing totems or taking cards)
+     * and sends them to the server via the controller.
+     * @param input The user's game-related choice.
+     */
     private void processTurnInput(String input) {
 
         if (awaitingServerResponse) {
@@ -493,6 +563,9 @@ public class CLI implements View {
     // METODI DI STAMPA
     // ================
 
+    /**
+     * Clears the console and renders the lobby menu with the list of available games.
+     */
     private void renderLobby() {
         CLIPrinter.clearScreen();
         System.out.println(CLIPrinter.ANSI_CYAN + "=== SALA D'ATTESA (LOBBY) ===" + CLIPrinter.ANSI_RESET);
@@ -513,6 +586,9 @@ public class CLI implements View {
         System.out.print("Scelta (1 o 2): ");
     }
 
+    /**
+     * Displays context-sensitive prompts to the user when it is their turn to move.
+     */
     private void renderTurnPrompt() {
         System.out.println(CLIPrinter.ANSI_CYAN + "\n TOCCA A TE! " + CLIPrinter.ANSI_RESET);
 
@@ -539,6 +615,10 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Full render of the game interface, including event logs, headers,
+     * the board, and player statuses.
+     */
     private void drawUI() {
         if (currentGameState == null) return;
         CLIPrinter.clearScreen();
@@ -559,6 +639,10 @@ public class CLI implements View {
         System.out.println("Fase attuale: " + CLIPrinter.ANSI_GREEN + currentGameState.currentState + CLIPrinter.ANSI_RESET + "\n");
     }
 
+    /**
+     * Queries the local database to retrieve and display global leaderboard
+     * rankings for the current game size.
+     */
     private void printDBLeaderboard() {
         try {
             GameResultDAO dao = new GameResultDAO();
@@ -585,11 +669,20 @@ public class CLI implements View {
         }
     }
 
+    /**
+     * Checks if the local player is currently the active player in the game.
+     * @return true if it is the local player's turn, false otherwise.
+     */
     private boolean isMyTurn() {
         return currentGameState.currentPlayerNickname != null &&
                 currentGameState.currentPlayerNickname.equals(myNickname);
     }
 
+    /**
+     * Checks player tribal buildings to see if they possess the specific
+     * ability to skip an extra card draw.
+     * @return true if the skip action is available.
+     */
     private boolean canSkipExtraDraw() {
         if (currentGameState == null || currentGameState.players == null) return false;
         for (PlayerDTO player : currentGameState.players) {
