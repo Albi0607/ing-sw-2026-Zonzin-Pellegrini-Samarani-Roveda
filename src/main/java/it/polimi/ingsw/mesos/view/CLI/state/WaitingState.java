@@ -1,7 +1,5 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
-import it.polimi.ingsw.mesos.view.CLI.UIContext;
-
 public class WaitingState implements UIState {
 
     public static final WaitingState INSTANCE = new WaitingState();

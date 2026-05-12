@@ -1,6 +1,8 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.common.CardJson;
+import it.polimi.ingsw.mesos.view.CLI.formatter.Formatters;
+import it.polimi.ingsw.mesos.view.CLI.formatter.FormattersRegistry;
 import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.common.enums.Color;

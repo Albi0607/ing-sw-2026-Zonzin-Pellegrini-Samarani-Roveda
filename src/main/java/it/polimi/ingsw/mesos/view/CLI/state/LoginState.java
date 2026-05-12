@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
 import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
-import it.polimi.ingsw.mesos.view.CLI.UIContext;
 
 public class LoginState implements UIState {
 

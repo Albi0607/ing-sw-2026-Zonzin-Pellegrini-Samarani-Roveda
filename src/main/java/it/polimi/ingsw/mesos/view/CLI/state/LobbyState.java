@@ -2,7 +2,6 @@ package it.polimi.ingsw.mesos.view.CLI.state;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
-import it.polimi.ingsw.mesos.view.CLI.UIContext;
 
 import java.util.List;
 

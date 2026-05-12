@@ -1,7 +1,5 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
-import it.polimi.ingsw.mesos.view.CLI.UIContext;
-
 public class EndGameState implements UIState {
     @Override
     public void handleInput(String input, UIContext context) {}

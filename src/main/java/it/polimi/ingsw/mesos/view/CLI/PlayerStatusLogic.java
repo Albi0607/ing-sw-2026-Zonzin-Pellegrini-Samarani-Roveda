@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
 import it.polimi.ingsw.mesos.common.BuildingCardJson;
+import it.polimi.ingsw.mesos.view.CLI.formatter.BuildingFormatter;
 import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.common.CharacterCardJson;
 import it.polimi.ingsw.mesos.common.enums.CharacterType;

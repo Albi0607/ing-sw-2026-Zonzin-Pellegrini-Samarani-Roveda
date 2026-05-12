@@ -2,7 +2,6 @@ package it.polimi.ingsw.mesos.view.CLI.state;
 
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
-import it.polimi.ingsw.mesos.view.CLI.UIContext;
 
 public class ChoosingCardIdState implements UIState {
 
