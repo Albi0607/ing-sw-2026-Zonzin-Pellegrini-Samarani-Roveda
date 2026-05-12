@@ -29,6 +29,7 @@
   { "id": "CH_28", "type": "SHAMAN", "era": "ERA_I", "playersRequired": 2, "numberOfIcons": 1 },
   { "id": "CH_29", "type": "SHAMAN", "era": "ERA_I", "playersRequired": 4, "numberOfIcons": 1 },
 
+
   { "id": "CH_30", "type": "HUNTER", "era": "ERA_II", "playersRequired": 2, "hasIcon": false },
   { "id": "CH_31", "type": "HUNTER", "era": "ERA_II", "playersRequired": 2, "hasIcon": false },
   { "id": "CH_32", "type": "HUNTER", "era": "ERA_II", "playersRequired": 3, "hasIcon": true },
