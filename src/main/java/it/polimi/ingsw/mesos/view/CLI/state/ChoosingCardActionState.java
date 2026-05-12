@@ -16,7 +16,7 @@ public class ChoosingCardActionState implements UIState {
 
         if (input.equals("1")) {
             context.transitionTo(new ChoosingCardIdState());
-            context.getCurrentState().renderPrompt(context); // Passa subito il testimone visivo
+            context.getCurrentState().renderPrompt(context);
         } else if (input.equals("2")) {
             context.getController().skipOnExtraDraw();
             context.transitionTo(WaitingState.INSTANCE);

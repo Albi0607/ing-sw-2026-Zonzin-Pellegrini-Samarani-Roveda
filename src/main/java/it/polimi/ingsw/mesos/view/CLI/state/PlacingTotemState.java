@@ -17,7 +17,7 @@ public class PlacingTotemState implements UIState {
         String choice = input.toUpperCase();
         if (choice.isEmpty() || choice.length() != 1) {
             System.out.println(CLIPrinter.ANSI_RED + "❌ Lettera non valida!" + CLIPrinter.ANSI_RESET);
-            renderPrompt(context); // Ristampa il prompt se sbaglia!
+            renderPrompt(context);
         } else {
             context.getController().placeTotem(choice.charAt(0));
             context.clearBufferedUserInputs();

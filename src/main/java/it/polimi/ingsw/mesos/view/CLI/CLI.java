@@ -180,7 +180,7 @@ public class CLI implements View, UIContext {
 
     private void syncStateWithGame() {
         if (currentGameState.currentState == GameState.FINISHED) {
-            // Usa il nuovo stato di fine partita!
+
             transitionTo(new EndGameState());
         }
         else if (isMyTurn()) {
@@ -188,7 +188,7 @@ public class CLI implements View, UIContext {
                 transitionTo(new PlacingTotemState());
             }
             else if (currentGameState.currentState == GameState.RESOLVING_ACTIONS) {
-                // Check sui nuovi stati per evitare di sovrascriverli a ogni aggiornamento
+
                 if (!(currentState instanceof ChoosingCardActionState) && !(currentState instanceof ChoosingCardIdState)) {
                     if (canSkipExtraDraw()) {
                         transitionTo(new ChoosingCardActionState());
@@ -199,7 +199,7 @@ public class CLI implements View, UIContext {
             }
         }
         else {
-            // Correttissimo: se non è il mio turno, metto la CLI in stato "dormiente"
+
             transitionTo(WaitingState.INSTANCE);
         }
     }
@@ -254,11 +254,11 @@ public class CLI implements View, UIContext {
             this.currentGameState = null;
         }
         else if (e.state() == ClientState.WAITING_PLAYERS) {
-            // Usa il nuovo stato che stampa il messaggio di attesa!
+
             transitionTo(new WaitingPlayersState());
         }
         else if (e.state() == ClientState.END_GAME) {
-            // Usa il nuovo stato che stampa i punteggi!
+
             transitionTo(new EndGameState());
         }
 
