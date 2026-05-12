@@ -1,6 +1,11 @@
 package it.polimi.ingsw.mesos.persistence;
 
 import it.polimi.ingsw.mesos.model.card.Card;
+import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
+import it.polimi.ingsw.mesos.model.card.character.TribeCard;
+import it.polimi.ingsw.mesos.model.deck.CreateBuildingCard;
+import it.polimi.ingsw.mesos.model.deck.CreateCharacterCard;
+import it.polimi.ingsw.mesos.model.deck.CreateEventCard;
 import it.polimi.ingsw.mesos.model.deck.Deck;
 
 import java.io.*;
@@ -73,30 +78,53 @@ public class StateSerializer {
             return false;
         }
 
-        // Svuota il deck attuale (quello generato casualmente)
-        List<T> current = drainDeck(currentDeck);
-        java.util.Map<String, T> byId = new java.util.HashMap<>();
-        for (T card : current) {
-            byId.put(card.getId(), card);
-        }
-
-        // Legge l'ordine originale dal file
-        List<String> savedIds = readIdsFromFile(path);
-        if (savedIds == null || savedIds.isEmpty()) return false;
-
-        // Ricostruisce il deck nell'ordine originale
-        for (int i = savedIds.size() - 1; i >= 0; i--) {
-            T card = byId.get(savedIds.get(i));
-            if (card != null) {
-                currentDeck.put(card);
-            } else {
-                System.err.println("[StateSerializer] Carta non trovata per id: " + savedIds.get(i));
+        if(isTribe) {
+            // creo il pool intero di carte tribe da cui matchare gli indici (SOLUZIONE PIù ESTENDIBILE??)
+            List<TribeCard> allCards = new ArrayList<>();
+            allCards.addAll(new CreateCharacterCard("cards/characters.json").getAllCharacterCards());
+            allCards.addAll(new CreateEventCard("cards/events.json").getAllEventCards());
+            // Svuota il deck attuale (quello generato casualmente)
+            drainDeck(currentDeck);
+            // itera in tutto il pool per matchare l'id
+            java.util.Map<String, TribeCard> byId = new java.util.HashMap<>();
+            for (TribeCard card : allCards) {
+                byId.put(card.getId(), card);
             }
-        }
+            // Legge l'ordine originale dal file
+            List<String> savedIds = readIdsFromFile(path);
+            if (savedIds == null || savedIds.isEmpty()) return false;
 
-        System.out.println("[StateSerializer] Mazzo ripristinato: "
-                + (isTribe ? "tribe" : "building") + " (" + savedIds.size() + " carte)");
-        return true;
+            for (int i = savedIds.size() - 1; i >= 0; i--) {
+                TribeCard card = byId.get(savedIds.get(i));
+                if (card != null) currentDeck.put((T) card);
+                else System.err.println("[StateSerializer] Carta tribe non trovata per id: " + savedIds.get(i));
+            }
+            System.out.println("[StateSerializer] Tribe deck ripristinato (" + savedIds.size() + " carte)");
+            return true;
+        }
+        else {
+            // creo il pool intero di carte building da cui matchare gli indici (SOLUZIONE PIù ESTENDIBILE??)
+            List<BuildingCard> allCards = new ArrayList<>();
+            allCards.addAll(new CreateBuildingCard("cards/buildings.json").getAllBuildingCards());
+            // itera in tutto il pool per matchare l'id
+            java.util.Map<String, BuildingCard> byId = new java.util.HashMap<>();
+            for (BuildingCard card : allCards) {
+                byId.put(card.getId(), card);
+            }
+            // Svuota il deck attuale (quello generato casualmente)
+            drainDeck(currentDeck);
+            // Legge l'ordine originale dal file
+            List<String> savedIds = readIdsFromFile(path);
+            if (savedIds == null || savedIds.isEmpty()) return false;
+
+            for (int i = savedIds.size() - 1; i >= 0; i--) {
+                BuildingCard card = byId.get(savedIds.get(i));
+                if (card != null) currentDeck.put((T) card);
+                else System.err.println("[StateSerializer] Carta building non trovata per id: " + savedIds.get(i));
+            }
+            System.out.println("[StateSerializer] Building deck ripristinato (" + savedIds.size() + " carte)");
+            return true;
+        }
     }
 
     /**
