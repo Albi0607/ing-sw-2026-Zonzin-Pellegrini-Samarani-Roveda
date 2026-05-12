@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.persistence;
 
 import it.polimi.ingsw.mesos.controller.GameController;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.util.List;
@@ -61,6 +62,7 @@ public class GameRestorer {
         }
 
         controller.setReplayMode(false);
+        controller.sendClientStateToAll(ClientState.IN_GAME);
 
         // Invia lo stato attuale a tutti i client riconnessi
         controller.broadcastUpdate();
@@ -94,22 +96,23 @@ public class GameRestorer {
             }
 
             case START_GAME -> {
-                controller.startGame();
-                DeckSerializer ds = controller.getDeckSerializer();
+                StateSerializer ss = controller.getStateSerializer();
 
-                if(ds.hasSavedDecks()) {
-                    ds.restoreDeck(
-                            controller.getGame().getBoard().getTribeDeck(),
-                            null,
-                            true
-                    );
+                if(ss.hasSavedState()) {
+                    // 1. Ripristiniamo i mazzi INTERI prima di chiamare startGame
+                    ss.restoreDeck(controller.getGame().getBoard().getTribeDeck(), true);
+                    ss.restoreDeck(controller.getGame().getBoard().getBuildingDeck(), false);
                 }
-                if(ds.hasSavedDecks()) {
-                    ds.restoreDeck(
-                            controller.getGame().getBoard().getBuildingDeck(),
-                            null,
-                            false
-                    );
+
+                // 2. Chiamiamo startGame: pescherà le carte giuste dal mazzo ripristinato!
+                controller.startGame();
+
+                // 3. Sistemiamo l'ordine dei giocatori (perché startGame ha rimescolato)
+                if(ss.hasSavedState()) {
+                    List<String> order = ss.restorePlayerOrder();
+                    if (order != null) {
+                        controller.getGame().setPlayerOrder(order);
+                    }
                 }
             }
 
