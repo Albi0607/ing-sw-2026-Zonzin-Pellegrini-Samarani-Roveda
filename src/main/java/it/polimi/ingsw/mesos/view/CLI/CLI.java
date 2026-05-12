@@ -16,6 +16,9 @@ import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.function.Consumer;
 
 public class CLI implements View {
     private ClientController controller;
@@ -33,6 +36,7 @@ public class CLI implements View {
     private List<LobbyInfoDTO> currentLobby;
     private InputMode currentInputMode = InputMode.LOGIN;
     private boolean awaitingServerResponse = false;
+    private final Map<Class<? extends UIEvent>, Consumer<UIEvent>> eventHandlers = new HashMap<>();
 
     // --- FLAG DI RENDERING ---
     private boolean fullDirty = true;
@@ -47,6 +51,7 @@ public class CLI implements View {
 
     public CLI() {
         this.scanner = new Scanner(System.in);
+        initializeEventHandlers();
     }
 
     /**
@@ -194,109 +199,209 @@ public class CLI implements View {
         }
     }
 
+    private void initializeEventHandlers() {
+        eventHandlers.put(
+                UIEvent.GameUpdatedEvent.class,
+                event -> handleGameUpdated((UIEvent.GameUpdatedEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.LobbyUpdatedEvent.class,
+                event -> handleLobbyUpdated((UIEvent.LobbyUpdatedEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.ClientStateUpdatedEvent.class,
+                event -> handleClientStateUpdated((UIEvent.ClientStateUpdatedEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.ActionRejectedEvent.class,
+                event -> handleActionRejected((UIEvent.ActionRejectedEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.ActionAcceptedEvent.class,
+                event -> handleActionAccepted((UIEvent.ActionAcceptedEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.MessageEvent.class,
+                event -> handleMessage((UIEvent.MessageEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.UserInputEvent.class,
+                event -> handleUserInput((UIEvent.UserInputEvent) event)
+        );
+
+        eventHandlers.put(
+                UIEvent.ResolutionTimeoutEvent.class,
+                event -> handleResolutionTimeout()
+        );
+
+        eventHandlers.put(
+                UIEvent.GameRestoredEvent.class,
+                event -> handleGameRestored((UIEvent.GameRestoredEvent) event)
+        );
+    }
+
     /**
      * Core logic for handling different types of UIEvent. Updates internal
      * state variables and manages transitions between game phases.
      * @param event The UIEvent to process.
      */
     private void handleEvent(UIEvent event) {
-        if (event instanceof UIEvent.GameUpdatedEvent e) {
-            this.currentGameState = e.game();
+        Consumer<UIEvent> handler =
+                eventHandlers.get(event.getClass());
 
-            if (this.currentClientState == null || this.currentClientState == ClientState.LOBBY || this.currentClientState == ClientState.WAITING_PLAYERS) {
-                this.currentClientState = ClientState.IN_GAME;
-                this.notifications.clear();
-                this.resolutionTimeoutScheduled = false;
-            }
-
-            this.awaitingServerResponse = false;
-            syncInputModeWithGameState();
-            this.fullDirty = true;
+        if (handler != null) {
+            handler.accept(event);
         }
-        else if (event instanceof UIEvent.LobbyUpdatedEvent e) {
-            this.currentLobby = e.lobby();
-            if (this.currentClientState == null) {
-                this.currentClientState = ClientState.LOBBY;
-                this.currentInputMode = InputMode.LOBBY_MENU;
-            }
-            this.fullDirty = true;
-        }
-        else if (event instanceof UIEvent.ClientStateUpdatedEvent e) {
-            this.currentClientState = e.state();
-            if (e.state() == ClientState.LOBBY) {
-                this.currentInputMode = InputMode.LOBBY_MENU;
+    }
 
-                this.resolutionTimeoutScheduled = false;
+    private void handleGameUpdated(UIEvent.GameUpdatedEvent e) {
 
-                this.notifications.clear();
-                this.currentGameState = null;
+        this.currentGameState = e.game();
 
-            } else if (e.state() == ClientState.WAITING_PLAYERS) {
-                this.currentInputMode = InputMode.WAITING;
-            }
-            this.fullDirty = true;
-        }
-        else if (event instanceof UIEvent.ActionRejectedEvent e) {
-            if (currentInputMode == InputMode.WAITING && currentClientState == ClientState.IN_GAME && isMyTurn()) {
-                this.awaitingServerResponse = false;
-                syncInputModeWithGameState();
-            }
-            if (currentGameState != null &&
-                    currentGameState.currentState == GameState.FINISHED) {
-                return;
-            }
-            notifications.offer("❌ " + e.reason());
-            this.softDirty = true;
-        }
-        else if (event instanceof UIEvent.ActionAcceptedEvent e) {
-            if (currentGameState != null &&
-                    currentGameState.currentState == GameState.FINISHED) {
-                return;
-            }
-            notifications.offer("✔ " + e.message());
-            this.softDirty = true;
-        }
-        else if (event instanceof UIEvent.MessageEvent e) {
-            if (currentGameState != null &&
-                    currentGameState.currentState == GameState.FINISHED) {
-                return;
-            }
-            notifications.offer("ℹ️ " + e.message());
-            this.softDirty = true;
-        }
-        else if (event instanceof UIEvent.UserInputEvent e) {
-            processInput(e.input());
-        }else if (event instanceof UIEvent.ResolutionTimeoutEvent) {
+        if (this.currentClientState == null ||
+                this.currentClientState == ClientState.LOBBY ||
+                this.currentClientState == ClientState.WAITING_PLAYERS) {
 
-            CLIPrinter.clearScreen();
-            printDBLeaderboard();
-
-            if (currentGameState != null) {
-                CLIPrinter.printGameOver(currentGameState);
-            }
-
-            this.currentInputMode = InputMode.WAITING;
-
-            this.fullDirty = false;
-            this.softDirty = false;
-
-        }else if (event instanceof UIEvent.GameRestoredEvent e) {
-
-            this.currentGameState = e.game();
-
-            if (this.currentClientState != ClientState.END_GAME) {
-                this.currentClientState = ClientState.IN_GAME;
-            }
-
+            this.currentClientState = ClientState.IN_GAME;
             this.notifications.clear();
-            this.awaitingServerResponse = false;
+            this.resolutionTimeoutScheduled = false;
+        }
+
+        this.awaitingServerResponse = false;
+
+        syncInputModeWithGameState();
+
+        this.fullDirty = true;
+    }
+
+    private void handleLobbyUpdated(UIEvent.LobbyUpdatedEvent e) {
+
+        this.currentLobby = e.lobby();
+        if (this.currentClientState == null) {
+            this.currentClientState = ClientState.LOBBY;
+            this.currentInputMode = InputMode.LOBBY_MENU;
+        }
+        this.fullDirty = true;
+
+    }
+
+    private void handleClientStateUpdated(UIEvent.ClientStateUpdatedEvent e) {
+
+        this.currentClientState = e.state();
+
+        if (e.state() == ClientState.LOBBY) {
+
+            this.currentInputMode = InputMode.LOBBY_MENU;
+
             this.resolutionTimeoutScheduled = false;
 
-            syncInputModeWithGameState();
-            this.fullDirty = true;
+            this.notifications.clear();
 
-            System.out.println(CLIPrinter.ANSI_GREEN + "\n💾 [SISTEMA] Partita ripristinata correttamente dal salvataggio." + CLIPrinter.ANSI_RESET);
+            this.currentGameState = null;
+
         }
+        else if (e.state() == ClientState.WAITING_PLAYERS) {
+
+            this.currentInputMode = InputMode.WAITING;
+        }
+
+        this.fullDirty = true;
+    }
+
+    private void handleActionRejected(UIEvent.ActionRejectedEvent e) {
+
+        if (currentInputMode == InputMode.WAITING &&
+                currentClientState == ClientState.IN_GAME &&
+                isMyTurn()) {
+
+            this.awaitingServerResponse = false;
+
+            syncInputModeWithGameState();
+        }
+
+        if (currentGameState != null &&
+                currentGameState.currentState == GameState.FINISHED) {
+            return;
+        }
+
+        notifications.offer("❌ " + e.reason());
+
+        this.softDirty = true;
+    }
+
+    private void handleActionAccepted(UIEvent.ActionAcceptedEvent e) {
+
+        if (currentGameState != null &&
+                currentGameState.currentState == GameState.FINISHED) {
+            return;
+        }
+
+        notifications.offer("✔ " + e.message());
+
+        this.softDirty = true;
+    }
+
+    private void handleMessage(UIEvent.MessageEvent e) {
+
+        if (currentGameState != null &&
+                currentGameState.currentState == GameState.FINISHED) {
+            return;
+        }
+
+        notifications.offer("ℹ️ " + e.message());
+
+        this.softDirty = true;
+    }
+
+    private void handleUserInput(UIEvent.UserInputEvent e) {
+        processInput(e.input());
+    }
+
+
+    private void handleResolutionTimeout() {
+
+        CLIPrinter.clearScreen();
+
+        printDBLeaderboard();
+
+        if (currentGameState != null) {
+            CLIPrinter.printGameOver(currentGameState);
+        }
+
+        this.currentInputMode = InputMode.WAITING;
+
+        this.fullDirty = false;
+
+        this.softDirty = false;
+    }
+
+    private void handleGameRestored(UIEvent.GameRestoredEvent e) {
+
+        this.currentGameState = e.game();
+
+        if (this.currentClientState != ClientState.END_GAME) {
+            this.currentClientState = ClientState.IN_GAME;
+        }
+
+        this.notifications.clear();
+
+        this.awaitingServerResponse = false;
+
+        this.resolutionTimeoutScheduled = false;
+
+        syncInputModeWithGameState();
+
+        notifications.offer("💾 [SISTEMA] Partita ripristinata correttamente dal salvataggio.");
+
+        this.fullDirty = true;
+
+        this.softDirty = true;
     }
 
     /**
