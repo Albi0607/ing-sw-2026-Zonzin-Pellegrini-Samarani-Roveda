@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.CLI;
+package it.polimi.ingsw.mesos.view.CLI.formatter;
 
 import it.polimi.ingsw.mesos.common.CardJson;
 

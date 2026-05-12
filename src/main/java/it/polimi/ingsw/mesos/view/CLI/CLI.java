@@ -39,7 +39,6 @@ public class CLI implements View, UIContext {
     private boolean awaitingServerResponse = false;
     private final Map<Class<? extends UIEvent>, Consumer<UIEvent>> eventHandlers = new HashMap<>();
 
-    // LA NUOVA MACCHINA A STATI
     private UIState currentState;
 
     // --- FLAG DI RENDERING ---
@@ -50,7 +49,7 @@ public class CLI implements View, UIContext {
 
     public CLI() {
         this.scanner = new Scanner(System.in);
-        this.currentState = new LoginState(); // Stato iniziale!
+        this.currentState = new LoginState();
         initializeEventHandlers();
     }
 

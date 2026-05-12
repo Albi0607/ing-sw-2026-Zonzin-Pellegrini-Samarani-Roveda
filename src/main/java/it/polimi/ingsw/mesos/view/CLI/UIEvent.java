@@ -6,10 +6,8 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 
 import java.util.List;
 
-// 1. La nostra interfaccia pulita (senza metodi, serve solo come "etichetta")
 public interface UIEvent {
 
-    // 2. Tutti i nostri eventi raggruppati qui dentro!
     record GameUpdatedEvent(GameDTO game) implements UIEvent {}
 
     record LobbyUpdatedEvent(List<LobbyInfoDTO> lobby) implements UIEvent {}

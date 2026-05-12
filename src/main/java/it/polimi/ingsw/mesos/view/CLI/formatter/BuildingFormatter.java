@@ -1,9 +1,10 @@
-package it.polimi.ingsw.mesos.view.CLI;
+package it.polimi.ingsw.mesos.view.CLI.formatter;
 
 import it.polimi.ingsw.mesos.common.BuildingCardJson;
 import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.EventType;
 import it.polimi.ingsw.mesos.common.enums.SpecialActionType;
+import it.polimi.ingsw.mesos.view.CLI.VisualTheme;
 
 public class BuildingFormatter implements Formatters.CardFormatter<BuildingCardJson> {
 
