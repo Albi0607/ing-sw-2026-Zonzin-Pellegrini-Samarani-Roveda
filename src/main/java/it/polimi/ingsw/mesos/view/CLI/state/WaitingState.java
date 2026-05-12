@@ -12,13 +12,11 @@ public class WaitingState implements UIState {
 
     @Override
     public void handleInput(String input, UIContext context) {
-        // Silenzio assoluto.
     }
 
     @Override
     public void render(UIContext context) {
-        // Disegna la plancia solo se siamo effettivamente in partita,
-        // altrimenti (es. durante il login) resta in silenzio.
+
         if (context.getClientState() == it.polimi.ingsw.mesos.rete.ClientModel.ClientState.IN_GAME) {
             context.drawUI();
         }

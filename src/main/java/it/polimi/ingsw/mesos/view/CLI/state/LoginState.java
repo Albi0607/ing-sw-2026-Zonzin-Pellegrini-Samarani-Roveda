@@ -13,15 +13,12 @@ public class LoginState implements UIState {
             return;
         }
 
-        // Usiamo il contesto per salvare il nome e chiamare il controller
         context.setMyNickname(input);
 
         try {
             context.getController().getLobby(input);
             System.out.println(CLIPrinter.ANSI_YELLOW + "Accesso alla Lobby in corso..." + CLIPrinter.ANSI_RESET);
 
-            // Dopo aver mandato la richiesta, andiamo in stato di attesa
-            // per evitare che l'utente spammi la tastiera
             context.transitionTo(WaitingState.INSTANCE);
 
         } catch (Exception e) {
