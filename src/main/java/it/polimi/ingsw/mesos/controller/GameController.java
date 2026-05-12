@@ -40,6 +40,7 @@ public class GameController {
     private DeckSerializer deckSerializer;
     private boolean replayMode = false;  // true durante il replay, disabilita broadcast
     private GameRestorer restorer = null;
+    private Runnable onGameFinished;
 
 
     //id del game che corrisponde a quello della lobby
@@ -75,6 +76,10 @@ public class GameController {
 
         this.expectedNumPlayers = expectedNumPlayers;
 
+        if (moveLogger != null && !replayMode) {
+            moveLogger.append(GameMove.setNumPlayers(expectedNumPlayers));
+        }
+
         if (pendingNicknames.size() == this.expectedNumPlayers) {
 
             createGame();
@@ -108,16 +113,11 @@ public class GameController {
 
     public synchronized void addPlayer(String nickname, VirtualView view) {
 
-        // Caso ripristino: il gioco era già stato creato, il giocatore si riconnette
-        if (restorer != null && game != null) {
-            reconnectPlayer(nickname, view);
-
-            // Se tutti i giocatori si sono riconnessi, termina il replay
-            boolean allReconnected = players.values().stream()
-                    .noneMatch(v -> v instanceof DummyVirtualView);
-            if (allReconnected) {
-                broadcastUpdate();
-                sendClientStateToAll(ClientState.IN_GAME);
+        if (replayMode) {
+            pendingNicknames.add(nickname);
+            //ricreiamo il game in modo possa essere chiamato startGame() nel replay di START_GAME
+            if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
+                createGame();
             }
             return;
         }
@@ -140,10 +140,26 @@ public class GameController {
                 restorer = null; // ripristino completato
             } else {
                 view.sendClientState(ClientState.WAITING_PLAYERS);
+                view.showMessage("Riconnessione in corso... in attesa degli altri giocatori.");
             }
             return;
         }
 
+        // Caso: riconnessione a partita in ripristino, dunque game è già stato creato
+        if (restorer != null && game != null) {
+            reconnectPlayer(nickname, view);
+
+            // Se tutti i giocatori si sono riconnessi, termina il replay
+            boolean allReconnected = players.values().stream()
+                    .noneMatch(v -> v instanceof DummyVirtualView);
+            if (allReconnected) {
+                broadcastUpdate();
+                sendClientStateToAll(ClientState.IN_GAME);
+            }
+            return;
+        }
+
+        // Caso: normale connessione ad un game appena creato
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
         }
@@ -244,6 +260,10 @@ public class GameController {
             moveLogger.append(GameMove.startGame());
         }
 
+        if(!replayMode){
+            sendClientStateToAll(ClientState.IN_GAME);
+        }
+
         broadcastUpdate();
     }
 
@@ -277,9 +297,13 @@ public class GameController {
              */
         }
         //broadcastUpdate();
+
         sendClientStateToAll(ClientState.END_GAME);
         if (moveLogger != null) moveLogger.delete();
         deckSerializer.delete();
+        if (onGameFinished != null) {
+            onGameFinished.run();
+        }
     }
 
     // AZIONI DEL GIOCATORE
@@ -605,6 +629,10 @@ public class GameController {
 
     public boolean hasRestorer() {
         return restorer != null;
+    }
+
+    public void setOnGameFinished(Runnable callback) {
+        this.onGameFinished = callback;
     }
 
     // GETTERS
