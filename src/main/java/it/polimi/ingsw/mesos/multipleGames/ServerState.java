@@ -24,18 +24,46 @@ public class ServerState {
     private final Map<String, GameController> playerToGame;
     //permette di vedere il nome di tutti i giocatori connessi per non avere ripetizioni
     private final Set<String> nicknames;
+    //permette di separare i nickname attualmente in gioco e quelli in attesa di riconnessione
+    private final Map<String, Integer> pendingReconnect;
 
     public ServerState(){
         this.lobby = new Lobby(this);
         this.connections = new ConcurrentHashMap<>();
         this.playerToGame = new ConcurrentHashMap<>();
         this.nicknames  = ConcurrentHashMap.newKeySet();
+        this.pendingReconnect = new ConcurrentHashMap<>();
     }
 
     public synchronized void getLobby(String nickname,VirtualView view){
-        if(isNicknameTaken(nickname)||nickname.isEmpty()){
+        if (nickname == null || nickname.isEmpty()) {
+            view.showMessage("Nickname non valido");
             return;
         }
+
+        //gestione riconnessione
+        if (pendingReconnect.containsKey(nickname)) {
+            int gameId = pendingReconnect.remove(nickname);
+            String virtualViewId = view.getId();
+            connections.put(virtualViewId, view);
+            nicknames.add(nickname);
+
+            GameController controller = lobby.joinGame(gameId, nickname, virtualViewId);
+            if (controller != null) {
+                playerToGame.put(nickname, controller);
+                System.out.println("[ServerState] Riconnessione di '" + nickname
+                        + "' alla partita " + gameId);
+            } else {
+                view.showMessage("Errore durante la riconnessione alla partita " + gameId);
+            }
+            return;
+        }
+
+        if(isNicknameTaken(nickname)){
+            view.showMessage("Nickname: " + nickname + " già in uso");
+            return;
+        }
+
         String virtualViewId= view.getId();
         connections.put(virtualViewId,view);
         lobby.addViewer(virtualViewId);
@@ -96,6 +124,11 @@ public class ServerState {
         }
     }
 
+    public synchronized void removePlayer(String nickname) {
+        nicknames.remove(nickname);
+        playerToGame.remove(nickname);
+    }
+
     //per rimuovere connessione a tutto
     public void removeConnection(String virtualViewId){
         connections.remove(virtualViewId);
@@ -107,10 +140,7 @@ public class ServerState {
      * interrotte (pattern: mesos_game_{id}.log) e le registra come partite
      * ripristinabili.
      *
-     * Va chiamato UNA VOLTA in ServerMain.main() prima di avviare i server
-     * RMI e Socket:
-     *
-     *   serverState.initializeFromDisk();
+     * Viene chiamato una volta prima di avviare i server RMI e Socket
      *
      * Le partite ripristinabili appaiono in lobby come "started=true" —
      * i giocatori originali possono riconnettersi con lo stesso nickname
@@ -158,12 +188,12 @@ public class ServerState {
             // Registra i nickname come "attesi" così non possono essere usati
             // da altri giocatori di altre partite
             for (String nick : originalNicknames) {
-                nicknames.add(nick);
+                pendingReconnect.put(nick, gameId);
             }
 
             // Aggiunge la partita alla lobby con l'ID originale
             // (così il nextId della Lobby non sovrascrive un ID già usato)
-            //lobby.restoreGame(gameId, controller);
+            lobby.restoreGame(gameId, controller);
 
             System.out.println("[ServerState] Partita " + gameId +
                     " ripristinabile. Giocatori attesi: " + originalNicknames);
