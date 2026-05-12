@@ -37,7 +37,7 @@ public class GameController {
     private LeaderboardService leaderboardService;
     //persistenza
     private MoveLogger moveLogger;
-    private DeckSerializer deckSerializer;
+    private StateSerializer stateSerializer;
     private boolean replayMode = false;  // true durante il replay, disabilita broadcast
     private GameRestorer restorer = null;
     private Runnable onGameFinished;
@@ -50,7 +50,7 @@ public class GameController {
         this.gameId = gameId;
         this.pendingNicknames = new ArrayList<>();
         this.moveLogger = new MoveLogger("mesos_game_" + gameId + ".log");
-        this.deckSerializer = new DeckSerializer(gameId);
+        this.stateSerializer = new StateSerializer(gameId);
         this.leaderboardService = new LeaderboardService(new GameResultDAO());
     }
 
@@ -192,16 +192,8 @@ public class GameController {
             // La stanza è piena. Creiamo la partita...
             createGame();
 
-            game.startGame();
-
             // Usiamo un Thread per sbloccare i giocatori e mandare la prima plancia
-            new Thread(() -> {
-                for (VirtualView v : players.values()) {
-                    v.sendClientState(ClientState.IN_GAME);
-                }
-
-                broadcastUpdate();
-            }).start();
+            new Thread(() -> startGame()).start();
         }
         else {
             // È entrato un giocatore, ma la stanza non è ancora piena.
@@ -252,11 +244,17 @@ public class GameController {
 
     public void startGame() {
         if (game == null) throw new IllegalStateException("Game not created");
+
+        // Salviamo i mazzi INTERI prima che startGame li consumi per il setup del Round 1
+        if (moveLogger != null && !replayMode) {
+            stateSerializer.saveDeck(game.getBoard().getTribeDeck(), true);
+            stateSerializer.saveDeck(game.getBoard().getBuildingDeck(), false);
+        }
+
         game.startGame();
 
         if (moveLogger != null && !replayMode) {
-            deckSerializer.saveDeck(game.getBoard().getTribeDeck(), true);
-            deckSerializer.saveDeck(game.getBoard().getBuildingDeck(), false);
+            stateSerializer.savePlayerOrder(game.getPlayers());
             moveLogger.append(GameMove.startGame());
         }
 
@@ -300,7 +298,7 @@ public class GameController {
 
         sendClientStateToAll(ClientState.END_GAME);
         if (moveLogger != null) moveLogger.delete();
-        deckSerializer.delete();
+        stateSerializer.delete();
         if (onGameFinished != null) {
             onGameFinished.run();
         }
@@ -334,7 +332,7 @@ public class GameController {
 
             if (moveLogger != null) moveLogger.append(GameMove.placeTotem(nickname, tileId));
 
-            view.showActionAccepted("Totem piazzato con successo!");
+            if (!replayMode) view.showActionAccepted("Totem piazzato con successo!");
 
             broadcastUpdate();
 
@@ -342,7 +340,7 @@ public class GameController {
 
         } catch (Exception e) {
 
-            view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
             System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
             return false;
         }
@@ -362,7 +360,7 @@ public class GameController {
             // forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
 
             game.takeCard(player, cardIndex, isUpper);
-            view.showActionAccepted("Carta scelta con successo!");
+            if (!replayMode) view.showActionAccepted("Carta scelta con successo!");
 
             if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
 
@@ -376,7 +374,7 @@ public class GameController {
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
             return false;
         }
     }
@@ -397,10 +395,10 @@ public class GameController {
             game.skipExtraDraw(player);
             if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
-            view.showActionAccepted("Azione saltata con successo!");
+            if (!replayMode) view.showActionAccepted("Azione saltata con successo!");
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            view.showActionRejected("Azione non saltata correttamente: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Azione non saltata correttamente: " + e.getMessage());
             return false;
         }
     }
@@ -411,6 +409,8 @@ public class GameController {
     //capire cosa fare quando un player si disconnette: chi fa le sue azioni? Si saltano?
     public synchronized void broadcastUpdate() {
         if (game == null || replayMode) return;
+        GameState state = game.getCurrentState().getStateId();
+        if (state == GameState.SETUP) return;
         GameDTO dto = buildLastGameDTO();
         for (VirtualView view : players.values()) {
             try {
@@ -542,7 +542,7 @@ public class GameController {
     }
 
     //notifica il cambio state agli altri player
-    protected void sendClientStateToAll(ClientState state) {
+    public void sendClientStateToAll(ClientState state) {
         for  (VirtualView view : players.values()) {
             try {
                 view.sendClientState(state);
@@ -614,8 +614,7 @@ public class GameController {
             throw new IllegalArgumentException("Giocatore non trovato: " + nickname);
         }
         players.put(nickname, newView); // sostituisce la DummyVirtualView
-        newView.sendGame(buildLastGameDTO());
-        newView.sendClientState(ClientState.IN_GAME);
+
         System.out.println("[GameController] Giocatore riconnesso: " + nickname);
     }
 
@@ -623,8 +622,8 @@ public class GameController {
         return moveLogger;
     }
 
-    public DeckSerializer getDeckSerializer() {
-        return deckSerializer;
+    public StateSerializer getStateSerializer() {
+        return stateSerializer;
     }
 
     public boolean hasRestorer() {

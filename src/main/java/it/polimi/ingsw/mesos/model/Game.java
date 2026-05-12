@@ -411,4 +411,38 @@ public class Game {
     public void setOnGameEnd(Runnable r) {
         this.onGameEnd = r;
     }
+
+    /**
+     * Ripristina l'ordine dei giocatori e il loro cibo iniziale.
+     * Usato dal GameRestorer per annullare lo shuffle casuale di startGame().
+     */
+    public void setPlayerOrder(List<String> order) {
+        List<Player> orderedPlayers = new ArrayList<>();
+        for (String nickname : order) {
+            Player p = players.stream()
+                    .filter(player -> player.getNickname().equals(nickname))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Player not found: " + nickname));
+            orderedPlayers.add(p);
+        }
+        this.players = orderedPlayers;
+
+        // Sincronizza la track e il cibo
+        this.board.getTurnOrderTrack().setEffectsActive(false); // Disabilita per evitare bonus duplicati
+        this.board.getTurnOrderTrack().resetOrder();
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            p.setFood(0); // reset cibo dato dallo shuffle casuale
+            this.board.getTurnOrderTrack().setPlayerAt(i, p);
+            if (i == 0) p.addFood(2);
+            else if (i == 1 || i == 2) p.addFood(3);
+            else p.addFood(4);
+        }
+        this.board.getTurnOrderTrack().setEffectsActive(true);
+
+        // Forza la ri-esecuzione dello stato PlacingState per aggiornare l'actingOrder
+        if (this.currentState instanceof PlacingState) {
+            this.currentState.execute(this);
+        }
+    }
 }
