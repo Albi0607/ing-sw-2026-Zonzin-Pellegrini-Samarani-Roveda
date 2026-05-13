@@ -1,5 +1,6 @@
 
 package it.polimi.ingsw.mesos.view.CLI;
+import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.rete.ClientChoseSetup;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.Network;
@@ -44,6 +45,16 @@ public class CLIClient {
         try {
             Network network = ClientChoseSetup.createNetwork(netChoice);
 
+            System.out.print("MySQL username (invio per skip): ");
+            String user = scanner.nextLine().trim();
+
+            String password = "";
+            if (!user.isBlank()) {
+                System.out.print("MySQL password: ");
+                password = scanner.nextLine().trim();
+            }
+
+            DBManager.init(user, password); // ← chiamato SEMPRE, anche con user vuoto
             CLI cli = new CLI();
 
             ClientController controller = new ClientController(cli, network);

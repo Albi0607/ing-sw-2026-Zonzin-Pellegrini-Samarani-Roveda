@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
@@ -38,7 +39,6 @@ public class CLI implements View, UIContext {
     private List<LobbyInfoDTO> currentLobby;
     private boolean awaitingServerResponse = false;
     private final Map<Class<? extends UIEvent>, Consumer<UIEvent>> eventHandlers = new HashMap<>();
-
     private UIState currentState;
 
     // --- FLAG DI RENDERING ---
@@ -318,7 +318,11 @@ public class CLI implements View, UIContext {
 
     private void renderIfNeeded() {
         if ((!fullDirty && !softDirty) || currentClientState == null) return;
-        if (currentClientState == ClientState.IN_GAME && currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        if (currentClientState == ClientState.IN_GAME
+                && currentGameState != null
+                && currentGameState.currentState == GameState.FINISHED
+                && !(currentState instanceof EndGameState)) return;
+
 
         // 1. RENDERING PRINCIPALE DELEGATO ALLO STATO
         if (fullDirty) {
@@ -378,6 +382,10 @@ public class CLI implements View, UIContext {
     }
 
     private void printDBLeaderboard() {
+        if (!DBManager.isActive()) {
+            System.out.println("Classifica non disponibile (DB offline)");
+            return;
+        }
         try {
             GameResultDAO dao = new GameResultDAO();
             LeaderboardService service = new LeaderboardService(dao);

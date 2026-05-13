@@ -2,8 +2,9 @@ package it.polimi.ingsw.mesos.DB;
 
 public class DBTest {
     public static void main(String[] args) throws Exception {
-
-        DBManager.init(); // inizializza DB e crea tabella
+        String username = "root" ;
+        String pw = "1234" ;
+        DBManager.init(username,pw); // inizializza DB e crea tabella
 
         GameResultDAO dao = new GameResultDAO(); // costruttore corretto
         LeaderboardService service = new LeaderboardService(dao);
