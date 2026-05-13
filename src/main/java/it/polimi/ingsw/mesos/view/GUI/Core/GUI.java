@@ -62,6 +62,10 @@ public class GUI extends Application implements View {
     public void showActionAccepted(String message) {
     }
 
+    @Override
+    public void  showLoginError(String message) {
+    }
+
     //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
     public void handleLogin(String nickname,String ip,int port,String networkChoice){
         try {

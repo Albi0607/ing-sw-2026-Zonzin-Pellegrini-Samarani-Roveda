@@ -39,6 +39,7 @@ public class CLI implements View, UIContext {
     private List<LobbyInfoDTO> currentLobby;
     private boolean awaitingServerResponse = false;
     private final Map<Class<? extends UIEvent>, Consumer<UIEvent>> eventHandlers = new HashMap<>();
+
     private UIState currentState;
 
     // --- FLAG DI RENDERING ---
@@ -135,6 +136,7 @@ public class CLI implements View, UIContext {
         }
     }
 
+
     // ==========================================================
     // METODI CHIAMATI DALLA RETE (Inseriscono solo eventi)
     // ==========================================================
@@ -151,6 +153,8 @@ public class CLI implements View, UIContext {
     public void showActionRejected(String reason) { eventQueue.offer(new UIEvent.ActionRejectedEvent(reason)); }
     @Override
     public void showActionAccepted(String message) { eventQueue.offer(new UIEvent.ActionAcceptedEvent(message)); }
+    @Override
+    public void showLoginError(String message){eventQueue.offer(new UIEvent.LoginErrorEvent(message));}
 
     // ==========================================================
     // IL MOTORE PRINCIPALE (EDT - Event Dispatch Thread)
@@ -204,6 +208,7 @@ public class CLI implements View, UIContext {
     }
 
     private void initializeEventHandlers() {
+        eventHandlers.put(UIEvent.LoginErrorEvent.class, event -> handleLoginError((UIEvent.LoginErrorEvent) event));
         eventHandlers.put(UIEvent.GameUpdatedEvent.class, event -> handleGameUpdated((UIEvent.GameUpdatedEvent) event));
         eventHandlers.put(UIEvent.LobbyUpdatedEvent.class, event -> handleLobbyUpdated((UIEvent.LobbyUpdatedEvent) event));
         eventHandlers.put(UIEvent.ClientStateUpdatedEvent.class, event -> handleClientStateUpdated((UIEvent.ClientStateUpdatedEvent) event));
@@ -232,6 +237,17 @@ public class CLI implements View, UIContext {
         this.awaitingServerResponse = false;
         syncStateWithGame();
         this.fullDirty = true;
+    }
+
+    private void handleLoginError(UIEvent.LoginErrorEvent e) {
+        transitionTo(new LoginState());
+        this.awaitingServerResponse = false;
+        CLIPrinter.clearScreen();
+        System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: " + e.message() + CLIPrinter.ANSI_RESET);
+        System.out.print("\nInserisci un nuovo nickname: ");
+
+        this.softDirty = false;
+        this.fullDirty = false;
     }
 
     private void handleLobbyUpdated(UIEvent.LobbyUpdatedEvent e) {
@@ -317,12 +333,18 @@ public class CLI implements View, UIContext {
     }
 
     private void renderIfNeeded() {
-        if ((!fullDirty && !softDirty) || currentClientState == null) return;
-        if (currentClientState == ClientState.IN_GAME
-                && currentGameState != null
-                && currentGameState.currentState == GameState.FINISHED
-                && !(currentState instanceof EndGameState)) return;
+        if (!fullDirty && !softDirty) return;
 
+        if (currentClientState == null) {
+            flushNotifications();
+            fullDirty = false;
+            softDirty = false;
+            return;
+        }
+
+        if (currentClientState == ClientState.IN_GAME &&
+                currentGameState != null &&
+                currentGameState.currentState == GameState.FINISHED) return;
 
         // 1. RENDERING PRINCIPALE DELEGATO ALLO STATO
         if (fullDirty) {
@@ -348,26 +370,6 @@ public class CLI implements View, UIContext {
     // ================
     // METODI DI STAMPA
     // ================
-
-    private void renderLobby() {
-        CLIPrinter.clearScreen();
-        System.out.println(CLIPrinter.ANSI_CYAN + "=== SALA D'ATTESA (LOBBY) ===" + CLIPrinter.ANSI_RESET);
-
-        if (currentLobby == null || currentLobby.isEmpty()) {
-            System.out.println(CLIPrinter.ANSI_GRAY + "Nessuna partita disponibile. Creane una nuova!" + CLIPrinter.ANSI_RESET);
-        } else {
-            System.out.println("Partite attualmente disponibili:");
-            for (LobbyInfoDTO info : currentLobby) {
-                System.out.println("▶ ID Partita: " + CLIPrinter.ANSI_YELLOW + info.id + CLIPrinter.ANSI_RESET + " | Giocatori: " + info.numPlayers + "/" + info.maxNumPlayers);
-            }
-        }
-
-        System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Crea una nuova partita");
-        System.out.println("2. Unisciti a una partita esistente");
-        System.out.print("Scelta (1 o 2): ");
-    }
-
 
     private void drawUIDirect() {
         if (currentGameState == null) return;
