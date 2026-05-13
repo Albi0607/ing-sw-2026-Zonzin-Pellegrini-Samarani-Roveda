@@ -101,6 +101,15 @@ public class RMIVirtualView implements VirtualView {
         }
     }
 
+    @Override
+    public void showLoginError(String message) {
+        try {
+            clientCallBack.showLoginError(message);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showLoginError: " + e.getMessage());
+        }
+    }
+
     /**
      * Method used to retrieve the client's name
      * @return client nickname

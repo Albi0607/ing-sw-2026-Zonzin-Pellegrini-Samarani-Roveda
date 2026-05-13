@@ -60,7 +60,7 @@ public class ServerState {
         }
 
         if(isNicknameTaken(nickname)){
-            view.showMessage("Nickname: " + nickname + " già in uso");
+            view.showLoginError("Nickname già in uso");
             return;
         }
 

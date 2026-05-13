@@ -73,4 +73,9 @@ public class CallBackImplementation extends UnicastRemoteObject implements CallB
         cController.showActionAccepted(message);
     }
 
+    @Override
+    public void showLoginError(String message) throws RemoteException {
+        cController.showLoginError(message);
+    }
+
 }

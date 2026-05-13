@@ -40,4 +40,5 @@ public interface CallBack extends Remote {
 
     void showActionRejected(String reason) throws RemoteException;
     void showActionAccepted(String message) throws RemoteException;
+    void showLoginError(String message) throws RemoteException;
 }
