@@ -38,8 +38,8 @@ public class EventFormatter implements Formatters.CardFormatter<EventCardJson> {
 
         switch (typeName) {
             case "SUSTENANCE" -> {
-                int foodCost = (eventJson.losePoints != null) ? eventJson.losePoints : 1;
-                details.append("-").append(foodCost).append(foodIcon).append(" / -2").append(prestigeIcon);
+                int ppCost = (eventJson.losePoints != null) ? eventJson.losePoints : 1;
+                details.append("-1").append(foodIcon).append(" / -").append(ppCost).append(prestigeIcon);
             }
             case "HUNT" -> {
                 int gp = (eventJson.gainPoints != null) ? eventJson.gainPoints : 0;
