@@ -87,6 +87,8 @@ public class ClientController {
         view.showActionAccepted(message);
     }
 
+    public void showLoginError(String message){ view.showLoginError(message); }
+
     /**
      * Method that allows the client to place the totem on the OfferTile
      * @param position position selected on the OfferTile

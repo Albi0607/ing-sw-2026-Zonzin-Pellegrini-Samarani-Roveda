@@ -65,6 +65,9 @@ public class SocketVirtualView implements VirtualView {
         send(new ActionAcceptedMessage(message));
     }
 
+    @Override
+    public synchronized void showLoginError(String message) { send(new LoginErrorMessage(message)); }
+
     /**
      * Scrive l'oggetto sullo stream out.
      */

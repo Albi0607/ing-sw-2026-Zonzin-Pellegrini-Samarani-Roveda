@@ -1,6 +1,7 @@
 
 package it.polimi.ingsw.mesos.controller;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.model.Game;
@@ -31,6 +32,7 @@ public class GameController {
     private Game game;
     //capire come gestire le virtual view per poi usare il protocollo di rete adeguato
     private final Map<String, VirtualView> players = new ConcurrentHashMap<>();
+    private final Map<String, Color> chosenColors = new ConcurrentHashMap<>();
     //private View view;
     private final  List<String> pendingNicknames;
     private int expectedNumPlayers=0;
@@ -279,12 +281,14 @@ public class GameController {
             String nickname = p.getNickname();
             int points = p.getPrestigePoints();
 
-            // salva su DB
-            leaderboardService.addResult(nickname, points, numPlayers);
+            if (DBManager.isActive()) {
+                // salva su DB
+                leaderboardService.addResult(nickname, points, numPlayers);
 
-            // calcola posizione
-            int position = leaderboardService.getPosition(nickname, numPlayers);
+                // calcola posizione
+                int position = leaderboardService.getPosition(nickname, numPlayers);
 
+            }
             // invia al client
             //modificato perchè c'è un bug a fine partita
             /*
@@ -367,9 +371,9 @@ public class GameController {
             broadcastUpdate();
 
             if (game.getCurrentState() instanceof FinishedState) {
-                if (game.onGameEnd != null) {
-                    game.onGameEnd.run();
-                }
+                    if (game.onGameEnd != null) {
+                        game.onGameEnd.run();
+                    }
             }
             return true;
 

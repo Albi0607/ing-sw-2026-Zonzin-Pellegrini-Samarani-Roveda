@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
@@ -135,6 +136,20 @@ public class CLI implements View, UIContext {
         }
     }
 
+    @Override
+    public void setAwaitingServerResponse(boolean value) {
+        this.awaitingServerResponse = value;
+        if (value) {
+            this.softDirty = true;
+        }
+    }
+
+    @Override
+    public boolean isfullDirty() {
+        return fullDirty;
+    }
+
+
     // ==========================================================
     // METODI CHIAMATI DALLA RETE (Inseriscono solo eventi)
     // ==========================================================
@@ -151,6 +166,8 @@ public class CLI implements View, UIContext {
     public void showActionRejected(String reason) { eventQueue.offer(new UIEvent.ActionRejectedEvent(reason)); }
     @Override
     public void showActionAccepted(String message) { eventQueue.offer(new UIEvent.ActionAcceptedEvent(message)); }
+    @Override
+    public void showLoginError(String message){eventQueue.offer(new UIEvent.LoginErrorEvent(message));}
 
     // ==========================================================
     // IL MOTORE PRINCIPALE (EDT - Event Dispatch Thread)
@@ -204,6 +221,7 @@ public class CLI implements View, UIContext {
     }
 
     private void initializeEventHandlers() {
+        eventHandlers.put(UIEvent.LoginErrorEvent.class, event -> handleLoginError((UIEvent.LoginErrorEvent) event));
         eventHandlers.put(UIEvent.GameUpdatedEvent.class, event -> handleGameUpdated((UIEvent.GameUpdatedEvent) event));
         eventHandlers.put(UIEvent.LobbyUpdatedEvent.class, event -> handleLobbyUpdated((UIEvent.LobbyUpdatedEvent) event));
         eventHandlers.put(UIEvent.ClientStateUpdatedEvent.class, event -> handleClientStateUpdated((UIEvent.ClientStateUpdatedEvent) event));
@@ -232,6 +250,17 @@ public class CLI implements View, UIContext {
         this.awaitingServerResponse = false;
         syncStateWithGame();
         this.fullDirty = true;
+    }
+
+    private void handleLoginError(UIEvent.LoginErrorEvent e) {
+        transitionTo(new LoginState());
+        this.awaitingServerResponse = false;
+        CLIPrinter.clearScreen();
+        System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: " + e.message() + CLIPrinter.ANSI_RESET);
+        System.out.print("\nInserisci un nuovo nickname: ");
+
+        this.softDirty = false;
+        this.fullDirty = false;
     }
 
     private void handleLobbyUpdated(UIEvent.LobbyUpdatedEvent e) {
@@ -276,8 +305,10 @@ public class CLI implements View, UIContext {
 
     private void handleActionAccepted(UIEvent.ActionAcceptedEvent e) {
         if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        this.awaitingServerResponse = false;
         notifications.offer("✔ " + e.message());
         this.softDirty = true;
+
     }
 
     private void handleMessage(UIEvent.MessageEvent e) {
@@ -318,7 +349,19 @@ public class CLI implements View, UIContext {
 
     private void renderIfNeeded() {
         if ((!fullDirty && !softDirty) || currentClientState == null) return;
-        if (currentClientState == ClientState.IN_GAME && currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        /*
+        if (!fullDirty && !softDirty) return;
+
+        if (currentClientState == null) {
+            flushNotifications();
+            fullDirty = false;
+            softDirty = false;
+            return;
+        }
+         */
+        if (currentClientState == ClientState.IN_GAME &&
+                currentGameState != null &&
+                currentGameState.currentState == GameState.FINISHED) return;
 
         // 1. RENDERING PRINCIPALE DELEGATO ALLO STATO
         if (fullDirty) {
@@ -331,7 +374,7 @@ public class CLI implements View, UIContext {
         // 3. GESTIONE PROMPT DI GIOCO
         if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
             if (awaitingServerResponse) {
-                if (fullDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
+                if (softDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
             } else {
                 currentState.renderPrompt(this);
             }
@@ -344,26 +387,6 @@ public class CLI implements View, UIContext {
     // ================
     // METODI DI STAMPA
     // ================
-
-    private void renderLobby() {
-        CLIPrinter.clearScreen();
-        System.out.println(CLIPrinter.ANSI_CYAN + "=== SALA D'ATTESA (LOBBY) ===" + CLIPrinter.ANSI_RESET);
-
-        if (currentLobby == null || currentLobby.isEmpty()) {
-            System.out.println(CLIPrinter.ANSI_GRAY + "Nessuna partita disponibile. Creane una nuova!" + CLIPrinter.ANSI_RESET);
-        } else {
-            System.out.println("Partite attualmente disponibili:");
-            for (LobbyInfoDTO info : currentLobby) {
-                System.out.println("▶ ID Partita: " + CLIPrinter.ANSI_YELLOW + info.id + CLIPrinter.ANSI_RESET + " | Giocatori: " + info.numPlayers + "/" + info.maxNumPlayers);
-            }
-        }
-
-        System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Crea una nuova partita");
-        System.out.println("2. Unisciti a una partita esistente");
-        System.out.print("Scelta (1 o 2): ");
-    }
-
 
     private void drawUIDirect() {
         if (currentGameState == null) return;
@@ -378,6 +401,10 @@ public class CLI implements View, UIContext {
     }
 
     private void printDBLeaderboard() {
+        if (!DBManager.isActive()) {
+            System.out.println("Classifica non disponibile (DB offline)");
+            return;
+        }
         try {
             GameResultDAO dao = new GameResultDAO();
             LeaderboardService service = new LeaderboardService(dao);

@@ -22,6 +22,8 @@ public interface UIEvent {
 
     record ActionAcceptedEvent(String message) implements UIEvent {}
 
+    record LoginErrorEvent(String message) implements UIEvent{}
+
     record ResolutionTimeoutEvent() implements UIEvent {}
 
     record GameRestoredEvent(GameDTO game) implements UIEvent {}

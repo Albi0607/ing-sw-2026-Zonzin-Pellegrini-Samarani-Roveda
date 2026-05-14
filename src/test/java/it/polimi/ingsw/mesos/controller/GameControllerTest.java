@@ -307,7 +307,9 @@ class GameControllerTest {
     @Test
     void testEndGame_SavesResultsAndSendsMessages() throws Exception {
 
-        DBManager.init();
+        String username = "root" ;
+        String pw = "1234" ;
+        DBManager.init(username,pw);
         GameResultDAO dao = new GameResultDAO();
         LeaderboardService service = new LeaderboardService(dao);
         dao.clearAll();
@@ -351,8 +353,9 @@ class GameControllerTest {
 
     @Test
     void testEndGame_UniversalTrigger() throws Exception {
-
-        DBManager.init();
+        String username = "root" ;
+        String pw = "1234" ;
+        DBManager.init(username,pw);
         GameResultDAO dao = new GameResultDAO();
         LeaderboardService service = new LeaderboardService(dao);
         dao.clearAll();

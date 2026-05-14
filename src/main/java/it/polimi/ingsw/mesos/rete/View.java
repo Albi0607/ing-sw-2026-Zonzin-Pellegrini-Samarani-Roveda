@@ -38,4 +38,6 @@ public interface View {
     void showActionRejected(String reason);
 
     void showActionAccepted(String message);
+
+    void showLoginError(String message);
 }
