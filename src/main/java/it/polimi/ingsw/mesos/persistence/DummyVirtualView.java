@@ -30,7 +30,6 @@ public class DummyVirtualView implements VirtualView {
     @Override public void showActionAccepted(String message) {}
     @Override public void showLoginError(String message) {}
 
-
     @Override
     public void sendLobby(List<LobbyInfoDTO> lobby) {
     }
