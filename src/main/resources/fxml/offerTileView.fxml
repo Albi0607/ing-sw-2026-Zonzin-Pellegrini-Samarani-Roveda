@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane fx:id="offerSlot" onMouseClicked="#handleOfferClick" onMouseEntered="#handleOfferEnter" onMouseExited="#handleOfferExit" prefHeight="140.0" prefWidth="80.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.Board.OfferTileView">
+   <children>
+      <ImageView fx:id="offerImage" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="offerTotemImage" fitHeight="60.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true" />
+   </children>
+</StackPane>

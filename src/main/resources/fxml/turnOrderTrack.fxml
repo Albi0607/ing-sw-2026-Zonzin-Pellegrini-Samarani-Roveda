@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane fx:id="turnOrderTrack" prefHeight="140.0" prefWidth="80.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.Board.TurnOrderController">
+   <children>
+      <ImageView fx:id="turnOrderTrackImage" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
+      <Pane fx:id="totemContainer" prefHeight="140.0" prefWidth="80.0" />
+   </children>
+</StackPane>
