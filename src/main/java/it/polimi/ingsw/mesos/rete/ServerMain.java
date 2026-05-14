@@ -43,8 +43,6 @@ public class ServerMain {
             socket.start(serverState, 1234 );
         }).start();
 
-        System.out.println("Server avviati e pronti a connessioni");
-
         DBManager dbManager = new DBManager();
         dbManager.init();
 
