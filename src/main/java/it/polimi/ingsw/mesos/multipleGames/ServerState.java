@@ -24,7 +24,7 @@ public class ServerState {
     private final Map<String, GameController> playerToGame;
     //permette di vedere il nome di tutti i giocatori connessi per non avere ripetizioni
     private final Set<String> nicknames;
-    //permette di separare i nickname attualmente in gioco e quelli in attesa di riconnessione
+    //permette di separare i nickname connessi e quelli in attesa di riconnessione
     private final Map<String, Integer> pendingReconnect;
 
     public ServerState(){

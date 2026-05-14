@@ -5,8 +5,6 @@ import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class serverSocket {
 
@@ -20,7 +18,6 @@ public class serverSocket {
      */
     public void start(ServerState serverState, int port) {
 
-        // ricorda: notazione confusionaria, esiste serverSocket di tipo ServerSocket e serverSocket l'attuale classe, due cose diverse
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server Socket pronto in attesa di connessioni");
 

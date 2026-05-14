@@ -60,6 +60,8 @@ public class ClientHandler implements Runnable {
             clientLoop();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            cleanup();
         }
     }
 
@@ -144,7 +146,6 @@ public class ClientHandler implements Runnable {
 
     /**
      * Gestisce la registrazione alla lobby.
-     * Analogo a RemoteMethodsImplementation.getLobby().
      */
     private void handleGetLobby(GetLobbyMessage msg) throws IOException {
         try {
@@ -164,6 +165,31 @@ public class ClientHandler implements Runnable {
             } catch (IOException ignored) {}
             clientSocket.close();
         }
+    }
+
+    /**
+     * Chiamato sempre quando il client si disconnette, sia per errore
+     * che per chiusura normale. Rimuove il nickname e la connessione
+     * da ServerState così il client può riconnettersi con lo stesso nome.
+     */
+    private void cleanup() {
+        System.out.println("[ClientHandler] Cleanup per: " + nickname);
+
+        // Rimuove nickname e playerToGame da ServerState
+        if (nickname != null) {
+            serverState.removePlayer(nickname);
+        }
+
+        // Rimuove la connessione e il viewer dalla lobby
+        if (virtualViewId != null) {
+            serverState.removeConnection(virtualViewId);
+        }
+        // Chiude il socket
+        try {
+            if (!clientSocket.isClosed()) {
+                clientSocket.close();
+            }
+        } catch (IOException ignored) {}
     }
 
 
