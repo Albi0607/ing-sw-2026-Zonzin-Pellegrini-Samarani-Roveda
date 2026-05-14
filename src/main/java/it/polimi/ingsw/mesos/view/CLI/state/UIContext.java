@@ -27,4 +27,6 @@ public interface UIContext {
     void drawUI();
     void flushNotifications(); // Per stampare le notifiche al momento giusto
     void scheduleResolutionTimeout();
+    void setAwaitingServerResponse(boolean value);
+    boolean isfullDirty();
 }

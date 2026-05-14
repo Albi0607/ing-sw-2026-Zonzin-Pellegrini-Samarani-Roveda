@@ -14,6 +14,7 @@ public class ChoosingCardActionState implements UIState {
         }
 
         if (input.equals("1")) {
+            context.setAwaitingServerResponse(true);
             context.transitionTo(new ChoosingCardIdState());
             context.getCurrentState().renderPrompt(context);
         } else if (input.equals("2")) {

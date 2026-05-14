@@ -136,6 +136,19 @@ public class CLI implements View, UIContext {
         }
     }
 
+    @Override
+    public void setAwaitingServerResponse(boolean value) {
+        this.awaitingServerResponse = value;
+        if (value) {
+            this.softDirty = true;
+        }
+    }
+
+    @Override
+    public boolean isfullDirty() {
+        return fullDirty;
+    }
+
 
     // ==========================================================
     // METODI CHIAMATI DALLA RETE (Inseriscono solo eventi)
@@ -292,8 +305,10 @@ public class CLI implements View, UIContext {
 
     private void handleActionAccepted(UIEvent.ActionAcceptedEvent e) {
         if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        this.awaitingServerResponse = false;
         notifications.offer("✔ " + e.message());
         this.softDirty = true;
+
     }
 
     private void handleMessage(UIEvent.MessageEvent e) {
@@ -333,6 +348,8 @@ public class CLI implements View, UIContext {
     }
 
     private void renderIfNeeded() {
+        if ((!fullDirty && !softDirty) || currentClientState == null) return;
+        /*
         if (!fullDirty && !softDirty) return;
 
         if (currentClientState == null) {
@@ -341,7 +358,7 @@ public class CLI implements View, UIContext {
             softDirty = false;
             return;
         }
-
+         */
         if (currentClientState == ClientState.IN_GAME &&
                 currentGameState != null &&
                 currentGameState.currentState == GameState.FINISHED) return;
@@ -357,7 +374,7 @@ public class CLI implements View, UIContext {
         // 3. GESTIONE PROMPT DI GIOCO
         if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
             if (awaitingServerResponse) {
-                if (fullDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
+                if (softDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
             } else {
                 currentState.renderPrompt(this);
             }
