@@ -20,6 +20,7 @@ public class PlacingTotemState implements UIState {
         } else {
             context.getController().placeTotem(choice.charAt(0));
             context.clearBufferedUserInputs();
+            context.setAwaitingServerResponse(true);
             context.transitionTo(WaitingState.INSTANCE);
         }
     }

@@ -6,8 +6,10 @@ import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.RMI.server_RMI;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.socket.serverSocket;
+import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 /**
  * Class used to start the game server, which accepts clients and manages game creation.
@@ -24,6 +26,32 @@ public class ServerMain {
         serverState.initializeFromDisk();
 
         int port = 1099;
+
+        boolean dbEnabled = false;
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("MySQL username (invio per skip): ");
+        String user = scanner.nextLine();
+
+        String password = null;
+
+        if (!user.isBlank()) {
+            System.out.print("MySQL password: ");
+            password = scanner.nextLine();
+        }
+
+        try {
+            DBManager.init(user, password);
+            dbEnabled = true;
+            if (!DBManager.isActive()) {
+                System.out.println("Database non attivato");}
+            else System.out.println("✔ Database attivato");
+
+        } catch (Exception e) {
+            System.out.println("⚠ DB non disponibile → modalità senza database");
+            dbEnabled = false;
+        }
 
         if(args.length>0){
             port=Integer.parseInt(args[0]);
@@ -43,11 +71,8 @@ public class ServerMain {
             socket.start(serverState, 1234 );
         }).start();
 
-        DBManager dbManager = new DBManager();
-        dbManager.init();
+        System.out.println("Server avviati e pronti a connessioni");
 
-        GameResultDAO dao = new GameResultDAO();
-        LeaderboardService service = new LeaderboardService(dao);
     }
 
 }

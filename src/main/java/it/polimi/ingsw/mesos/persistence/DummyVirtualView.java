@@ -28,6 +28,7 @@ public class DummyVirtualView implements VirtualView {
     @Override public String getNickname()                 { return nickname; }
     @Override public void showActionRejected(String reason) {}
     @Override public void showActionAccepted(String message) {}
+    @Override public void showLoginError(String message) {}
 
 
     @Override
