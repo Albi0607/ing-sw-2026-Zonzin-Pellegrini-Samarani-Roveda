@@ -19,6 +19,7 @@ public class ChoosingCardIdState implements UIState {
 
             context.getController().takeCard(cardIndex, isUpper);
             context.clearBufferedUserInputs();
+            context.setAwaitingServerResponse(true);
             context.transitionTo(WaitingState.INSTANCE);
 
         } catch (NumberFormatException e) {
