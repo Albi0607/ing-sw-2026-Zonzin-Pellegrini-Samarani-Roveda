@@ -5,10 +5,14 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI">
    <center>
-      <VBox fx:id="centerBoard" prefHeight="200.0" prefWidth="1118.0" scaleX="0.9" scaleY="0.9" spacing="5.0" />
+      <VBox alignment="CENTER" spacing="10.0">
+         <VBox fx:id="centerBoard" prefHeight="200.0" prefWidth="1118.0" scaleX="0.9" scaleY="0.9" spacing="5.0"  alignment="CENTER"/>
+         <Label fx:id="actionLabel" visible="false" style="-fx-text-fill: #00ff00; -fx-font-size: 20px; -fx-font-weight: bold;" />
+      </VBox>
    </center>
    <top>
       <Pane fx:id="topArea" prefHeight="180.0" prefWidth="1500.0" BorderPane.alignment="CENTER">
