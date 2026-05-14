@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController">
    <children>
       <VBox alignment="CENTER" layoutX="425.0" layoutY="175.0" prefHeight="400.0" prefWidth="600.0" spacing="10.0" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 20; -fx-background-color: #e8e8e8; -fx-border-color: #cfcfcf; -fx-border-width: 1;" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="425.0" AnchorPane.rightAnchor="425.0" AnchorPane.topAnchor="175.0">
          <children>
