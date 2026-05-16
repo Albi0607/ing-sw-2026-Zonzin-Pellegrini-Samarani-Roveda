@@ -92,7 +92,7 @@ public class GameRestorer {
                         move.nickname,
                         new DummyVirtualView(move.nickname)
                 );
-                controller.addPlayer(move.nickname, view);
+                controller.addPlayer(move.nickname, move.colorPayload, view);
             }
 
             case START_GAME -> {

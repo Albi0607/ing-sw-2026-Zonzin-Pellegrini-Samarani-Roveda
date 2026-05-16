@@ -88,7 +88,7 @@ public class LobbyController {
     @FXML
     public void handleCreateGame() {
         try {
-            clientController.createNewGame(playersComboBox.getValue());
+            clientController.createNewGame(playersComboBox.getValue(), null); // da modificare perchè ora ilserver chiede all'utente anche il colore
             sceneManager.loadWaitingRoom();
             //gestire la creazione e passaggio di ID
             //ti deve portare alla waitingRoom

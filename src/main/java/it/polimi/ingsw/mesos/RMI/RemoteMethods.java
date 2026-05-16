@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.RMI;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
 
@@ -45,8 +46,8 @@ public interface RemoteMethods extends Remote {
     //metodi da usare nella lobby
     String getLobby(String nickname,CallBack clientCallback) throws RemoteException;
 
-    void createNewGame(String nickname, int expectedNumPlayers, String viewId) throws  RemoteException;
+    void createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId) throws  RemoteException;
 
-    void joinGame(String nickname, int id, String viewId) throws  RemoteException;
+    void joinGame(String nickname, int id, Color color, String viewId) throws  RemoteException;
 
 }
