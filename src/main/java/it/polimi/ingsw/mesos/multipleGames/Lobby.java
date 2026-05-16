@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.multipleGames;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
@@ -39,9 +40,10 @@ public class Lobby {
     //fare un check sul massimo numero di game online e creabili per non sovraccaricare il server?
     //fare in modo lato client che quando fa createNewGame nella lobby deve scegliere il numero di giocatori ed entrare
     //con l'id scelto
-    public synchronized GameController createNewGame(String nickname, int expectedNumPlayers, String virtualViewId) {
+    public synchronized GameController createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId) throws Exception{
         //controlli per gestione di eventuali errori e cambiare client.State al client
-        try {
+
+        //try {
             VirtualView view = serverState.getConnection(virtualViewId);
             if (view == null) {
                 return null;
@@ -52,20 +54,21 @@ public class Lobby {
             controller.setNumPlayers(expectedNumPlayers);
             games.put(id, controller);
             System.out.println("Nuovo game creato con questo id: " + id);
-            games.get(id).addPlayer(nickname, view);
+            games.get(id).addPlayer(nickname, color, view);
             removeViewer(virtualViewId);
             broadcast();
             return controller;
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             System.out.println("Creazione del gioco non riuscita");
             return null;
         }
+         */
     }
 
     //se da errore perché magari nel frattempo la partita è iniziata con altri giocatori magari gestire direttamente
     //l'errore da qua e restituire la lista di game per poter scegliere ulteriormente
     //Gestire i system out con un messaggio di ritorno al client
-    public synchronized GameController joinGame(int id, String nickname, String virtualViewId) {
+    public synchronized GameController joinGame(int id, String nickname, Color color, String virtualViewId) throws Exception{
         VirtualView view = serverState.getConnection(virtualViewId);
         if (view == null) {
             return null;
@@ -80,15 +83,17 @@ public class Lobby {
             return null;
         }
         // Partita non ancora iniziata OPPURE in attesa di ripristino
-        try {
-            controller.addPlayer(nickname, view);
+        //try {
+            controller.addPlayer(nickname, color, view);
             removeViewer(virtualViewId);
             broadcast();
             return controller;
-        } catch (Exception e) {
+        /*} catch (Exception e) {
             System.out.println("Errore generico che non permette di entrare nella partita con id: " + id + ": " + e.getMessage());
             return null;
         }
+
+         */
     }
 
     /**
@@ -174,6 +179,7 @@ public class Lobby {
             dto.numPlayers=controller.getNumPlayersConnected();
             dto.maxNumPlayers=controller.getExpectedNumPlayers();
             dto.started=(controller.getGame()!=null);
+            dto.takenColors = controller.getTakenColors();
             lobbyGames.add(dto);
         }
         return lobbyGames;

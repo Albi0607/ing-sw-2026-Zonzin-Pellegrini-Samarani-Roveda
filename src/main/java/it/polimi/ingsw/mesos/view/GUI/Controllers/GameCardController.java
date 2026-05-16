@@ -53,7 +53,7 @@ public class GameCardController {
 
     @FXML
     public void handleJoinGame() {
-        clientController.joinGame(data.id);
+        clientController.joinGame(data.id, null); // da modificare perchè ora ilserver chiede all'utente anche il colore
         sceneManager.loadWaitingRoom();
     }
 }

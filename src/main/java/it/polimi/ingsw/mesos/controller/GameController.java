@@ -113,9 +113,10 @@ public class GameController {
      * @throws IllegalArgumentException if the nickname is already used or invalid
      */
 
-    public synchronized void addPlayer(String nickname, VirtualView view) {
+    public synchronized void addPlayer(String nickname, Color chosenColor, VirtualView view) {
 
         if (replayMode) {
+            chosenColors.put(nickname, chosenColor);
             pendingNicknames.add(nickname);
             //ricreiamo il game in modo possa essere chiamato startGame() nel replay di START_GAME
             if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
@@ -179,9 +180,14 @@ public class GameController {
             throw new IllegalArgumentException("Nickname already in use");
         }
 
+        if (chosenColors.containsValue(chosenColor)) {
+            throw new IllegalArgumentException("Colore già scelto da un altro giocatore");
+        }
+
         pendingNicknames.add(nickname);
         players.put(nickname,view);
-        if (moveLogger != null) moveLogger.append(GameMove.addPlayer(nickname));
+        chosenColors.put(nickname, chosenColor);
+        if (moveLogger != null) moveLogger.append(GameMove.addPlayer(nickname, chosenColor));
 
         /* Non si fa piu questo controllo poiché esiste un metodo apposta per creare i game
         if (expectedNumPlayers == 0 && pendingNicknames.size() == 1) {
@@ -210,11 +216,18 @@ public class GameController {
 
     private void createGame() {
         List<Player> players = new ArrayList<>();
+        /*
         Color[] availableColors = Color.values();
 
         for (int i = 0; i < pendingNicknames.size(); i++) {
             Color color = availableColors[i];
             players.add(new Player(pendingNicknames.get(i), color));
+        }
+         */
+
+        for (String nick : pendingNicknames) {
+            Color color = chosenColors.get(nick);
+            players.add(new Player(nick, color));
         }
 
         this.game = new Game(players);
@@ -229,6 +242,8 @@ public class GameController {
 
         // Clear temporary data after game creation
         pendingNicknames.clear();
+
+        chosenColors.clear();
         //alternativa a clear se il controller è inteso come unico
         //e ci dovessero essere più di 5 player in attesa magari di
         //un'altra lobby
@@ -659,6 +674,10 @@ public class GameController {
     }
     public LeaderboardService getLeaderboardService() {
         return this.leaderboardService;
+    }
+
+    public List<Color> getTakenColors() {
+        return new ArrayList<>(chosenColors.values());
     }
 }
 

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.multipleGames;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.persistence.GameMove;
 import it.polimi.ingsw.mesos.persistence.GameRestorer;
@@ -48,13 +49,18 @@ public class ServerState {
             connections.put(virtualViewId, view);
             nicknames.add(nickname);
 
-            GameController controller = lobby.joinGame(gameId, nickname, virtualViewId);
-            if (controller != null) {
-                playerToGame.put(nickname, controller);
-                System.out.println("[ServerState] Riconnessione di '" + nickname
-                        + "' alla partita " + gameId);
-            } else {
-                view.showMessage("Errore durante la riconnessione alla partita " + gameId);
+            try{
+
+                GameController controller = lobby.joinGame(gameId, nickname, null, virtualViewId);
+                if (controller != null) {
+                    playerToGame.put(nickname, controller);
+                    System.out.println("[ServerState] Riconnessione di '" + nickname
+                            + "' alla partita " + gameId);
+                } else {
+                    view.showMessage("Errore durante la riconnessione alla partita " + gameId);
+                }
+            }catch (Exception e){
+                view.showMessage("Errore durante la riconnessione alla partita " + gameId + ": " + e.getMessage());
             }
             return;
         }
@@ -74,53 +80,53 @@ public class ServerState {
         return connections.get(virtualViewId);
     }
 
-    public synchronized void createNewGame(String nickname, int expectedNumPlayers, String virtualViewId){
+    public synchronized void createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId){
+
+        VirtualView view = connections.get(virtualViewId);
+        if(view==null || !lobby.containView(virtualViewId)){
+            return;
+        }
+
         try{
-            VirtualView view = connections.get(virtualViewId);
-            if(view==null||!lobby.containView(virtualViewId)){
-                return;
-            }
-            if(expectedNumPlayers<2||expectedNumPlayers>5){
-                view.showMessage("Partita non creata: Numero di giocatori non corretto");
+            if(expectedNumPlayers<2 || expectedNumPlayers>5){
+                // Usiamo showActionRejected invece di showMessage
+                view.showActionRejected("Numero di giocatori non corretto");
                 return;
             }
 
-            GameController controller = lobby.createNewGame(nickname,expectedNumPlayers,virtualViewId);
+            GameController controller = lobby.createNewGame(nickname, expectedNumPlayers, color, virtualViewId);
             if(controller == null){
-                view.showMessage("Partita non creata: GameController non creato correttamente");
+                view.showActionRejected("GameController non creato correttamente");
                 return;
             }
-            playerToGame.put(nickname,controller);
+
+            playerToGame.put(nickname, controller);
+
             view.showMessage("Partita creata correttamente");
 
         } catch (Exception e) {
-            VirtualView view = connections.get(virtualViewId);
-            if(view==null||!lobby.containView(virtualViewId)){
-                return;
-            }
-            view.showMessage("Partita non creata: Errore generico");
-
+            view.showActionRejected(e.getMessage());
         }
     }
 
-    public synchronized void joinGame(String nickname, int id, String virtualViewId){
+    public synchronized void joinGame(String nickname, int id, Color color, String virtualViewId){
+        VirtualView view = connections.get(virtualViewId);
+        if(view==null || !lobby.containView(virtualViewId)){
+            return;
+        }
+
         try {
-            VirtualView view = connections.get(virtualViewId);
-            if(view==null||!lobby.containView(virtualViewId)){
-                return;
-            }
-            GameController controller = lobby.joinGame(id, nickname, virtualViewId);
+            GameController controller = lobby.joinGame(id, nickname, color, virtualViewId);
             if(controller == null){
-                view.showMessage("Non sei entrato nella partita: Partita non trovata");
+                // Usiamo showActionRejected invece di showMessage
+                view.showActionRejected("Partita non trovata");
                 return;
             }
+
             playerToGame.put(nickname, controller);
+
         } catch (Exception e) {
-            VirtualView view = connections.get(virtualViewId);
-            if(view==null||!lobby.containView(virtualViewId)){
-                return;
-            }
-            view.showMessage("Non sei entrato nella partita: Errore generico");
+            view.showActionRejected(e.getMessage());
         }
     }
 
