@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
 import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
 import javafx.fxml.FXML;
@@ -56,7 +56,7 @@ public class LoginController {
 
     }
 
-    //valutare le scelte di indirizzo ip e porta
+    //valutare le scelte di indirizzo ip e porta e attenzione a errori e usare label per segnalarli
     @FXML public void handleConnect() {
         String nickname = nicknameTextField.getText();
         String ip = ipTextField.getText();
@@ -64,5 +64,6 @@ public class LoginController {
         String networkChoice = networkComboBox.getValue();
 
         gui.handleLogin(nickname,ip,port,networkChoice);
+        gui.setNickname(nickname);
     }
 }
