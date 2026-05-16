@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.rete;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 
 import java.util.List;
@@ -41,8 +42,8 @@ public interface Network {
     String getLobby(String nickname,ClientController controller);
 
     //azioni del client sulla lobby
-    boolean createNewGame(String nickname, int expectedNumPlayers, String viewId);
+    boolean createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId);
 
-    boolean joinGame(String nickname, int id, String viewId);
+    boolean joinGame(String nickname, int id, Color color,String viewId);
 
 }

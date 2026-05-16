@@ -4,6 +4,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.common.enums.Color;
 
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class ClientController {
     private List<LobbyInfoDTO> lobby;
     private GameDTO game;
     private ClientState clientState;
+
+
 
     /**
      * Constructor of the class that requires as parameters the object responsible for managing the view type
@@ -162,7 +165,7 @@ public class ClientController {
         this.clientState=ClientState.LOBBY;
     }
 
-    public void createNewGame(int expectedNumPlayers){
+    public void createNewGame(int expectedNumPlayers, Color color){
         if(clientState!=ClientState.LOBBY){
             return;
         }
@@ -171,19 +174,19 @@ public class ClientController {
         }
         //ti deve chiedere di inserire nickname e il numero di giocatori dalla view
         //Per gestire subito un eventuale errore di connessione
-        if(!network.createNewGame(nickname,expectedNumPlayers,virtualViewId)){
+        if(!network.createNewGame(nickname,expectedNumPlayers, color,virtualViewId)){
             view.showMessage("Errore nel creare una nuova partita: Errore di connessione con il server");
         }
 
     }
-    public void joinGame(int id){
+    public void joinGame(int id, Color color){
         if(clientState!=ClientState.LOBBY){
             return;
         }
         if(virtualViewId==null){
             return;
         }
-        if(!network.joinGame(nickname,id,virtualViewId)){
+        if(!network.joinGame(nickname,id, color, virtualViewId)){
             //Per gestire subito un eventuale errore di connessione
             view.showMessage("Errore nel partecipare ad una partita: Errore di connessione con il server");
         }
