@@ -8,7 +8,9 @@ import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
+import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class GUI extends Application implements View {
     private SceneManager sceneManager;
     private ClientController clientController;
     private ObservableGameModel gameModel;
+    private String localNickname;
+    private boolean gameStarted;
 
     public static void main(String[] args) {
         launch(args);
@@ -25,16 +29,30 @@ public class GUI extends Application implements View {
 
     @Override public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        this.gameModel = new ObservableGameModel();
+        gameModel = new ObservableGameModel();
         sceneManager = new SceneManager(primaryStage, this, gameModel);
+        gameStarted=false;
         sceneManager.loadLoginScene();
-        primaryStage.setTitle("Mesos");
-        primaryStage.show();
+        this.primaryStage.setTitle("Mesos");
+        this.primaryStage.getIcons().add(new Image("/images/tool/icon.png"));
+        this.primaryStage.show();
     }
 
     @Override
     public void showLastUpdate(GameDTO game) {
-        // DA IMPLEMENTARE: Platform.runLater() -> gameModel.updateFromDTO(game)
+        javafx.application.Platform.runLater(() -> {
+
+            //partita appena iniziata aggiorno il modello e cambio la scene con il modello appena aggiornato
+            if(!gameStarted) {
+                gameStarted = true;
+                gameModel.updateFromDTO(game);
+                sceneManager.loadGameScene();
+                return;
+            }
+
+            //partita già iniziata solo aggiornamento del modello
+            gameModel.updateFromDTO(game);
+        });
     }
 
     @Override
@@ -76,6 +94,14 @@ public class GUI extends Application implements View {
         } catch (Exception e) {
             showMessage("Errore: nel fare l'accesso e/o nell'andare nella lobby");
         }
+    }
+
+    public void setNickname(String nickname){
+        this.localNickname = nickname;
+    }
+
+    public String getNickname(){
+        return this.localNickname;
     }
 
 }

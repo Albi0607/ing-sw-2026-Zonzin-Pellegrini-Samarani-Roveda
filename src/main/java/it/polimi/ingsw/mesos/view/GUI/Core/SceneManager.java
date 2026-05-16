@@ -2,8 +2,11 @@ package it.polimi.ingsw.mesos.view.GUI.Core;
 
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.view.GUI.Controllers.LobbyController;
-import it.polimi.ingsw.mesos.view.GUI.Controllers.LoginController;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.TotemChoiceController;
+import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,6 +19,7 @@ public class SceneManager {
     private final GUI gui;
     private ClientController clientController;
     private LobbyController lobbyController;
+    private TotemChoiceController totemController;
     private final ObservableGameModel gameModel;
 
     public SceneManager(Stage stage, GUI gui, ObservableGameModel gameModel) {
@@ -59,6 +63,7 @@ public class SceneManager {
             Parent root = loader.load();
 
             lobbyController = null;
+            totemController=null;
             Scene scene = new Scene(root);
             stage.setScene(scene);
         } catch (Exception e) {
@@ -70,9 +75,43 @@ public class SceneManager {
     }
 
     public void loadGameScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/gameScene.fxml"));
+            Parent root = loader.load();
+            if(lobbyController!=null){
+                lobbyController=null;
+            }
+            GameControllerGUI controller = loader.getController();
+            controller.setController(clientController,this,gameModel,gui.getNickname());
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+        } catch (Exception e) {
+            System.out.println("ERRORE NEL CARICAMENTO DELLA GIOCO  : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    public void loadTotemScene(int id, int numPlayers,LobbyInfoDTO dto){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/totemScene.fxml"));
+            Parent root = loader.load();
+            totemController = loader.getController();
+            totemController.setController(clientController,this);
+            totemController.setParameter(id,numPlayers,dto);
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+        } catch (Exception e) {
+            System.out.println("ERRORE NEL CARICAMENTO DELLA GIOCO  : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void updateLobby(List<LobbyInfoDTO> lobby) {
+        if(totemController!=null){
+            totemController.updateDTO(lobby);
+            System.out.println("CONTROLLO SULL' AGGIORNAMENTO DELL'INTERFACCIA TOTEM");
+        }
         if (lobbyController != null) {
             lobbyController.updateLobby(lobby);
             System.out.println("LOBBY UPDATE");

@@ -1,9 +1,8 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
-import it.polimi.ingsw.mesos.view.GUI.Core.ObservableGameModel;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -87,18 +86,6 @@ public class LobbyController {
 
     @FXML
     public void handleCreateGame() {
-        try {
-            clientController.createNewGame(playersComboBox.getValue(), null); // da modificare perchè ora ilserver chiede all'utente anche il colore
-            sceneManager.loadWaitingRoom();
-            //gestire la creazione e passaggio di ID
-            //ti deve portare alla waitingRoom
-        } catch (Exception e) {
-            System.out.println("ERRORE NELLA CREAZIONE DEL GAME");
-        }
+        sceneManager.loadTotemScene(-1,playersComboBox.getValue(),null);
     }
-
-    //@FXML
-    public void joinGame() { }
-
-    public void cleanup() { }
 }
