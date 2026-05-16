@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.socket;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.*;
@@ -91,13 +92,13 @@ public class clientSocket implements Network {
     }
 
     @Override
-    public boolean createNewGame(String nickname, int expectedNumPlayers, String viewId) {
-        return sendMessage(new CreateGameMessage(expectedNumPlayers));
+    public boolean createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId) {
+        return sendMessage(new CreateGameMessage(expectedNumPlayers, color));
     }
 
     @Override
-    public boolean joinGame(String nickname, int id, String viewId) {
-        return  sendMessage(new JoinGameMessage(id));
+    public boolean joinGame(String nickname, int id, Color color, String viewId) {
+        return  sendMessage(new JoinGameMessage(id, color));
     }
 
     /**

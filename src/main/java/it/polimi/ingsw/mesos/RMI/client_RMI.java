@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.RMI;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.Network;
+import it.polimi.ingsw.mesos.common.enums.Color;
 
 import java.rmi.*;
 import java.rmi.registry.*;
@@ -91,9 +92,9 @@ public class client_RMI implements Network {
     }
 
     @Override
-    public boolean createNewGame(String nickname, int expectedNumPlayers,String viewId){
+    public boolean createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId){
         try {
-            remote.createNewGame(nickname,expectedNumPlayers, viewId);
+            remote.createNewGame(nickname,expectedNumPlayers,color, viewId);
             return true;
         } catch (RemoteException e){
             return false;
@@ -101,9 +102,9 @@ public class client_RMI implements Network {
     }
 
     @Override
-    public boolean joinGame(String nickname, int id, String viewId){
+    public boolean joinGame(String nickname, int id, Color color, String viewId){
         try {
-            remote.joinGame(nickname,id,viewId);
+            remote.joinGame(nickname,id,color,viewId);
             return true;
         } catch (RemoteException e){
             return false;

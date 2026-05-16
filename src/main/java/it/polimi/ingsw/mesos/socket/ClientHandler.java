@@ -120,12 +120,12 @@ public class ClientHandler implements Runnable {
 
         // Azioni lobby
         if (message instanceof CreateGameMessage cgm) {
-            serverState.createNewGame(nickname, cgm.getNumPlayers(), virtualViewId);
+            serverState.createNewGame(nickname, cgm.getNumPlayers(), cgm.getColor(), virtualViewId);
             return;
         }
 
         if (message instanceof JoinGameMessage jgm) {
-            serverState.joinGame(nickname, jgm.getGameId(), virtualViewId);
+            serverState.joinGame(nickname, jgm.getGameId(), jgm.getColor(),virtualViewId);
             return;
         }
 

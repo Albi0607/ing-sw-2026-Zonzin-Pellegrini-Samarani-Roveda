@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.RMI;
 
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.rete.VirtualView;
@@ -91,17 +92,17 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         return view.getId();
     }
 
-    public void createNewGame(String nickname, int expectedNumPlayers, String virtualViewId) throws  RemoteException{
+    public void createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId) throws  RemoteException{
         executor.submit(()-> {
             //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
-            serverState.createNewGame(nickname, expectedNumPlayers, virtualViewId);
+            serverState.createNewGame(nickname, expectedNumPlayers, color, virtualViewId);
         });
     }
 
-    public void joinGame(String nickname, int id, String virtualViewId) throws RemoteException{
+    public void joinGame(String nickname, int id, Color color, String virtualViewId) throws RemoteException{
         executor.submit(()-> {
             //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
-            serverState.joinGame(nickname, id, virtualViewId);
+            serverState.joinGame(nickname, id, color, virtualViewId);
         });
     }
 

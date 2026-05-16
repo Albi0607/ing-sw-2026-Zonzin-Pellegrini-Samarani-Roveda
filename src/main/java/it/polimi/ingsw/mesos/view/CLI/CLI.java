@@ -294,6 +294,15 @@ public class CLI implements View, UIContext {
     }
 
     private void handleActionRejected(UIEvent.ActionRejectedEvent e) {
+        if (currentClientState == ClientState.LOBBY && currentState instanceof WaitingState) {
+            transitionTo(new LobbyState());
+            CLIPrinter.clearScreen();
+            System.out.println(CLIPrinter.ANSI_RED + "\n❌ Accesso fallito: " + e.reason() + CLIPrinter.ANSI_RESET);
+            this.softDirty = false;
+            this.fullDirty = true;
+            return;
+        }
+
         if (currentState instanceof WaitingState && currentClientState == ClientState.IN_GAME && isMyTurn()) {
             this.awaitingServerResponse = false;
             syncStateWithGame();
