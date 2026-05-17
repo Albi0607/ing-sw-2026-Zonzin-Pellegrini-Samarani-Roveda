@@ -19,6 +19,7 @@ public class GUI extends Application implements View {
     private Stage primaryStage;
     private SceneManager sceneManager;
     private ClientController clientController;
+    private ClientState clientState;
     private ObservableGameModel gameModel;
     private String localNickname;
     private boolean gameStarted;
@@ -30,7 +31,7 @@ public class GUI extends Application implements View {
     @Override public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         gameModel = new ObservableGameModel();
-        sceneManager = new SceneManager(primaryStage, this, gameModel);
+        sceneManager = new SceneManager(primaryStage, this,clientState, gameModel);
         gameStarted=false;
         sceneManager.loadLoginScene();
         this.primaryStage.setTitle("Mesos");
@@ -70,6 +71,7 @@ public class GUI extends Application implements View {
 
     @Override
     public void showClientStateUpdate(ClientState currentState){
+        this.clientState = currentState;
     }
 
     @Override

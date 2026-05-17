@@ -1,12 +1,22 @@
 package it.polimi.ingsw.mesos.rete.ClientModel;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class CardDTO implements Serializable {
 
     public String id;
 
-    //non serve utilizzo id della carta per visionarla
+    //implementazione di equals per poter evitare aggiornamenti inutili in GUI
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CardDTO cardDTO = (CardDTO) o;
+        return Objects.equals(id, cardDTO.id);
+    }
+
+        //non serve utilizzo id della carta per visionarla
 /*
     //attributi degli eventi
     public int positivePP;

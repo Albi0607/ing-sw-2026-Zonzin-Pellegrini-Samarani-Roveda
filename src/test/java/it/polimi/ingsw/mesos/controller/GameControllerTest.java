@@ -3,6 +3,7 @@ package it.polimi.ingsw.mesos.controller;
 import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
+import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.model.state.EventState;
 import it.polimi.ingsw.mesos.model.state.FinishedState;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
@@ -38,7 +39,10 @@ class GameControllerTest {
             @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
             @Override public String getId() {return "";}
             @Override public void showActionRejected(String reason) {};
-            @Override public void showActionAccepted(String message) {};
+            @Override public void showActionAccepted(String message) {}
+            @Override public void showLoginError(String message) {}
+
+            ;
         };
     }
 
@@ -46,9 +50,9 @@ class GameControllerTest {
     void testSimulazionePrimoRoundCompleto() {
 
         controller.setNumPlayers(3);
-        controller.addPlayer("Alice", mockView);
-        controller.addPlayer("Bob", mockView);
-        controller.addPlayer("Carlo", mockView);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob",Color.RED,mockView);
+        controller.addPlayer("Carlo",Color.PURPLE, mockView);
 
         controller.startGame();
 
@@ -128,25 +132,25 @@ class GameControllerTest {
         controller.setNumPlayers(3);
 
         // Aggiunta giocatori con nomi non validi
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("", mockView),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("", Color.RED, mockView),
                 "Il controller deve rifiutare stringhe vuote");
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer(null, mockView),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer(null, Color.BLUE, mockView),
                 "Il controller deve rifiutare nomi null");
 
         // Aggiunta corretta
-        controller.addPlayer("Marco", mockView);
-        controller.addPlayer("Sofia", mockView);
+        controller.addPlayer("Marco",Color.PURPLE, mockView);
+        controller.addPlayer("Sofia",Color.BLUE, mockView);
 
         // Duplicati
-        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("Marco", mockView),
+        assertThrows(IllegalArgumentException.class, () -> controller.addPlayer("Marco", Color.RED, mockView),
                 "Il controller deve rifiutare nomi duplicati");
 
         // Ultimo giocatore (innesca la creazione automatica)
-        controller.addPlayer("Alice", mockView);
+        controller.addPlayer("Alice",Color.WHITE, mockView);
         assertNotNull(controller.getGame(), "Il gioco deve essere stato istanziato automaticamente");
 
         // Limite massimo superato
-        assertThrows(IllegalStateException.class, () -> controller.addPlayer("Bob", mockView),
+        assertThrows(IllegalStateException.class, () -> controller.addPlayer("Bob",Color.YELLOW, mockView),
                 "Il controller deve bloccare aggiunte a gioco già creato");
 
 
@@ -239,8 +243,8 @@ class GameControllerTest {
     void testOnSkipExtraDraw_WrongState_ReturnsFalse() {
         // Prepariamo la partita ma NON avanziamo fino a RESOLVING_ACTIONS
         controller.setNumPlayers(2);
-        controller.addPlayer("Alice", mockView);
-        controller.addPlayer("Bob", mockView);
+        controller.addPlayer("Alice", Color.RED, mockView);
+        controller.addPlayer("Bob", Color.WHITE, mockView);
         controller.startGame();
 
         // Siamo ancora in PLACING_TOTEMS
@@ -264,8 +268,8 @@ class GameControllerTest {
 
     private void avanzaFinoARisoluzioneAzioni() {
         controller.setNumPlayers(2);
-        controller.addPlayer("Alice", mockView);
-        controller.addPlayer("Bob", mockView);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.PURPLE, mockView );
 
         // NOTA: Ho tolto controller.startGame() perché il tuo addPlayer lo chiama
         // in automatico non appena entra l'ultimo giocatore (la stanza si riempie).
@@ -300,6 +304,7 @@ class GameControllerTest {
         @Override public String getId() { return ""; }
         @Override public void showActionRejected(String reason) {};
         @Override public void showActionAccepted(String message) {}
+        @Override public void showLoginError(String message) {}
 
         public List<String> getMessages() { return messages; }
     }
@@ -322,9 +327,9 @@ class GameControllerTest {
         FakeView v3 = new FakeView();
 
         controller.setNumPlayers(3);
-        controller.addPlayer("Alice", v1);
-        controller.addPlayer("Bob", v2);
-        controller.addPlayer("Carlo", v3);
+        controller.addPlayer("Alice", Color.PURPLE, v1);
+        controller.addPlayer("Bob", Color.BLUE, v2);
+        controller.addPlayer("Carlo", Color.RED, v3);
 
         controller.startGame();
 
@@ -367,8 +372,8 @@ class GameControllerTest {
         FakeView v2 = new FakeView();
 
         controller.setNumPlayers(2);
-        controller.addPlayer("Alice", v1);
-        controller.addPlayer("Bob", v2);
+        controller.addPlayer("Alice", Color.WHITE, v1);
+        controller.addPlayer("Bob", Color.WHITE, v2);
 
         controller.startGame();
 

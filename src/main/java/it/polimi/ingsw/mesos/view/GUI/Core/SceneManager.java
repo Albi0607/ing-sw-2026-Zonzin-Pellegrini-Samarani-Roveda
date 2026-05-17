@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.Core;
 
 import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
@@ -17,14 +18,16 @@ import java.util.List;
 public class SceneManager {
     private final Stage stage;
     private final GUI gui;
+    private ClientState clientState;
     private ClientController clientController;
     private LobbyController lobbyController;
     private TotemChoiceController totemController;
     private final ObservableGameModel gameModel;
 
-    public SceneManager(Stage stage, GUI gui, ObservableGameModel gameModel) {
+    public SceneManager(Stage stage, GUI gui, ClientState clientState, ObservableGameModel gameModel) {
         this.stage = stage;
         this.gui = gui;
+        this.clientState = clientState;
         this.gameModel = gameModel;
     }
 
