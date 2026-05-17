@@ -57,6 +57,7 @@ public class LobbyController {
         });
     }
 
+    //TODO da modificare per rendere l'aggiornamento piu intelligente senza eliminare ogni volta le gameCard
     public void updateLobby(List<LobbyInfoDTO> lobby){
         //pulisco l'interfaccia vecchia
         gamesVBox.getChildren().clear();

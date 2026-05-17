@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -53,7 +53,6 @@ public class GameCardController {
 
     @FXML
     public void handleJoinGame() {
-        clientController.joinGame(data.id, null); // da modificare perchè ora ilserver chiede all'utente anche il colore
-        sceneManager.loadWaitingRoom();
+        sceneManager.loadTotemScene(data.id,0,data);
     }
 }
