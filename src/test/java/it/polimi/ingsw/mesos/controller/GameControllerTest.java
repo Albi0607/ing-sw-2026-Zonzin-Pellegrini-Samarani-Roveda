@@ -15,11 +15,18 @@ import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.persistence.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -221,25 +228,6 @@ class GameControllerTest {
     }
 
     @Test
-    void testOnSkipExtraDraw_Success() {
-        avanzaFinoARisoluzioneAzioni();
-
-        // Ci assicuriamo di essere nello stato corretto
-        assertEquals(GameState.RESOLVING_ACTIONS, controller.getGame().getCurrentState().getStateId());
-
-        // Dobbiamo capire a quale giocatore tocca eseguire la risoluzione ora
-        ResolvingState rs = (ResolvingState) controller.getGame().getCurrentState();
-        Player activePlayer = rs.getActivePlayer(controller.getGame());
-
-        assertNotNull(activePlayer, "Ci dovrebbe essere un giocatore attivo in risoluzione");
-
-        // Il giocatore attivo decide di saltare
-        boolean result = controller.onSkipExtraDraw(activePlayer.getNickname());
-
-        assertTrue(result, "onSkipExtraDraw deve ritornare true quando l'azione è legale");
-    }
-
-    @Test
     void testOnSkipExtraDraw_WrongState_ReturnsFalse() {
         // Prepariamo la partita ma NON avanziamo fino a RESOLVING_ACTIONS
         controller.setNumPlayers(2);
@@ -254,16 +242,6 @@ class GameControllerTest {
         boolean result = controller.onSkipExtraDraw("Alice");
 
         assertFalse(result, "onSkipExtraDraw deve ritornare false se chiamato nello stato sbagliato");
-    }
-
-    @Test
-    void testOnSkipExtraDraw_PlayerNotFound_ReturnsFalse() {
-        avanzaFinoARisoluzioneAzioni();
-
-        // Proviamo a chiamare l'azione con un nome che non fa parte del gioco
-        boolean result = controller.onSkipExtraDraw("CarloFantasma");
-
-        assertFalse(result, "onSkipExtraDraw deve ritornare false se il giocatore non esiste");
     }
 
     private void avanzaFinoARisoluzioneAzioni() {
@@ -373,7 +351,7 @@ class GameControllerTest {
 
         controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.WHITE, v1);
-        controller.addPlayer("Bob", Color.WHITE, v2);
+        controller.addPlayer("Bob", Color.RED, v2);
 
         controller.startGame();
 
@@ -389,6 +367,351 @@ class GameControllerTest {
 
         var leaderboard = service.getLeaderboard(2);
         assertEquals(2, leaderboard.size());
+    }
+
+    @Test
+    void testReplayModeBasic() {
+        controller.setReplayMode(true);
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+
+        assertNotNull(controller.getGame());
+    }
+
+    @Test
+    void testGettersAndPersistence() {
+        assertEquals(0, controller.getExpectedNumPlayers());
+        assertEquals(0, controller.getNumPlayersConnected());
+        assertNotNull(controller.getMoveLogger());
+        assertNotNull(controller.getStateSerializer());
+        assertFalse(controller.hasRestorer());
+
+        controller.setNumPlayers(2);
+        assertEquals(2, controller.getExpectedNumPlayers());
+
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        assertEquals(1, controller.getNumPlayersConnected());
+        assertEquals(List.of(Color.BLUE), controller.getTakenColors());
+
+        assertNotNull(controller.getLeaderboardService());
+        assertNotNull(controller.getLeaderboardService());
+    }
+
+    @Test
+    void testOnGameFinishedCallback() throws SQLException {
+        boolean[] called = {false};
+        controller.setOnGameFinished(() -> called[0] = true);
+
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        controller.endGame();
+        assertTrue(called[0]);
+    }
+
+    @Test
+    void testReconnectionFlow() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        controller.onPlayerDisconnected("Alice");
+
+        VirtualView newView = new VirtualView() {
+            @Override public void sendGame(GameDTO gameDTO) {}
+            @Override public void sendClientState(ClientState clientState) {}
+            @Override public void showMessage(String message) {}
+            @Override public String getNickname() { return "Alice"; }
+            @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
+            @Override public String getId() { return ""; }
+            @Override public void showActionRejected(String reason) {}
+            @Override public void showActionAccepted(String message) {}
+            @Override public void showLoginError(String message) {}
+        };
+
+        controller.reconnectPlayer("Alice", newView);
+
+        // Test reconnecting unknown player
+        assertThrows(IllegalArgumentException.class, () -> controller.reconnectPlayer("Unknown", mockView));
+    }
+
+    @Test
+    void testDisconnectionAndSkipTurn() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        String currentPlayer = controller.getGame().getCurrentPlayerNickname();
+        controller.onPlayerDisconnected(currentPlayer);
+
+        assertNotEquals(currentPlayer, controller.getGame().getCurrentPlayerNickname());
+
+        // Test disconnecting already disconnected player
+        controller.onPlayerDisconnected(currentPlayer);
+    }
+
+    @Test
+    void testActionsWhenDisconnected() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        String currentPlayer = controller.getGame().getCurrentPlayerNickname();
+        controller.onPlayerDisconnected(currentPlayer);
+
+        assertFalse(controller.onPlaceTotem(currentPlayer, 'A'));
+        assertFalse(controller.onTakeCard(currentPlayer, 0, true));
+        assertFalse(controller.onSkipExtraDraw(currentPlayer));
+    }
+
+    @Test
+    void testAllPlayersDisconnected() throws SQLException {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        controller.onPlayerDisconnected("Alice");
+        controller.onPlayerDisconnected("Bob");
+    }
+
+    @Test
+    void testTurnTimerFlow() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        controller.startTurnTimer("Alice");
+        controller.cancelTurnTimer();
+    }
+
+    @Test
+    void testSetNumPlayers_Logging() {
+        // ExpectedNumPlayers is 0 initially.
+        controller.setNumPlayers(3);
+        
+        List<GameMove> moves = controller.getMoveLogger().readAll();
+        boolean foundSet = moves.stream()
+                .anyMatch(m -> m.type == GameMove.MoveType.SET_NUM_PLAYERS && m.intPayload == 3);
+        assertTrue(foundSet, "La mossa SET_NUM_PLAYERS dovrebbe essere presente nel log");
+    }
+
+    @Test
+    void testSetNumPlayers_TriggersBroadcastInThread() throws InterruptedException {
+        // We use a latch or just wait a bit to ensure the thread inside setNumPlayers runs
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        
+        controller.setNumPlayers(2);
+        
+        // Wait a brief moment for the thread to execute v.sendClientState and broadcastUpdate
+        Thread.sleep(200);
+        
+        assertNotNull(controller.getGame());
+    }
+
+    @Test
+    void testSetNumPlayersAlreadySet() {
+        controller.setNumPlayers(2);
+        // This should trigger the "already set" block
+        controller.setNumPlayers(3);
+        assertEquals(2, controller.getExpectedNumPlayers());
+    }
+
+    @Test
+    void testSetNumPlayersTriggersCreateGame() {
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        // Alice and Bob are already in pendingNicknames.
+        // Setting numPlayers to 2 should trigger createGame() and startGame()
+        controller.setNumPlayers(2);
+        assertNotNull(controller.getGame());
+        assertEquals(GameState.PLACING_TOTEMS, controller.getGame().getCurrentState().getStateId());
+    }
+
+    @Test
+    void testOnSkipExtraDraw_Success() {
+        avanzaFinoARisoluzioneAzioni();
+
+        // Ci assicuriamo di essere nello stato corretto
+        assertEquals(GameState.RESOLVING_ACTIONS, controller.getGame().getCurrentState().getStateId());
+
+        // Dobbiamo capire a quale giocatore tocca eseguire la risoluzione ora
+        String current = controller.getGame().getCurrentPlayerNickname();
+        assertNotNull(current, "Ci dovrebbe essere un giocatore attivo in risoluzione");
+
+        // Il giocatore attivo decide di saltare
+        boolean result = controller.onSkipExtraDraw(current);
+
+        assertTrue(result, "onSkipExtraDraw deve ritornare true quando l'azione è legale");
+    }
+
+    @Test
+    void testOnSkipExtraDraw_FullExecutionPath() {
+        avanzaFinoARisoluzioneAzioni();
+        String current = controller.getGame().getCurrentPlayerNickname();
+
+        // Start timer to verify cancelTurnTimer() is called (implicitly by the path execution)
+        controller.startTurnTimer(current);
+
+        // Perform the skip
+        boolean result = controller.onSkipExtraDraw(current);
+
+        assertTrue(result);
+        
+        // Verify move was logged
+        List<GameMove> moves = controller.getMoveLogger().readAll();
+        boolean foundSkip = moves.stream()
+                .anyMatch(m -> m.type == GameMove.MoveType.SKIP_EXTRA_DRAW && current.equals(m.nickname));
+        assertTrue(foundSkip, "La mossa SKIP_EXTRA_DRAW dovrebbe essere presente nel log");
+    }
+
+    @Test
+    void testOnSkipExtraDraw_PlayerDisconnected_ReturnsFalse() {
+        avanzaFinoARisoluzioneAzioni();
+        String current = controller.getGame().getCurrentPlayerNickname();
+
+        // Simulate disconnection
+        controller.onPlayerDisconnected(current);
+
+        // Try to skip
+        boolean result = controller.onSkipExtraDraw(current);
+
+        assertFalse(result, "Dovrebbe ritornare false se il giocatore è disconnesso");
+    }
+
+    @Test
+    void testOnSkipExtraDraw_PlayerNotFound_ReturnsFalse() {
+        avanzaFinoARisoluzioneAzioni();
+
+        // Proviamo a chiamare l'azione con un nome che non fa parte del gioco
+        boolean result = controller.onSkipExtraDraw("CarloFantasma");
+
+        assertFalse(result, "onSkipExtraDraw deve ritornare false se il giocatore non esiste");
+    }
+
+    @Test
+    void testAddPlayer_ReplayMode() {
+        controller.setReplayMode(true);
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        // Should not create game yet
+        assertNull(controller.getGame());
+        controller.addPlayer("Bob", Color.RED, mockView);
+        // Should create game now because pendingNicknames.size() == 2
+        assertNotNull(controller.getGame());
+    }
+
+    @Test
+    void testAddPlayer_RestorerFlow_WaitingPlayers() throws IOException {
+        String logFile = "test_restorer_wait.log";
+        Files.deleteIfExists(Paths.get(logFile));
+        MoveLogger logger = new MoveLogger(logFile);
+
+        // Add TWO players to the log
+        logger.append(GameMove.addPlayer("Alice", Color.BLUE));
+        logger.append(GameMove.addPlayer("Bob", Color.RED));
+
+        GameRestorer restorer = new GameRestorer(logger);
+        controller.setRestorer(restorer);
+
+        // First player reconnects
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+
+        // Should still have restorer because Bob hasn't reconnected
+        assertTrue(controller.hasRestorer());
+
+        Files.deleteIfExists(Paths.get(logFile));
+    }
+
+    @Test
+    void testAddPlayer_RestorerFlow_Complete() throws IOException {
+        String logFile = "test_restorer_complete.log";
+        Files.deleteIfExists(Paths.get(logFile));
+        MoveLogger logger = new MoveLogger(logFile);
+
+        logger.append(GameMove.addPlayer("Alice", Color.BLUE));
+
+        GameRestorer restorer = new GameRestorer(logger);
+        controller.setRestorer(restorer);
+
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+
+        // Reconnection complete
+        assertFalse(controller.hasRestorer());
+
+        Files.deleteIfExists(Paths.get(logFile));
+    }
+
+    @Test
+    void testAddPlayer_RestorerFlow_GameAlreadyCreated() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        GameRestorer restorer = new GameRestorer(new MoveLogger("temp.log"));
+        controller.setRestorer(restorer);
+
+        // Bob reconnects (game != null, restorer != null)
+        controller.addPlayer("Bob", Color.RED, mockView);
+        
+        // Alice reconnects -> should complete restoration
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+    }
+
+    @Test
+    void testEndGame_DBInactive() throws SQLException {
+        // Ensure DB is not active or just let it fail gracefully
+        // The controller catches exceptions or checks DBManager.isActive()
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+        
+        // We can just call endGame. If DB is inactive it skips DB logic.
+        assertDoesNotThrow(() -> controller.endGame());
+    }
+
+    @Test
+    void testBroadcastUpdate_Exceptions() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, new VirtualView() {
+            @Override public void sendGame(GameDTO gameDTO) { throw new RuntimeException("Network Error"); }
+            @Override public void sendClientState(ClientState clientState) {}
+            @Override public void showMessage(String message) {}
+            @Override public String getNickname() { return "Alice"; }
+            @Override public void sendLobby(List<LobbyInfoDTO> lobby) {}
+            @Override public String getId() { return ""; }
+            @Override public void showActionRejected(String reason) {}
+            @Override public void showActionAccepted(String message) {}
+            @Override public void showLoginError(String message) {}
+        });
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+        
+        // broadcastUpdate is called inside startGame and other actions.
+        // It should catch the RuntimeException.
+        assertDoesNotThrow(() -> controller.broadcastUpdate());
+    }
+
+    @Test
+    void testOnPlayerDisconnected_AllConnectedCountZero() {
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob", Color.RED, mockView);
+        controller.startGame();
+
+        controller.onPlayerDisconnected("Alice");
+        // This will call skipDisconnectedTurn which will check connectedCount
+        controller.onPlayerDisconnected("Bob");
     }
 }
 
