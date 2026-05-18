@@ -25,9 +25,9 @@ public class StateSerializer {
     private final String orderFile;
 
     public StateSerializer(int gameId) {
-        this.tribeFile    = "mesos_tribe_"    + gameId + ".dat";
-        this.buildingFile = "mesos_building_" + gameId + ".dat";
-        this.orderFile    = "mesos_order_"    + gameId + ".dat";
+        this.tribeFile    = "mesos_tribe_"    + gameId + ".txt";
+        this.buildingFile = "mesos_building_" + gameId + ".txt";
+        this.orderFile    = "mesos_order_"    + gameId + ".txt";
     }
 
     /**
