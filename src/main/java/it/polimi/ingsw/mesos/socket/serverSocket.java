@@ -23,7 +23,7 @@ public class serverSocket {
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("New connection from: " + clientSocket.getInetAddress().getHostAddress());
+                System.out.println("New SOCKET connection/request from: " + clientSocket.getInetAddress().getHostAddress());
 
                 ClientHandler handler = new ClientHandler(clientSocket, serverState);
 

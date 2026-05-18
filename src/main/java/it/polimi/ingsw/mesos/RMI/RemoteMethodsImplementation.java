@@ -94,6 +94,12 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
 
     //gestire questo metodo con l'utilizzo di una view con nome gia scelto univoco
     public String getLobby(String nickname,CallBack clientCallback) throws RemoteException{
+        try {
+            String clientIP = RemoteServer.getClientHost();
+            System.out.println("New RMI connection/request from: " + clientIP + " (Nickname: " + nickname + ")");
+        } catch (ServerNotActiveException e) {
+            System.out.println("RMI request da IP sconosciuto (Nickname: " + nickname + ")");
+        }
         VirtualView view = new RMIVirtualView(nickname, clientCallback);
         serverState.getLobby(nickname,view);
         return view.getId();

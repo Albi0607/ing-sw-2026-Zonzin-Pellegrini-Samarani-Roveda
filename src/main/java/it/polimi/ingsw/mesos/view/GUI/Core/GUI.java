@@ -89,7 +89,10 @@ public class GUI extends Application implements View {
     //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
     public void handleLogin(String nickname,String ip,int port,String networkChoice){
         try {
-            Network network = ClientChoseSetup.createNetwork(networkChoice);
+            if (ip == null || ip.trim().isEmpty()) {
+                ip = "127.0.0.1";
+            }
+            Network network = ClientChoseSetup.createNetwork(networkChoice, ip, port);
             this.clientController = new ClientController(this, network);
             sceneManager.loadLobbyScene(clientController);
             clientController.getLobby(nickname);

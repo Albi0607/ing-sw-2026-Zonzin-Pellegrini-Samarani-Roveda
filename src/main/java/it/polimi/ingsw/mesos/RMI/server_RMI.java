@@ -8,10 +8,10 @@ import java.rmi.registry.*;
 public class server_RMI {
 
     //aggiunta della porta scelta a runtime
-    public void start(ServerState serverState, int port) {
+    public void start(ServerState serverState, String serverIp, int port) {
 
         try {
-            //System.setProperty("java.rmi.server.hostname", "192.168.0.1");
+            System.setProperty("java.rmi.server.hostname", serverIp);
             RemoteMethods remoteMethods = new RemoteMethodsImplementation(serverState);
             Registry registry = LocateRegistry.createRegistry(port);
             registry.bind("remoteMethods", remoteMethods);
