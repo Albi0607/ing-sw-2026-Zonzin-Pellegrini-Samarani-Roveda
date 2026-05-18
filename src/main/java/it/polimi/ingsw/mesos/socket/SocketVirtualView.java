@@ -4,6 +4,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.PingMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.*;
 
 import java.io.IOException;
@@ -99,5 +100,9 @@ public class SocketVirtualView implements VirtualView {
     @Override
     public String getId() {
         return id;
+    }
+
+    public synchronized void sendPing() {
+        send(new PingMessage());
     }
 }

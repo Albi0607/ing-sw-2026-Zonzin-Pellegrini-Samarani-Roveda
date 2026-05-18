@@ -124,5 +124,27 @@ public class PlacingState implements GameStateLogic {
         return actingOrder;
     }
 
+    @Override
+    public void forceSkipCurrentPlayer(Game game) {
+        Player skipped = getActivePlayer(game);
+        System.out.println("[PlacingState] Salto forzato per: " +
+                (skipped != null ? skipped.getNickname() : "nessuno"));
+
+        if (skipped == null) return;
+
+        // Rimuove il giocatore dalla track (come farebbe placeTotemOnOffer)
+        game.getBoard().getTurnOrderTrack().removePlayer(skipped);
+
+        activePlayerIndex++;
+
+        if (activePlayerIndex >= actingOrder.size()) {
+            // Era l'ultimo a dover piazzare → passa alla risoluzione
+            System.out.println("[PlacingState] Tutti i totem piazzati (o saltati). Avvio risoluzione.");
+            game.changeState(new ResolvingState());
+        } else {
+            System.out.println("[PlacingState] Tocca a: " + actingOrder.get(activePlayerIndex).getNickname());
+        }
+    }
+
 
 }

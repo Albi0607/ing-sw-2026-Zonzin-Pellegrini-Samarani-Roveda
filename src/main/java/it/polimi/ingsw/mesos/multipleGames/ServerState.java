@@ -37,8 +37,10 @@ public class ServerState {
     }
 
     public synchronized void getLobby(String nickname,VirtualView view){
-        if (nickname == null || nickname.isEmpty()) {
-            view.showMessage("Nickname non valido");
+        GameController controllerR = getController(nickname);
+        if (controllerR != null) {
+            // Il giocatore era in una partita → riconnessione
+            controllerR.reconnectPlayer(nickname, view);
             return;
         }
 

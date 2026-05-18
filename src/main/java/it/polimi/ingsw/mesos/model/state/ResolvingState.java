@@ -334,4 +334,34 @@ public class ResolvingState implements GameStateLogic {
         }
     }
 
+    @Override
+    public void forceSkipCurrentPlayer(Game game) {
+        Player skipped = getActivePlayer(game);
+        System.out.println("[ResolvingState] Salto forzato per: " +
+                (skipped != null ? skipped.getNickname() : "nessuno"));
+
+        if (skipped == null) return;
+
+        if (isExtraDrawPhase) {
+            // Nella fase extra: semplicemente avanza nella coda, come skipExtraDraw()
+            extraQueueIndex++;
+            moveToNextOccupiedTile(game);
+            return;
+        }
+
+        // Fase normale: il giocatore era su una tessera
+        // Va rimesso nella TurnOrderTrack e la tessera va resettata,
+        // esattamente come quando finisce i pick normalmente
+        OfferTile tile = game.getBoard().getTiles().get(currentTileIndex);
+
+        TurnOrderTrack track = game.getBoard().getTurnOrderTrack();
+        int slot = track.getFirstFreeSlot();
+        track.setPlayerAt(slot, skipped);
+
+        tile.reset();
+
+        currentTileIndex++;
+        moveToNextOccupiedTile(game);
+    }
+
 }

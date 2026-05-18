@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 public class GameController {
 
@@ -43,6 +43,12 @@ public class GameController {
     private boolean replayMode = false;  // true durante il replay, disabilita broadcast
     private GameRestorer restorer = null;
     private Runnable onGameFinished;
+
+    //controllo KeepAlive
+    private final java.util.Set<String> disconnectedPlayers = ConcurrentHashMap.newKeySet();
+    private ScheduledExecutorService turnTimer = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> currentTurnTimeout = null;
+    private static final long TURN_TIMEOUT_SEC = 30;
 
 
     //id del game che corrisponde a quello della lobby
@@ -342,8 +348,14 @@ public class GameController {
         }
         try {
             requireState(GameState.PLACING_TOTEMS);
+            cancelTurnTimer();
 
             Player player = requirePlayer(nickname);
+
+            // controlla se il payer è disconnesso e salta le sue azioni
+            if (disconnectedPlayers.contains(nickname)) {
+                return false;
+            }
             OfferTile tile = requireTile(tileId);
 
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
@@ -374,7 +386,12 @@ public class GameController {
 
         try {
             requireState(GameState.RESOLVING_ACTIONS);
+            cancelTurnTimer();
             Player player = requirePlayer(nickname);
+            // controlla se il payer è disconnesso e salta le sue azioni
+            if (disconnectedPlayers.contains(nickname)) {
+                return false;
+            }
 
             // forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
 
@@ -408,7 +425,12 @@ public class GameController {
         }
         try {
             requireState(GameState.RESOLVING_ACTIONS);
+            cancelTurnTimer();
             Player player = requirePlayer(nickname);
+            // controlla se il payer è disconnesso e salta le sue azioni
+            if (disconnectedPlayers.contains(nickname)) {
+                return false;
+            }
 
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.skipExtraDraw(player);
@@ -440,6 +462,14 @@ public class GameController {
         }
 
         game.clearLastResolvedEvents();
+
+        // controlla se il payer è disconnesso e salta le sue azioni
+        skipIfCurrentPlayerDisconnected();
+
+        String current = game.getCurrentPlayerNickname();
+        if (current != null && !disconnectedPlayers.contains(current)) {
+            startTurnTimer(current);
+        }
     }
 
     // metodo che ricostruisce lo stato attuale del gioco valido, per ogni aggiornamento
@@ -606,13 +636,7 @@ public class GameController {
         return tile;
     }
 
-    //TODO
-    //il GameController dovrebbe mandare timer con richieste ogni 3 secondi cosi da capire se i client sono ancora
-    //collegati oppure se rimuovere le connessioni
 
-    //metodo per rimuove giocatori che perdono connessione, capire se c'é altro da fare
-    //bisogna però tenere nickname perché se si riconnette deve controllare che metta stesso nickname per potere ritornare
-    //a giocare
     private void RemovePlayer(String nickname){
         players.remove(nickname);
     }
@@ -632,9 +656,23 @@ public class GameController {
         if (!players.containsKey(nickname)) {
             throw new IllegalArgumentException("Giocatore non trovato: " + nickname);
         }
-        players.put(nickname, newView); // sostituisce la DummyVirtualView
+        players.put(nickname, newView);
+        disconnectedPlayers.remove(nickname);
 
         System.out.println("[GameController] Giocatore riconnesso: " + nickname);
+
+        // Notifica tutti gli altri player sullo stato del giocatore
+        for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
+            if (!entry.getKey().equals(nickname)) {
+                try {
+                    entry.getValue().showMessage(nickname + " si è riconnesso!");
+                } catch (Exception ignored) {}
+            }
+        }
+
+        // Aggiorna lo stato del giocatore che si era disconnesso
+        newView.sendClientState(ClientState.IN_GAME);
+        broadcastUpdate();
     }
 
     public MoveLogger getMoveLogger() {
@@ -678,6 +716,79 @@ public class GameController {
 
     public List<Color> getTakenColors() {
         return new ArrayList<>(chosenColors.values());
+    }
+
+    // gestione dei player disconnessi
+    public synchronized void onPlayerDisconnected(String nickname) {
+        if (disconnectedPlayers.contains(nickname)) return;
+        // devo salvare i nickname dei player disconnessi per poermettere l'eventuale riconnessione
+        disconnectedPlayers.add(nickname);
+
+        System.out.println("[GameController] Giocatore disconnesso: " + nickname);
+
+        for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
+            if (!entry.getKey().equals(nickname)) {
+                try {
+                    // avviso che quel player verrà saltato nella dinamica del gioco
+                    entry.getValue().showMessage(nickname + " si è disconnesso. Il suo turno verrà saltato.");
+                } catch (Exception ignored) {}
+            }
+        }
+
+        if (game != null && nickname.equals(game.getCurrentPlayerNickname())) {
+            skipDisconnectedTurn(nickname);
+        }
+    }
+
+    /**
+     * Avanza il turno saltando i giocatori disconnessi.
+     * Chiama il metodo esistente del model per passare al prossimo.
+     */
+    private void skipDisconnectedTurn(String nickname) {
+        try {
+            long connectedCount = players.keySet().stream()
+                    .filter(n -> !disconnectedPlayers.contains(n))
+                    .count();
+
+            if (connectedCount == 0) {
+                System.out.println("[GameController] Tutti disconnessi, fine partita.");
+                try { endGame(); } catch (Exception ignored) {}
+                return;
+            }
+
+            game.skipCurrentPlayerTurn();
+            broadcastUpdate();
+
+        } catch (Exception e) {
+            System.err.println("[GameController] Errore nel saltare il turno: " + e.getMessage());
+        }
+    }
+
+    private void skipIfCurrentPlayerDisconnected() {
+        if (game == null) return;
+        String current = game.getCurrentPlayerNickname();
+        if (current != null && disconnectedPlayers.contains(current)) {
+            System.out.println("[GameController] Turno di " + current + " ma è disconnesso, salto automatico.");
+            skipDisconnectedTurn(current);
+        }
+    }
+
+    // Avvia il timer per il player corrente -> viene ogni volta riportato a zero
+    public synchronized void startTurnTimer(String nickname) {
+        cancelTurnTimer();
+
+        currentTurnTimeout = turnTimer.schedule(() -> {
+            System.out.println("[TurnTimer] Timeout per: " + nickname);
+            onPlayerDisconnected(nickname);
+        }, TURN_TIMEOUT_SEC, TimeUnit.SECONDS);
+    }
+
+    // Cancella il timer (chiamato quando il giocatore fa una mossa)
+    public synchronized void cancelTurnTimer() {
+        if (currentTurnTimeout != null && !currentTurnTimeout.isDone()) {
+            currentTurnTimeout.cancel(false);
+            currentTurnTimeout = null;
+        }
     }
 }
 

@@ -2,15 +2,14 @@ package it.polimi.ingsw.mesos.socket;
 
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
+import it.polimi.ingsw.mesos.rete.PlayerStatus;
 import it.polimi.ingsw.mesos.socket.Message.Message;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.CreateGameMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.GetLobbyMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.JoinGameMessage;
-import it.polimi.ingsw.mesos.socket.Message.messageClient.RegisterMessage;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.*;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 /**
  * Handles a single client connection on the server side.
@@ -36,6 +35,11 @@ public class ClientHandler implements Runnable {
     private String nickname;
     private String virtualViewId;
     private SocketVirtualView virtualView;
+
+    // KeepAlive
+    private static final long TIMEOUT_MS = 30_000; // 30 secondi
+    private volatile long lastPingTime = System.currentTimeMillis();
+    private volatile PlayerStatus status = PlayerStatus.CONNECTED;
 
     /**
      * Creates a new handler for a connected client.
@@ -71,10 +75,12 @@ public class ClientHandler implements Runnable {
      * @throws IOException if stream initialization fails
      */
     private void setupStreams() throws IOException {
+        clientSocket.setSoTimeout((int) TIMEOUT_MS);
         out = new ObjectOutputStream(clientSocket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
+
 
     /**
      * Continuously reads messages from the client while the connection is active.
@@ -88,8 +94,28 @@ public class ClientHandler implements Runnable {
                 Message message = (Message) in.readObject();
                 handleMessage(message);
             }
+        } catch (SocketTimeoutException e) {
+            // Nessun messaggio (neanche PING) entro 15s
+            System.out.println("Timeout keepalive: " + nickname);
+            handleDisconnection();
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Client disconnesso: " + nickname);
+            handleDisconnection();
+        }
+    }
+
+    // rende lo status del giocatore = disconnesso
+    // notifica il controller che gestisce la partita che quel giocatore non è più attivo
+    private void handleDisconnection() {
+        if (status == PlayerStatus.DISCONNECTED) return; // evita doppia chiamata
+        status = PlayerStatus.DISCONNECTED;
+
+        if (nickname == null) return;
+
+        // Notifica il controller se il giocatore era in partita
+        var controller = serverState.getController(nickname);
+        if (controller != null) {
+            controller.onPlayerDisconnected(nickname);
         }
     }
 
@@ -106,6 +132,11 @@ public class ClientHandler implements Runnable {
      * @throws IOException if sending responses to the client fails
      */
     private void handleMessage(Message message) throws IOException {
+
+        // messagio per KeepAlive
+        if (message instanceof PingMessage) {
+            return;
+        }
 
         // Registrazione alla lobby (primo messaggio obbligatorio)
         if (message instanceof GetLobbyMessage glm) {
@@ -174,9 +205,14 @@ public class ClientHandler implements Runnable {
      */
     private void cleanup() {
         System.out.println("[ClientHandler] Cleanup per: " + nickname);
+        var controller = serverState.getController(nickname);
 
-        // Rimuove nickname e playerToGame da ServerState
-        if (nickname != null) {
+        if (controller != null) {
+            // Era in partita → NON rimuovere, permetti riconnessione
+            // la disconnessione è già gestita da handleDisconnection()
+        } else {
+            // Non era in partita → rimuovi normalmente
+            // lo elimino perchè non è mai stato parte di una partita
             serverState.removePlayer(nickname);
         }
 
