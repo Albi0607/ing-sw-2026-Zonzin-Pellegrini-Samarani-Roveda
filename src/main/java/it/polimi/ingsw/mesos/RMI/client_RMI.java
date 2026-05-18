@@ -23,8 +23,8 @@ public class client_RMI implements Network {
      * @throws NotBoundException if no entry is found in the registry or if there is an error in the registration of the
      * remote methods.
      * */
-    public client_RMI() throws RemoteException, NotBoundException{
-        Registry registry = LocateRegistry.getRegistry();
+    public client_RMI(String serverIp, int port) throws RemoteException, NotBoundException{
+        Registry registry = LocateRegistry.getRegistry(serverIp, port);
         System.out.print("RMI registry bindings: ");
         String[] e = registry.list();
         for (int i = 0; i < e.length; i++) {
