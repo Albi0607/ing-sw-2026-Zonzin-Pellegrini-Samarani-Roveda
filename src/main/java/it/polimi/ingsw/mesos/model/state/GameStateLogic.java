@@ -77,4 +77,10 @@ public interface GameStateLogic {
     default Player getActivePlayer(Game g) {return null;}
 
     default boolean isNextUpper(Game g) {return false;}
+
+
+    // per saltare i player disconnessi
+    default void forceSkipCurrentPlayer(Game game) {
+        System.out.println("[GameState] forceSkipCurrentPlayer non supportato in: " + this.getClass().getSimpleName());
+    }
 }

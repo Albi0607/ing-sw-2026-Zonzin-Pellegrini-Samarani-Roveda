@@ -49,5 +49,6 @@ public interface RemoteMethods extends Remote {
     void createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId) throws  RemoteException;
 
     void joinGame(String nickname, int id, Color color, String viewId) throws  RemoteException;
+    void heartbeat(String nickname) throws RemoteException;
 
 }

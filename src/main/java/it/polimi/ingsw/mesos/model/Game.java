@@ -445,4 +445,15 @@ public class Game {
             this.currentState.execute(this);
         }
     }
+
+    // gestisce i player disconnessi
+    // => se un player non è attivo salta il suo turno e permette agli altri giocatori
+    // di continuare la partita
+    public void skipCurrentPlayerTurn() {
+        if (this.currentState != null) {
+            this.currentState.forceSkipCurrentPlayer(this);
+        } else {
+            System.err.println("CRITICAL ERROR: No active state to skip player.");
+        }
+    }
 }

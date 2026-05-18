@@ -27,7 +27,8 @@ public class clientSocket implements Network {
     private ObjectInputStream in;
 
     private ClientController controller;
-    
+    private KeepAliveSender keepAlive;
+
     /**
      * Creates a new client socket and connects to the specified server.
      * <p>
@@ -44,6 +45,11 @@ public class clientSocket implements Network {
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
+
+        keepAlive = new KeepAliveSender(out);
+        Thread keepAliveThread = new Thread(keepAlive);
+        keepAliveThread.setDaemon(true);
+        keepAliveThread.start();
 
         new Thread(this::listenFromServer).start();
     }
@@ -108,8 +114,11 @@ public class clientSocket implements Network {
      */
     private boolean sendMessage(Message message) {
         try {
-            out.writeObject(message);
-            out.flush();
+            synchronized (out) {
+                out.writeObject(message);
+                out.flush();
+                out.reset();
+            }
             return true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -126,11 +135,11 @@ public class clientSocket implements Network {
     private void listenFromServer() {
         try {
             while (true) {
-
                 Message message = (Message) in.readObject();
                 message.executeClientSide(controller);
             }
         } catch (IOException | ClassNotFoundException e) {
+            keepAlive.stop(); // ferma il keepalive se cade la connessione
             e.printStackTrace();
         }
     }

@@ -7,8 +7,11 @@ import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
 import java.rmi.server.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -22,10 +25,14 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     //da capire se è meglio avere una gestione centralizzata in serverState con tutto
     private final ExecutorService executor;
 
+    // gestione keepAlive Message
+    private final Map<String, Long> lastHeartbeat = new ConcurrentHashMap<>();
+
 
     public RemoteMethodsImplementation(ServerState serverState) throws RemoteException {
         this.serverState = serverState;
         this.executor = Executors.newCachedThreadPool();
+        startWatchdog();
     }
 
 
@@ -104,6 +111,31 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
             //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
             serverState.joinGame(nickname, id, color, virtualViewId);
         });
+    }
+
+
+
+
+    @Override
+    public void heartbeat(String nickname) throws RemoteException {
+        lastHeartbeat.put(nickname, System.currentTimeMillis());
+    }
+
+    private void startWatchdog() {
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            long now = System.currentTimeMillis();
+            lastHeartbeat.forEach((nickname, lastTime) -> {
+                if (now - lastTime > 30_000) {
+                    lastHeartbeat.remove(nickname);
+                    System.out.println("[RMI Watchdog] Timeout per: " + nickname);
+                    var controller = serverState.getController(nickname);
+                    if (controller != null) {
+                        controller.onPlayerDisconnected(nickname);
+                    }
+                    serverState.removePlayer(nickname);
+                }
+            });
+        }, 5, 5, TimeUnit.SECONDS);
     }
 
 }
