@@ -306,6 +306,7 @@ public class GameControllerGUI {
 
 
     private void refreshUI() {
+        checkIfEnd();
         topRowController.refreshInteraction();
         bottomRowController.refreshInteraction();
         offerTileController.refreshOfferTileInteraction();
@@ -357,6 +358,12 @@ public class GameControllerGUI {
 
     public int getCurrentRound(){
         return gameModel.getCurrentRound();
+    }
+
+    public void checkIfEnd(){
+        if(gameModel.getGameState()==GameState.FINISHED){
+            Platform.runLater(sceneManager::loadEndScene);
+        }
     }
 
 
