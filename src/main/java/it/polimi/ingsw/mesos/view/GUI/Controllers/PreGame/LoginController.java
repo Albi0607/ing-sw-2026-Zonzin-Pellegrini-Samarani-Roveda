@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ProgressIndicator;
 import it.polimi.ingsw.mesos.rete.ServerDiscoverer;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 
 public class LoginController {
@@ -130,5 +132,21 @@ public class LoginController {
 
         gui.handleLogin(nickname,ip,port,networkChoice);
         gui.setNickname(nickname);
+    }
+
+    public void showLoginError(String errorMessage) {
+        if (errorLabel != null) {
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
+            errorLabel.setText("❌ Nickname già in uso. Scegline un altro!");
+            errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+
+        } else {
+            System.err.println("[ERRORE CRITICO] errorLabel è NULL! Controlla se nel file FXML c'è fx:id=\"errorLabel\"");
+        }
+        nicknameTextField.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 3px;");
+        nicknameTextField.clear();
+        nicknameTextField.requestFocus();
+
     }
 }

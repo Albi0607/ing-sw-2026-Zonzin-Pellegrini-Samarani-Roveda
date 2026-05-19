@@ -21,6 +21,7 @@ public class SceneManager {
     private final GUI gui;
     private ClientState clientState;
     private ClientController clientController;
+    private LoginController loginController;
     private LobbyController lobbyController;
     private TotemChoiceController totemController;
     private final ObservableGameModel gameModel;
@@ -36,8 +37,8 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginScene.fxml"));
             Parent root = loader.load();
-            LoginController loginController = loader.getController();
-            loginController.setController(gui);
+            this.loginController = loader.getController();
+            this.loginController.setController(gui);
             Scene scene = new Scene(root);
             stage.setScene(scene);
         } catch (Exception e) {
@@ -134,6 +135,9 @@ public class SceneManager {
             System.out.println("ERRORE NEL CARICAMENTO DELLA FINE DEL GIOCO  : " + e.getMessage());
             e.printStackTrace();
         }
+    }
 
+    public LoginController getLoginController() {
+        return this.loginController;
     }
 }

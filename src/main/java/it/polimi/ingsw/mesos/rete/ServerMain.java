@@ -57,6 +57,7 @@ public class ServerMain {
     public static void main(String[] args) throws SQLException {
 
         String myIp = getLocalIPv4();
+
         try {
             // FORZA RMI ad usare questo IP per evitare che i client si connettano a se stessi!
             System.setProperty("java.rmi.server.hostname", myIp);
