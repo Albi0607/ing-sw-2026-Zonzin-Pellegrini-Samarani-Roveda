@@ -187,7 +187,7 @@ public class ClientHandler implements Runnable {
             // Delega a ServerState
             serverState.getLobby(nickname, virtualView);
 
-            System.out.println("Registrato in lobby: " + nickname);
+            //System.out.println("Registrato in lobby: " + nickname);
         } catch (Exception e) {
             System.err.println("Errore registrazione lobby '" + msg.getNickname() + "': " + e.getMessage());
             try {

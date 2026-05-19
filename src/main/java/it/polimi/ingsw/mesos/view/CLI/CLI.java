@@ -265,10 +265,12 @@ public class CLI implements View, UIContext {
 
     private void handleLobbyUpdated(UIEvent.LobbyUpdatedEvent e) {
         this.currentLobby = e.lobby();
+
         if (this.currentClientState == null) {
             this.currentClientState = ClientState.LOBBY;
             transitionTo(new LobbyState());
         }
+
         this.fullDirty = true;
     }
 
@@ -294,14 +296,30 @@ public class CLI implements View, UIContext {
     }
 
     private void handleActionRejected(UIEvent.ActionRejectedEvent e) {
-        if (currentClientState == ClientState.LOBBY && currentState instanceof WaitingState) {
-            transitionTo(new LobbyState());
+        if (currentClientState == ClientState.LOBBY &&
+                currentState instanceof WaitingState) {
+
             CLIPrinter.clearScreen();
-            System.out.println(CLIPrinter.ANSI_RED + "\n❌ Accesso fallito: " + e.reason() + CLIPrinter.ANSI_RESET);
-            this.softDirty = false;
-            this.fullDirty = true;
+
+            System.out.println(
+                    CLIPrinter.ANSI_RED +
+                            "❌ Accesso fallito: " + e.reason() +
+                            CLIPrinter.ANSI_RESET
+            );
+
+            LobbyState lobbyState = new LobbyState();
+            lobbyState.resetToMenu();
+
+            transitionTo(lobbyState);
+
+            awaitingServerResponse = false;
+
+            fullDirty = true;
+            softDirty = false;
+
             return;
         }
+
 
         if (currentState instanceof WaitingState && currentClientState == ClientState.IN_GAME && isMyTurn()) {
             this.awaitingServerResponse = false;
@@ -375,6 +393,8 @@ public class CLI implements View, UIContext {
         // 1. RENDERING PRINCIPALE DELEGATO ALLO STATO
         if (fullDirty) {
             currentState.render(this);
+        }else if (softDirty && currentState instanceof LobbyState) {
+            currentState.renderPrompt(this);
         }
 
         // 2. STAMPA NOTIFICHE RIMANENTI

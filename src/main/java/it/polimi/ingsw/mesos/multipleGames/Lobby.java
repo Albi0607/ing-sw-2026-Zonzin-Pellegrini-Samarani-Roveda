@@ -75,12 +75,10 @@ public class Lobby {
         }
         GameController controller = games.get(id);
         if (controller == null) {
-            System.out.println("Nessun game trovato con questo id: " + id);
-            return null;
+            throw new IllegalArgumentException("Partita non trovata");
         }
         if (controller.getGame() != null && !controller.hasRestorer()) {
-            System.out.println("Partita già iniziata non è più possibile partecipare");
-            return null;
+            throw new IllegalStateException("La partita è già piena o iniziata");
         }
         // Partita non ancora iniziata OPPURE in attesa di ripristino
         //try {

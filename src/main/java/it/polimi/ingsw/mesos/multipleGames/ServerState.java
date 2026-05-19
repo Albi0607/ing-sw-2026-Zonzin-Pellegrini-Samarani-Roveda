@@ -40,7 +40,15 @@ public class ServerState {
         GameController controllerR = getController(nickname);
         if (controllerR != null) {
             // Il giocatore era in una partita → riconnessione
-            controllerR.reconnectPlayer(nickname, view);
+            if (controllerR.isPlayerDisconnected(nickname)) {
+                // Sì, era crashato. Lo facciamo rientrare.
+                String virtualViewId = view.getId();
+                connections.put(virtualViewId, view);
+                controllerR.reconnectPlayer(nickname, view);
+            } else {
+                // non è crashato, qualcun altro sta provando a usare il suo nickname mentre gioca.
+                view.showLoginError("Il giocatore '" + nickname + "' è già online e sta giocando!");
+            }
             return;
         }
 
@@ -119,12 +127,6 @@ public class ServerState {
 
         try {
             GameController controller = lobby.joinGame(id, nickname, color, virtualViewId);
-            if(controller == null){
-                // Usiamo showActionRejected invece di showMessage
-                view.showActionRejected("Partita non trovata");
-                return;
-            }
-
             playerToGame.put(nickname, controller);
 
         } catch (Exception e) {
