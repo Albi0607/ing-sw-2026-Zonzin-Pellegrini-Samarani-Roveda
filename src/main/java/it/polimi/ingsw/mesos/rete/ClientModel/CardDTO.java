@@ -1,11 +1,15 @@
 package it.polimi.ingsw.mesos.rete.ClientModel;
 
+import it.polimi.ingsw.mesos.common.enums.CharacterType;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public class CardDTO implements Serializable {
 
     public String id;
+
+    public CharacterType characterType;
 
     //implementazione di equals per poter evitare aggiornamenti inutili in GUI
     @Override

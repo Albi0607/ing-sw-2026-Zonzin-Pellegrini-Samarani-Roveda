@@ -8,17 +8,26 @@ import it.polimi.ingsw.mesos.rete.ClientModel.TurnOrderSlotDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.Board.*;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
+import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.TextAlignment;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameControllerGUI {
 
@@ -33,11 +42,23 @@ public class GameControllerGUI {
     private OfferTileController offerTileController;
     private TurnOrderController turnOrderController;
     private DeckController deckController;
-    private PlayersManagerController playersController;
+
+    private List<PlayerBoardController> playersController;
 
     @FXML private VBox centerBoard;
     //label creata per spiegare al client tramite visualizzazione di messaggi cosa deve fare
-    @FXML private Label actionLabel;
+    private Label actionLabel;
+    @FXML private StackPane bottomPlayerContainer;
+    @FXML private StackPane topLeftPlayerContainer;
+    @FXML private StackPane topRightPlayerContainer;
+    @FXML private StackPane topCenterPlayerContainer;
+    @FXML private StackPane leftPlayerContainer;
+    @FXML private StackPane rightPlayerContainer;
+
+    @FXML private StackPane topRightPlayerArea;
+    @FXML private StackPane topCenterPlayerArea;
+    @FXML private StackPane topLeftPlayerArea;
+
 
 
     public void setController(ClientController clientController,SceneManager sceneManager,ObservableGameModel model,String nickname) {
@@ -46,6 +67,7 @@ public class GameControllerGUI {
         this.gameModel = model;
         this.localNickname = nickname;
         initBoard();
+        initPlayerBoard();
         bindModel();
         //faccio runLater cosi aspetto che finisca di creare la visualizzazione e poi aggiorno e rendo able i valori
         Platform.runLater(this::refreshUI);
@@ -55,6 +77,8 @@ public class GameControllerGUI {
     private void initBoard() {
         try {
 
+            centerBoard.setScaleX(0.9);
+            centerBoard.setScaleY(0.9);
             //creo la fila superiore delle carte che possono essere pescate dai giocatori
             FXMLLoader topLoader = new FXMLLoader(getClass().getResource("/fxml/topRowCards.fxml"));
             Parent top = topLoader.load();
@@ -70,6 +94,7 @@ public class GameControllerGUI {
             FXMLLoader turnLoader = new FXMLLoader(getClass().getResource("/fxml/turnOrderTrack.fxml"));
             Parent turn = turnLoader.load();
             turnOrderController = turnLoader.getController();
+            turnOrderController.setTurnOrder(gameModel.getTurnOrderTrack());
 
             //creo offerTile che dovrà essere cliccabile e i totem potranno starci sopra
             FXMLLoader offerLoader = new FXMLLoader(getClass().getResource("/fxml/offerTileArea.fxml"));
@@ -87,15 +112,121 @@ public class GameControllerGUI {
             //creo un HBox(allineamento orizzontale) per tenere sullo stesso piano deck, turnOrderTrack e offerTiles
             HBox middleRow = new HBox(deck, turn, offer);
             middleRow.setSpacing(20);
-            middleRow.setAlignment(javafx.geometry.Pos.CENTER);
+            middleRow.setAlignment(Pos.CENTER);
+            actionLabel = new Label();
+            actionLabel.setTextFill(Color.GREEN);
+            actionLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+            actionLabel.setAlignment(Pos.CENTER);
+            actionLabel.setTextAlignment(TextAlignment.CENTER);
+            actionLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(actionLabel, Priority.ALWAYS);
 
             //metto nel container centrale per la board tutte le cose appena create
-            centerBoard.getChildren().setAll(top, middleRow, bottom);
+            centerBoard.getChildren().setAll(top, middleRow, bottom,actionLabel);
 
         } catch (IOException e) {
             System.out.println("ERRORE NELL'INIZIALIZZAZIONE DELLA BOARD: "+ e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    //creo le postazioni dei player in base al loro numero
+    private void initPlayerBoard(){
+        topRightPlayerArea.setManaged(false);
+        topCenterPlayerArea.setManaged(false);
+        topLeftPlayerArea.setManaged(false);
+
+
+        playersController = new ArrayList<>();
+        List<ObservablePlayerModel> players = gameModel.getPlayers();
+
+        ObservablePlayerModel localPlayer = players.stream()
+                .filter(p -> p.getNickname().equals(localNickname))
+                .findFirst()
+                .orElse(null);
+
+        List<ObservablePlayerModel> others = players.stream()
+                .filter(p -> !p.getNickname().equals(localNickname))
+                .toList();
+
+        List<StackPane> usedSlots = switch(players.size()){
+            case 2 -> List.of(topCenterPlayerContainer);
+
+            case 3 -> List.of(topLeftPlayerContainer, topRightPlayerContainer);
+
+            case 4 -> List.of(leftPlayerContainer, topCenterPlayerContainer, rightPlayerContainer);
+
+            case 5 -> List.of(leftPlayerContainer, topLeftPlayerContainer, topRightPlayerContainer, rightPlayerContainer);
+
+            default -> {
+                System.out.println("ERRORE NELL'ASSEGNAZIONE DEGLI SLOT PLAYER DA USARE");
+                yield List.of();}
+        };
+
+        //assegno il player corrente al bottomSlot
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/playerBoardView.fxml"));
+            Parent view = loader.load();
+
+            PlayerBoardController controller = loader.getController();
+            controller.setPlayer(localPlayer);
+            playersController.add(controller);
+            bottomPlayerContainer.getChildren().setAll(view);
+        } catch (Exception e) {
+            System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEL PLAYER CORRENTE" + e.getMessage());
+            e.printStackTrace();;
+        }
+
+
+        //assegno tutti gli altri player agli slot stabiliti
+        for(int i = 0; i<others.size(); i++){
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/playerBoardView.fxml"));
+                Parent view = loader.load();
+
+                PlayerBoardController controller = loader.getController();
+                controller.setPlayer(others.get(i));
+                playersController.add(controller);
+
+
+                StackPane targetSlot = usedSlots.get(i);
+
+                //compio le rotazioni cosi che le mani dei giocatori siano settate correttamente
+                if(targetSlot == topCenterPlayerContainer) {
+
+                    view.setRotate(180);
+                    topCenterPlayerArea.setManaged(true);
+
+                } else if(targetSlot == topLeftPlayerContainer){
+
+                    view.setRotate(180);
+                    topLeftPlayerArea.setManaged(true);
+
+                } else if(targetSlot == topRightPlayerContainer){
+
+                    view.setRotate(180);
+                    topRightPlayerArea.setManaged(true);
+
+                } else if(targetSlot == leftPlayerContainer){
+
+                    view.setRotate(90);
+
+                } else if(targetSlot == rightPlayerContainer){
+
+                    view.setRotate(-90);
+
+                }
+
+                Group wrapper = new Group(view);
+
+                targetSlot.getChildren().setAll(wrapper);
+            } catch (Exception e) {
+                System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEI PLAYER" + e.getMessage());
+                e.printStackTrace();;
+            }
+        }
+
     }
 
     //associo al gameModel degli osservatori che chiamano i metodi di update quando ricevono un cambiamento
@@ -117,16 +248,11 @@ public class GameControllerGUI {
             turnOrderController.update(gameModel.getTurnOrderTrack());
         });
 
-        /*gameModel.getPlayers().addListener((ListChangeListener<? super ObservablePlayerModel>) (obs) -> {
-            playersController.update(gameModel.getPlayers());
-        });*/
-
         gameModel.eraProperty().addListener((o, oldV, newV) -> {
             deckController.updateDeckView(newV);
         });
 
         gameModel.currentRoundProperty().addListener((o, oldV, newV) -> {
-            GameControllerGUI.updateRound(newV.intValue());
             scheduledRefresh();
         });
 
@@ -234,16 +360,5 @@ public class GameControllerGUI {
     }
 
 
-
-    private void handleGameState(GameState newV) {
-    }
-
-    private static void updateRound(int i) {
-    }
-
-
-    private void initPlayers(){
-
-    }
 
 }

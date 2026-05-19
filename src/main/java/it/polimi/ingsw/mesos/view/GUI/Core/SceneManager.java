@@ -3,6 +3,7 @@ package it.polimi.ingsw.mesos.view.GUI.Core;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.EndGameController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
@@ -119,5 +120,20 @@ public class SceneManager {
             lobbyController.updateLobby(lobby);
             System.out.println("LOBBY UPDATE");
         }
+    }
+
+    public void loadEndScene(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/endGameScene.fxml"));
+            Parent root = loader.load();
+            EndGameController controller = loader.getController();
+            controller.set(gameModel);
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+        } catch (Exception e) {
+            System.out.println("ERRORE NEL CARICAMENTO DELLA FINE DEL GIOCO  : " + e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 }

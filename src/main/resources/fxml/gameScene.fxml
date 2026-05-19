@@ -1,54 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI">
-   <center>
-      <VBox alignment="CENTER" spacing="10.0">
-         <VBox fx:id="centerBoard" prefHeight="200.0" prefWidth="1118.0" scaleX="0.9" scaleY="0.9" spacing="5.0"  alignment="CENTER"/>
-         <Label fx:id="actionLabel" visible="false" style="-fx-text-fill: #00ff00; -fx-font-size: 20px; -fx-font-weight: bold;" />
-      </VBox>
-   </center>
-   <top>
-      <Pane fx:id="topArea" prefHeight="180.0" prefWidth="1500.0" BorderPane.alignment="CENTER">
-         <children>
-            <StackPane fx:id="topLeftPlayerArea" alignment="TOP_CENTER" prefHeight="180.0" prefWidth="600.0">
-               <children>
-                  <StackPane fx:id="topLeftPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
-               </children></StackPane>
-            <StackPane fx:id="topCenterPlayerArea" alignment="TOP_CENTER" layoutX="425.0" prefHeight="180.0" prefWidth="600.0">
-               <children>
-                  <StackPane fx:id="topCenterPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
-               </children></StackPane>
-            <StackPane fx:id="topRightPlayerArea" alignment="TOP_CENTER" layoutX="850.0" prefHeight="180.0" prefWidth="600.0">
-               <children>
-                  <StackPane fx:id="topRightPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
-               </children></StackPane>
-         </children>
-      </Pane>
-   </top>
-   <left>
-      <VBox fx:id="leftPlayerArea" prefHeight="600.0" prefWidth="180.0" spacing="5.0" BorderPane.alignment="BOTTOM_CENTER">
-         <children>
-            <StackPane fx:id="leftPlayerContainer" prefHeight="600.0" prefWidth="150.0" />
-         </children></VBox>
-   </left>
-   <right>
-      <VBox fx:id="rightPlayerArea" prefHeight="600.0" prefWidth="180.0" spacing="5.0" BorderPane.alignment="BOTTOM_CENTER">
-         <children>
-            <StackPane fx:id="rightPlayerContainer" prefHeight="600.0" prefWidth="180.0" />
-         </children></VBox>
-   </right>
-   <bottom>
-      <HBox fx:id="bottomPlayerArea" alignment="BOTTOM_CENTER" prefHeight="180.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <StackPane fx:id="bottomPlayerContainer" prefHeight="180.0" prefWidth="600.0" />
-         </children>
-      </HBox>
-   </bottom>
-</BorderPane>
+<AnchorPane prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI">
+<children>
+   <Pane fx:id="leftPlayerArea" layoutX="10.0" layoutY="10.0" prefHeight="570.0" prefWidth="180.0"
+         maxWidth="180" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+      <children>
+         <StackPane fx:id="leftPlayerContainer" prefHeight="650.0" prefWidth="180.0" maxWidth="180" />
+      </children>
+   </Pane>
+   <Pane fx:id="rightPlayerArea" layoutX="10.0" layoutY="10.0" prefHeight="570.0" prefWidth="180.0" maxWidth="180" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <children>
+         <StackPane fx:id="rightPlayerContainer" prefHeight="650.0" prefWidth="180.0" maxWidth="180" />
+      </children>
+   </Pane>
+   <HBox fx:id="bottomPlayerArea" alignment="BOTTOM_CENTER" layoutX="375.0" layoutY="570.0" prefHeight="180.0" prefWidth="700.0" AnchorPane.bottomAnchor="0.0">
+      <children>
+         <StackPane fx:id="bottomPlayerContainer" prefHeight="180.0" prefWidth="700.0" />
+      </children>
+   </HBox>
+   <Pane fx:id="topArea" layoutX="-19.0" layoutY="4.0" prefHeight="180.0" prefWidth="1450.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
+      <children>
+         <StackPane fx:id="topLeftPlayerArea" alignment="TOP_CENTER" prefHeight="180.0" prefWidth="650.0">
+            <children>
+               <StackPane fx:id="topLeftPlayerContainer" prefHeight="200.0" prefWidth="650.0" />
+            </children>
+         </StackPane>
+         <StackPane fx:id="topCenterPlayerArea" alignment="TOP_CENTER" layoutX="425.0" prefHeight="180.0" prefWidth="650.0">
+            <children>
+               <StackPane fx:id="topCenterPlayerContainer" prefHeight="180.0" prefWidth="650.0" />
+            </children>
+         </StackPane>
+         <StackPane fx:id="topRightPlayerArea" alignment="TOP_CENTER" layoutX="802.0" prefHeight="180.0" prefWidth="650.0">
+            <children>
+               <StackPane fx:id="topRightPlayerContainer" prefHeight="180.0" prefWidth="650.0" />
+            </children>
+         </StackPane>
+      </children>
+   </Pane>
+   <VBox alignment="TOP_CENTER" layoutX="179.0" layoutY="184.0" prefHeight="360.0" prefWidth="1090.0">
+      <children>
+         <VBox fx:id="centerBoard" prefHeight="334.0" prefWidth="1145.0" spacing="5.0" />
+      </children>
+   </VBox>
+</children>
+
+</AnchorPane>

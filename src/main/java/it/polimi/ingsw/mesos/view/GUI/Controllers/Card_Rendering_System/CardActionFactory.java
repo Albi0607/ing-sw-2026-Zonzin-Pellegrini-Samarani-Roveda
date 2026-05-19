@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.GUI.Card_Rendering_System;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.Card_Rendering_System;
 
 import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
 

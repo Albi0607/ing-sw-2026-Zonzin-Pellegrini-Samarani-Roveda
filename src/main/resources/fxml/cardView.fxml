@@ -3,7 +3,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="cardSlot" onMouseClicked="#handleCardClick" onMouseEntered="#handleCardEnter" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Card_Rendering_System.CardController">
+<StackPane fx:id="cardSlot" onMouseClicked="#handleCardClick" onMouseEntered="#handleCardEnter" onMouseExited="#handleCardExit" prefHeight="140.0" prefWidth="80.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.Card_Rendering_System.CardController">
    <children>
       <ImageView fx:id="cardImage" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
    </children>

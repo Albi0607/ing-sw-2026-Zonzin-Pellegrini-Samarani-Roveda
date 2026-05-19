@@ -22,10 +22,16 @@ public class ObservableTribeModel {
         return buildings;
     }
 
+    //se il numero di carte characters o buildings rimane uguale evito di aggiornare l'intero array
     public void updateFromDTO(TribeDTO dto){
-        characters.setAll(dto.characters);
 
-        buildings.setAll(dto.buildings);
+        if (characters.size() != dto.characters.size()) {
+            characters.setAll(dto.characters);
+        }
 
+        if (buildings.size() != dto.buildings.size()) {
+            buildings.setAll(dto.buildings);
+        }
     }
+
 }

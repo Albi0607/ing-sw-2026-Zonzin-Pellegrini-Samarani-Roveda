@@ -567,6 +567,9 @@ public class GameController {
     private CardDTO buildCardDTO(Card c) {
         CardDTO dto = new CardDTO();
         dto.id = c.getId();
+        if(c instanceof CharacterCard){
+            dto.characterType = ((CharacterCard) c).getCharacterType();
+        }
         return dto;
     }
 
@@ -578,6 +581,7 @@ public class GameController {
         for (CharacterCard c : tribe.getCharacters()) {
             CardDTO card = new CardDTO();
             card.id = c.getId();
+            card.characterType = c.getCharacterType();
             dto.characters.add(card);
         }
 
