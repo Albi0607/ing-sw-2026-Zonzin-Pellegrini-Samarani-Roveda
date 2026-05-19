@@ -327,6 +327,7 @@ public class GameController {
         if (onGameFinished != null) {
             onGameFinished.run();
         }
+        turnTimer.shutdownNow();
     }
 
     // AZIONI DEL GIOCATORE
@@ -704,6 +705,10 @@ public class GameController {
     //per passare alla lobby il numero di giocatori che sono attualmente in attesa della partita
     //(principalmente per mostrarlo nella view)
     public int getNumPlayersConnected(){
+        if (game != null) {
+            return game.getPlayers().size();
+        }
+
         return pendingNicknames.size();
     }
 
@@ -789,6 +794,10 @@ public class GameController {
             currentTurnTimeout.cancel(false);
             currentTurnTimeout = null;
         }
+    }
+
+    public boolean isPlayerDisconnected(String nickname) {
+        return disconnectedPlayers.contains(nickname);
     }
 }
 
