@@ -8,6 +8,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.application.Application;
 import javafx.scene.image.Image;
@@ -65,6 +66,12 @@ public class GUI extends Application implements View {
     public void showLobby(List<LobbyInfoDTO> lobby) {
         // DA IMPLEMENTARE: Platform.runLater() -> aggiorna scena lobby
         javafx.application.Platform.runLater(()->{
+
+            if (this.clientState == null || this.clientState != ClientState.LOBBY) {
+                this.clientState = ClientState.LOBBY;
+                sceneManager.loadLobbyScene(clientController);
+            }
+
             sceneManager.updateLobby(lobby);
         });
     }
@@ -84,6 +91,14 @@ public class GUI extends Application implements View {
 
     @Override
     public void  showLoginError(String message) {
+        javafx.application.Platform.runLater(() -> {
+
+            LoginController loginController = sceneManager.getLoginController();
+
+            if (loginController != null) {
+                loginController.showLoginError(message);
+            }
+        });
     }
 
     //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
@@ -94,7 +109,6 @@ public class GUI extends Application implements View {
             }
             Network network = ClientChoseSetup.createNetwork(networkChoice, ip, port);
             this.clientController = new ClientController(this, network);
-            sceneManager.loadLobbyScene(clientController);
             clientController.getLobby(nickname);
         } catch (Exception e) {
             showMessage("Errore: nel fare l'accesso e/o nell'andare nella lobby");
