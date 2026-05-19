@@ -110,19 +110,26 @@ public class ObservableGameModel {
     }
 
     //Metodo update di tutti i parametri di tutti i player in gioco
-    // TODO Aggiornare in modo che modifichi solo le parti che cambiano e le restanti rimangono invariate
+    //prima invocazione creo players, dalla seconda aggiorno i parametri
     private void updatePlayers(List<PlayerDTO> playerDTOs) {
 
-        if (playerDTOs == null) return;
+        if (playerDTOs == null){
+            return;
+        }
 
-        players.clear();
+        //al primo aggiornamento creo gli observable per tutti i player
+        if(players.isEmpty()) {
+            for (PlayerDTO dto : playerDTOs) {
 
-        for (PlayerDTO dto : playerDTOs) {
+                ObservablePlayerModel player = new ObservablePlayerModel();
+                player.updateFromDTO(dto);
 
-            ObservablePlayerModel player = new ObservablePlayerModel();
-            player.updateFromDTO(dto);
-
-            players.add(player);
+                players.add(player);
+            }
+            return;
+        }
+        for(int i = 0; i<players.size(); i++){
+            players.get(i).updateFromDTO(playerDTOs.get(i));
         }
     }
 

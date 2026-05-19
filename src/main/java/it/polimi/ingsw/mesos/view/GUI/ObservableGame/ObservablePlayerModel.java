@@ -56,15 +56,16 @@ public class ObservablePlayerModel {
 
     public void updateFromDTO(PlayerDTO dto) {
 
+        if(dto==null){
+            return;
+        }
+
         nickname.set(dto.nickname);
-
         food.set(dto.food);
-
         prestigePoints.set(dto.prestigePoints);
-
         color.set(dto.color);
 
         tribe.updateFromDTO(dto.tribe);
-
     }
+
 }
