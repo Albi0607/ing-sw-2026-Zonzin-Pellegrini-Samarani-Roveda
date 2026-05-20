@@ -10,6 +10,8 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.common.enums.TriggerType;
 
+import java.util.List;
+
 /**
  * Represents the terminal phase of the game.
  * <p>
@@ -44,12 +46,21 @@ public class FinishedState implements GameStateLogic {
         }
 
         // Determiniamo il vincitore
-        Player winner = g.getWinner();
+        List<Player> winners = g.getWinner();
 
-        if (winner != null) {
-            System.out.println("\n IL VINCITORE È: " + winner.getNickname() + "!");
-            System.out.println("Punti totali: " + winner.getPrestigePoints());
-            System.out.println("Cibo rimanente: " + winner.getFood());
+        if (winners != null && !winners.isEmpty()) {
+            if (winners.size() == 1) {
+                Player winner = winners.get(0);
+                System.out.println("\n🏆 IL VINCITORE È: " + winner.getNickname() + "!");
+                System.out.println("Punti totali: " + winner.getPrestigePoints());
+                System.out.println("Cibo rimanente: " + winner.getFood());
+            } else {
+                System.out.println("\n🤝 C'È UN PAREGGIO!");
+                System.out.println("I vincitori a pari merito sono:");
+                for (Player w : winners) {
+                    System.out.println("- " + w.getNickname() + " (Punti: " + w.getPrestigePoints() + ", Cibo: " + w.getFood() + ")");
+                }
+            }
         }
 
         /*

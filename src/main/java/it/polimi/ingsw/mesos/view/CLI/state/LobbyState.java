@@ -120,10 +120,7 @@ public class LobbyState implements UIState {
             }
         }
 
-        System.out.println("\nCosa vuoi fare?");
-        System.out.println("1. Crea una nuova partita");
-        System.out.println("2. Unisciti a una partita esistente");
-        System.out.print("Scelta (1 o 2): ");
+        renderPrompt(context);
     }
 
     private List<Color> getAvailableColors(UIContext context) {
@@ -156,7 +153,12 @@ public class LobbyState implements UIState {
     @Override
     public void renderPrompt(UIContext context) {
         switch (currentPhase) {
-            case MENU -> System.out.print("Scelta (1 o 2): ");
+            case MENU ->{
+                    System.out.println("Cosa vuoi fare?");
+                    System.out.println("1. Crea una nuova partita");
+                    System.out.println("2. Unisciti a una partita esistente");
+                    System.out.print("Scelta (1 o 2): ");
+            }
             case CHOOSING_PLAYERS -> System.out.print("Quanti giocatori parteciperanno? (2-5): ");
             case JOINING -> System.out.print("Inserisci l'ID della partita a cui unirti: ");
             case CHOOSING_COLOR -> printColorChoice(context);
@@ -180,5 +182,13 @@ public class LobbyState implements UIState {
         isCreating = false;
         tempGameData = -1;
         lastAvailableColorsCount = -1;
+    }
+
+    public boolean isChoosingColor() {
+        return currentPhase == Phase.CHOOSING_COLOR;
+    }
+
+    public boolean isCreating() {
+        return isCreating;
     }
 }

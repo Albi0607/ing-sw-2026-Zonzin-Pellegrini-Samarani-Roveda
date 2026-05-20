@@ -1041,4 +1041,40 @@ class MesosIntegrationTest {
                 () -> rs.takeCard(game, marco, 0, false)
         );
     }
+
+    @Test
+    void testGestionePareggiEVincitori() {
+
+        // --- CASO 1: Vittoria netta sui Punti Prestigio ---
+        marco.setPrestigePoints(15);
+        marco.setFood(2);
+
+        sofia.setPrestigePoints(10);
+        sofia.setFood(10); // Sofia ha più cibo, ma non conta perché ha meno PP
+
+        List<Player> winners1 = game.getWinner();
+        assertEquals(1, winners1.size(), "Caso 1: Deve esserci un solo vincitore");
+        assertEquals(marco, winners1.get(0), "Caso 1: Marco deve vincere per Punti Prestigio assoluti");
+
+        // --- CASO 2: Parità sui Punti Prestigio, vittoria allo spareggio (Cibo) ---
+        sofia.setPrestigePoints(15);
+        // Ora hanno entrambi 15 PP. Marco ha 2 Cibo, Sofia ha 10 Cibo.
+
+        List<Player> winners2 = game.getWinner();
+        assertEquals(1, winners2.size(), "Caso 2: Deve esserci un solo vincitore dopo lo spareggio");
+        assertEquals(sofia, winners2.get(0), "Caso 2: Sofia deve vincere grazie allo spareggio sul Cibo");
+
+        // --- CASO 3: Pareggio assoluto (Vittoria Condivisa) ---
+        marco.setFood(10);
+        // Ora hanno entrambi 15 PP e 10 Cibo.
+
+        List<Player> winners3 = game.getWinner();
+        assertEquals(2, winners3.size(), "Caso 3: Devono esserci due vincitori (pareggio assoluto)");
+        assertTrue(winners3.contains(marco) && winners3.contains(sofia), "Caso 3: Entrambi devono essere dichiarati vincitori");
+
+        // --- CASO EXTRA: Partita senza giocatori (Edge Case di sicurezza) ---
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Game(List.of());
+        }, "Il costruttore di Game deve bloccare la creazione di partite con 0 giocatori");
+    }
 }

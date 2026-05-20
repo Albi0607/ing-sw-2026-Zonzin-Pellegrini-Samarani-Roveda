@@ -90,45 +90,35 @@ public class ServerMain {
             DBManager.init(user, password);
             dbEnabled = true;
             if (!DBManager.isActive()) {
-                System.out.println("Database non attivato");}
-            else System.out.println("✔ Database attivato");
+                System.out.println("Database non attivato");
+            } else {
+                System.out.println("✔ Database attivato");
+            }
 
         } catch (Exception e) {
             System.out.println("⚠ DB non disponibile → modalità senza database");
             dbEnabled = false;
         }
 
-        if(args.length>0){
-            port=Integer.parseInt(args[0]);
+        if(args.length > 0){
+            port = Integer.parseInt(args[0]);
         }
         final int finalPort = port;
-
         final int socketPort = 1234;
-
         final String finalIp = myIp;
 
         //RMI THREAD
         new Thread(() -> {
             server_RMI rmi = new server_RMI();
-            rmi.start(serverState, finalIp ,finalPort);
+            rmi.start(serverState, finalIp, finalPort);
         }).start();
 
         //SOCKET THREAD
         new Thread(() -> {
             serverSocket socket = new serverSocket();
             // 1234 per il socket per non andare in conflitto con RMI (1099)
-            socket.start(serverState, socketPort );
+            socket.start(serverState, socketPort);
         }).start();
-
-        Thread broadcasterThread =
-                new Thread(new UDPBroadcaster(
-                        myIp,
-                        socketPort,
-                        finalPort
-                ));
-
-        broadcasterThread.setDaemon(true);
-        broadcasterThread.start();
 
         System.out.println("\n======================================");
         System.out.println("SERVER AVVIATI E PRONTI ALLE CONNESSIONI");
@@ -136,7 +126,5 @@ public class ServerMain {
         System.out.println("Porta RMI:      " + finalPort);
         System.out.println("Porta Socket:   " + socketPort);
         System.out.println("======================================\n");
-
     }
-
 }
