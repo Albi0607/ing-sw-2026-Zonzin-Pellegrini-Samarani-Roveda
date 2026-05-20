@@ -2,6 +2,7 @@
 package it.polimi.ingsw.mesos.controller;
 
 import it.polimi.ingsw.mesos.DB.DBManager;
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.model.Game;
@@ -293,34 +294,32 @@ public class GameController {
      */
 
     public void endGame() throws SQLException {
-
         List<Player> gamePlayers = game.getPlayers();
-
         int numPlayers = gamePlayers.size();
 
+        // 1. Salva i risultati di tutti i giocatori
         for (Player p : gamePlayers) {
-            String nickname = p.getNickname();
-            int points = p.getPrestigePoints();
-
             if (DBManager.isActive()) {
-                // salva su DB
-                leaderboardService.addResult(nickname, points, numPlayers);
+                leaderboardService.addResult(p.getNickname(), p.getPrestigePoints(), numPlayers);
+            }
+        }
 
-                // calcola posizione
+        // 2. Recupera la leaderboard UNA VOLTA SOLA e inviala a ogni client
+        if (DBManager.isActive()) {
+            List<GameResult> leaderboard = leaderboardService.getLeaderboard(numPlayers);
+
+            for (Player p : gamePlayers) {
+                String nickname = p.getNickname();
                 int position = leaderboardService.getPosition(nickname, numPlayers);
 
+                VirtualView view = players.get(nickname);
+                if (view != null) {
+                    view.showLeaderboard(leaderboard, position);
+                }
             }
-            // invia al client
-            //modificato perchè c'è un bug a fine partita
-            /*
-            VirtualView view = players.get(nickname);
-            if (view != null) {
-                view.showMessage("Hai finito in posizione: " + position);
-            }
-             */
         }
-        //broadcastUpdate();
 
+        // 3. Notifica fine partita e pulizia (invariato)
         sendClientStateToAll(ClientState.END_GAME);
         if (moveLogger != null) moveLogger.delete();
         stateSerializer.delete();

@@ -1,9 +1,11 @@
 package it.polimi.ingsw.mesos.socket;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.socket.Message.messageClient.LeaderboardMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageClient.PingMessage;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.*;
 
@@ -105,4 +107,10 @@ public class SocketVirtualView implements VirtualView {
     public synchronized void sendPing() {
         send(new PingMessage());
     }
+
+    @Override
+    public synchronized void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        send(new LeaderboardMessage(leaderboard, myPosition));
+    }
+
 }

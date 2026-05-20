@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.Core;
 
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientChoseSetup;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
@@ -123,4 +124,8 @@ public class GUI extends Application implements View {
         return this.localNickname;
     }
 
+    @Override
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        // DA IMPLEMENTARE
+    }
 }

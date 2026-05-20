@@ -48,6 +48,10 @@ public class CLI implements View, UIContext {
     private final Queue<String> notifications = new LinkedList<>();
     private boolean resolutionTimeoutScheduled = false;
 
+    // DB
+    private List<GameResult> cachedLeaderboard = null;
+    private int cachedMyPosition = -1;
+
     public CLI() {
         this.scanner = new Scanner(System.in);
         this.currentState = new LoginState();
@@ -231,6 +235,7 @@ public class CLI implements View, UIContext {
         eventHandlers.put(UIEvent.UserInputEvent.class, event -> handleUserInput((UIEvent.UserInputEvent) event));
         eventHandlers.put(UIEvent.ResolutionTimeoutEvent.class, event -> handleResolutionTimeout());
         eventHandlers.put(UIEvent.GameRestoredEvent.class, event -> handleGameRestored((UIEvent.GameRestoredEvent) event));
+        eventHandlers.put(UIEvent.LeaderboardReadyEvent.class,  event -> handleLeaderboardReady((UIEvent.LeaderboardReadyEvent) event));
     }
 
     private void handleEvent(UIEvent event) {
@@ -357,7 +362,7 @@ public class CLI implements View, UIContext {
 
     private void handleResolutionTimeout() {
         CLIPrinter.clearScreen();
-        printDBLeaderboard();
+        printDBLeaderboard(cachedLeaderboard, cachedMyPosition);
         if (currentGameState != null) {
             CLIPrinter.printGameOver(currentGameState);
         }
@@ -378,6 +383,11 @@ public class CLI implements View, UIContext {
         notifications.offer("💾 [SISTEMA] Partita ripristinata correttamente dal salvataggio.");
         this.fullDirty = true;
         this.softDirty = true;
+    }
+
+    private void handleLeaderboardReady(UIEvent.LeaderboardReadyEvent e) {
+        this.cachedLeaderboard = e.leaderboard();
+        this.cachedMyPosition = e.myPosition();
     }
 
     private void renderIfNeeded() {
@@ -435,29 +445,20 @@ public class CLI implements View, UIContext {
         System.out.println("Fase attuale: " + CLIPrinter.ANSI_GREEN + currentGameState.currentState + CLIPrinter.ANSI_RESET + "\n");
     }
 
-    private void printDBLeaderboard() {
-        if (!DBManager.isActive()) {
-            System.out.println("Classifica non disponibile (DB offline)");
+    private void printDBLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        if (leaderboard == null || leaderboard.isEmpty()) {
+            System.out.println("Classifica non disponibile.");
             return;
         }
-        try {
-            GameResultDAO dao = new GameResultDAO();
-            LeaderboardService service = new LeaderboardService(dao);
-            int numPlayers = currentGameState.players.size();
-            List<GameResult> leaderboard = service.getLeaderboard(numPlayers);
-
-            System.out.println(CLIPrinter.ANSI_YELLOW + "\n===== CLASSIFICA COMPLETA (" + numPlayers + " GIOCATORI) =====" + CLIPrinter.ANSI_RESET);
-            int pos = 1;
-            for (GameResult r : leaderboard) {
-                System.out.printf("%d) %s - %d punti | %d giocatori | (%s)\n", pos, r.getNickname(), r.getPoints(), r.getNumPlayers(), r.getDate().toString());
-                pos++;
-            }
-            int myPos = service.getPosition(myNickname, numPlayers);
-            System.out.println("\nLa tua posizione nella classifica globale: " + myPos);
-            System.out.println(CLIPrinter.ANSI_YELLOW + "===========================================\n" + CLIPrinter.ANSI_RESET);
-        } catch (Exception e) {
-            System.out.println(CLIPrinter.ANSI_RED + "Errore nel caricamento della classifica dal DB: " + e.getMessage() + CLIPrinter.ANSI_RESET);
+        int numPlayers = currentGameState.players.size();
+        System.out.println(CLIPrinter.ANSI_YELLOW + "\n===== CLASSIFICA COMPLETA (" + numPlayers + " GIOCATORI) =====" + CLIPrinter.ANSI_RESET);
+        int pos = 1;
+        for (GameResult r : leaderboard) {
+            System.out.printf("%d) %s - %d punti | %d giocatori | (%s)\n",
+                    pos++, r.getNickname(), r.getPoints(), r.getNumPlayers(), r.getDate());
         }
+        System.out.println("\nLa tua posizione nella classifica globale: " + myPosition);
+        System.out.println(CLIPrinter.ANSI_YELLOW + "===========================================\n" + CLIPrinter.ANSI_RESET);
     }
 
     private boolean isMyTurn() {
@@ -474,5 +475,10 @@ public class CLI implements View, UIContext {
             }
         }
         return false;
+    }
+
+    @Override
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        eventQueue.offer(new UIEvent.LeaderboardReadyEvent(leaderboard, myPosition));
     }
 }

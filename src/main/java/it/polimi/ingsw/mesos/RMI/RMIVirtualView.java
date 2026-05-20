@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.RMI;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -122,5 +123,14 @@ public class RMIVirtualView implements VirtualView {
     @Override
     public String getId(){
         return id;
+    }
+
+    @Override
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        try {
+            clientCallBack.showLeaderboard(leaderboard, myPosition);
+        } catch (RemoteException e) {
+            System.out.println("Errore nel RMIVirtualView in showLeaderboard: " + e.getMessage());
+        }
     }
 }

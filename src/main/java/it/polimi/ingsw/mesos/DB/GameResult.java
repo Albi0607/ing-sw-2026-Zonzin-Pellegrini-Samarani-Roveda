@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.DB;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
@@ -16,7 +17,7 @@ import java.time.LocalDate;
  *
  */
 
-public class GameResult {
+public class GameResult implements Serializable {
     private String nickname;
     private int points;
     private int numPlayers;

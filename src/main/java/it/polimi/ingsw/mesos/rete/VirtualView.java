@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.rete;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -50,4 +51,7 @@ public interface VirtualView {
     void showActionAccepted(String message);
 
     void showLoginError(String message);
+
+    void showLeaderboard(List<GameResult> leaderboard, int myPosition);
+
 }
