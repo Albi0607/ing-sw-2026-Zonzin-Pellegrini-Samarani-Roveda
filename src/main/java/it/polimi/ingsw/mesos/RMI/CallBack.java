@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.RMI;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -41,4 +42,7 @@ public interface CallBack extends Remote {
     void showActionRejected(String reason) throws RemoteException;
     void showActionAccepted(String message) throws RemoteException;
     void showLoginError(String message) throws RemoteException;
+
+    void showLeaderboard(List<GameResult> leaderboard, int myPosition) throws RemoteException;
+
 }

@@ -73,16 +73,6 @@ public class CLIClient {
         }
 
         try {
-            System.out.print("\nMySQL username (invio per skip): ");
-            String user = scanner.nextLine().trim();
-
-            String password = "";
-            if (!user.isBlank()) {
-                System.out.print("MySQL password: ");
-                password = scanner.nextLine().trim();
-            }
-
-            DBManager.init(user, password); // ← chiamato SEMPRE, anche con user vuoto
             CLI cli = new CLI();
 
             ClientController controller = new ClientController(cli, network);

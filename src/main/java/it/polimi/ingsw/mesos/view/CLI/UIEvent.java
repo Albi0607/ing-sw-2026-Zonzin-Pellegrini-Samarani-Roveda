@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
@@ -27,5 +28,7 @@ public interface UIEvent {
     record ResolutionTimeoutEvent() implements UIEvent {}
 
     record GameRestoredEvent(GameDTO game) implements UIEvent {}
+
+    record LeaderboardReadyEvent(List<GameResult> leaderboard, int myPosition) implements UIEvent {}
 
 }

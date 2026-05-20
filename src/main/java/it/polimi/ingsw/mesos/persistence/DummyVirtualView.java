@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.persistence;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -38,4 +39,7 @@ public class DummyVirtualView implements VirtualView {
     public String getId() {
         return "";
     }
+
+    @Override
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) { /* scarta */ }
 }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.rete;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.common.enums.GameState;
@@ -190,6 +191,10 @@ public class ClientController {
             //Per gestire subito un eventuale errore di connessione
             view.showMessage("Errore nel partecipare ad una partita: Errore di connessione con il server");
         }
+    }
+
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
+        view.showLeaderboard(leaderboard, myPosition);
     }
 
 }

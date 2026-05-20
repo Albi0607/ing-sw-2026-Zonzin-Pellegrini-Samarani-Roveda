@@ -1,5 +1,7 @@
 package it.polimi.ingsw.mesos.DB;
 
+import it.polimi.ingsw.mesos.view.CLI.UIEvent;
+
 import java.sql.SQLException;
 import java.util.List;
 
@@ -47,4 +49,6 @@ public class LeaderboardService {
     public List<GameResult> getLeaderboard(int numPlayers) throws SQLException {
         return dao.getLeaderboard(numPlayers);
     }
+
+    record LeaderboardReadyEvent(List<GameResult> leaderboard, int myPosition) implements UIEvent {}
 }

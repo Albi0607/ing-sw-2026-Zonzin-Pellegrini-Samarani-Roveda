@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
+ *
  * Manages the connection to the MySQL database used for storing game results.
  *
  * <p>This class provides static methods to initialize the database, retrieve the active
@@ -19,7 +20,6 @@ import java.sql.Statement;
  *   <li>Create the target database ({@value #DB_NAME}) if it does not already exist.</li>
  *   <li>Connect to the target database and create the {@code game_results} table if missing.</li>
  * </ol>
- *
  */
 
 public class DBManager {
