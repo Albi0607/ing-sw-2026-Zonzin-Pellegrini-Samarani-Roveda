@@ -28,58 +28,31 @@ public class CLIClient {
 
         while (true) {
             System.out.println(CLIPrinter.ANSI_CYAN + "\n=== CONFIGURAZIONE RETE ===" + CLIPrinter.ANSI_RESET);
-            System.out.println("⏳ Ricerca automatica server LAN in corso...");
-            String serverIp = "";
-            int port = 0;
+
+            System.out.print("Inserisci IP del Server (o 'local' per 127.0.0.1): ");
+            String userInput = scanner.nextLine().trim();
+            String serverIp = userInput.equalsIgnoreCase("local") ? "127.0.0.1" : userInput;
+
             String netChoice = "";
+            int port = 0;
 
-            String[] serverInfo = it.polimi.ingsw.mesos.rete.ServerDiscoverer.discoverServerInfo();
-
-            if (serverInfo != null) {
-                // --- SERVER TROVATO ---
-                serverIp = serverInfo[0];
-                int socketPort = Integer.parseInt(serverInfo[1]);
-                int rmiPort = Integer.parseInt(serverInfo[2]);
-
-                System.out.println(CLIPrinter.ANSI_GREEN + "✔ Server trovato!" + CLIPrinter.ANSI_RESET);
-                System.out.println("IP: " + serverIp);
-                System.out.println("\nScegli il protocollo:");
-                System.out.println(" 1) SOCKET");
-                System.out.println(" 2) RMI");
+            while (true) {
+                System.out.println("\nScegli il protocollo di connessione:");
+                System.out.println(" 1) SOCKET (Porta default: 1234)");
+                System.out.println(" 2) RMI    (Porta default: 1099)");
                 System.out.print("> ");
+                String choice = scanner.nextLine().trim().toUpperCase();
 
-                String choice = scanner.nextLine().trim();
-                if (choice.equals("1") || choice.equalsIgnoreCase("SOCKET")) {
+                if (choice.equals("1") || choice.equals("SOCKET")) {
                     netChoice = "SOCKET";
-                    port = socketPort;
-                } else {
+                    port = 1234;
+                    break;
+                } else if (choice.equals("2") || choice.equals("RMI")) {
                     netChoice = "RMI";
-                    port = rmiPort;
-                }
-
-            } else {
-                // --- FALLBACK MANUALE ---
-                System.out.println(CLIPrinter.ANSI_RED + "❌ Nessun server trovato automaticamente." + CLIPrinter.ANSI_RESET);
-                System.out.print("\nInserisci IP manualmente (o 'local'): ");
-                String userInput = scanner.nextLine().trim();
-                serverIp = userInput.equalsIgnoreCase("local") ? "127.0.0.1" : userInput;
-
-                while (true) {
-                    System.out.println("\nScegli il protocollo di connessione:");
-                    System.out.println(" - RMI");
-                    System.out.println(" - SOCKET");
-                    System.out.print("> ");
-                    netChoice = scanner.nextLine().trim().toUpperCase();
-
-                    if (netChoice.equals("RMI")) {
-                        port = 1099; // Default fallback
-                        break;
-                    } else if (netChoice.equals("SOCKET")) {
-                        port = 1234; // Default fallback
-                        break;
-                    } else {
-                        System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida." + CLIPrinter.ANSI_RESET);
-                    }
+                    port = 1099;
+                    break;
+                } else {
+                    System.out.println(CLIPrinter.ANSI_RED + "❌ Scelta non valida." + CLIPrinter.ANSI_RESET);
                 }
             }
 
@@ -89,7 +62,6 @@ public class CLIClient {
                 // Tenta la connessione
                 network = ClientChoseSetup.createNetwork(netChoice, serverIp, port);
                 System.out.println(CLIPrinter.ANSI_GREEN + "✔ Connessione stabilita con successo!" + CLIPrinter.ANSI_RESET);
-
                 break;
 
             } catch (Exception e) {
@@ -99,7 +71,6 @@ public class CLIClient {
                 System.out.println("Riprova.\n");
             }
         }
-
 
         try {
             System.out.print("\nMySQL username (invio per skip): ");

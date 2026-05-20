@@ -511,6 +511,24 @@ public class GameController {
                 })
                 .collect(java.util.stream.Collectors.toList());
 
+        if (dto.currentState == GameState.FINISHED) {
+            dto.players.sort((p1, p2) -> {
+                int prestigeCompare = Integer.compare(p2.prestigePoints, p1.prestigePoints);
+                if (prestigeCompare == 0) {
+                    return Integer.compare(p2.food, p1.food);
+                }
+                return prestigeCompare;
+            });
+
+            List<String> winnerNicknames = game.getWinner().stream()
+                    .map(Player::getNickname)
+                    .toList();
+
+            dto.winners = dto.players.stream()
+                    .filter(p -> winnerNicknames.contains(p.nickname))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
         return dto;
     }
 

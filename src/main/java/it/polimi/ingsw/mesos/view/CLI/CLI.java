@@ -271,6 +271,12 @@ public class CLI implements View, UIContext {
             transitionTo(new LobbyState());
         }
 
+        if (currentState instanceof LobbyState lobbyState) {
+            if (lobbyState.isChoosingColor() && lobbyState.isCreating()) {
+                return;
+            }
+        }
+
         this.fullDirty = true;
     }
 

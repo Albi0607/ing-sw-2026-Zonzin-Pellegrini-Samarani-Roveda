@@ -3,8 +3,12 @@ import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.common.enums.Color;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.rmi.*;
 import java.rmi.registry.*;
+import java.util.Collections;
 
 /**
  * Class responsible for establishing an RMI connection with the RMI server and handling all client-side remote method
@@ -16,6 +20,27 @@ public class client_RMI implements Network {
 
     private final RemoteMethods remote;
 
+    private static String getLocalIPv4() {
+        try {
+            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (!ni.isUp() || ni.isLoopback() || ni.isVirtual()) {
+                    continue;
+                }
+                for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
+                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
+                        String ip = addr.getHostAddress();
+                        if (!ip.startsWith("169.254")) {
+                            return ip;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Errore scansione rete client: " + e.getMessage());
+        }
+        return "127.0.0.1";
+    }
+
     /**
      * Constructor that initializes this class and connects to the server registry to obtain a reference to the remote
      * object, which allows invoking remote methods that implement client actions
@@ -24,6 +49,15 @@ public class client_RMI implements Network {
      * remote methods.
      * */
     public client_RMI(String serverIp, int port) throws RemoteException, NotBoundException{
+
+        String myIp = getLocalIPv4();
+        try {
+            System.setProperty("java.rmi.server.hostname", myIp);
+            System.out.println("✔ RMI Hostname del Client configurato su: " + myIp);
+        } catch (Exception e) {
+            System.err.println("⚠ Impossibile settare l'hostname RMI sul client.");
+        }
+
         Registry registry = LocateRegistry.getRegistry(serverIp, port);
         System.out.print("RMI registry bindings: ");
         String[] e = registry.list();
@@ -94,7 +128,7 @@ public class client_RMI implements Network {
 
             return remote.getLobby(nickname, cb);
         } catch (RemoteException e) {
-            return null;
+            throw new RuntimeException("Errore di comunicazione RMI durante l'accesso alla lobby.", e);
         }
     }
 

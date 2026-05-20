@@ -162,16 +162,29 @@ public class CLIPrinter {
         System.out.println("==========================================================" + ANSI_RESET);
 
         if (gameDTO.players != null && !gameDTO.players.isEmpty()) {
-            gameDTO.players.sort((p1, p2) -> Integer.compare(p2.prestigePoints, p1.prestigePoints));
 
-            System.out.println("🏆 IL VINCITORE È " + getPlayerColorANSI(gameDTO.players.get(0).color) + gameDTO.players.get(0).nickname.toUpperCase() + ANSI_RESET + "!\n");
+            if (gameDTO.winners != null && !gameDTO.winners.isEmpty()) {
+                if (gameDTO.winners.size() == 1) {
+                    PlayerDTO winner = gameDTO.winners.get(0);
+                    System.out.println("🏆 IL VINCITORE È " + getPlayerColorANSI(winner.color) + winner.nickname.toUpperCase() + ANSI_RESET + "!\n");
+                } else {
+                    System.out.println("🤝 PAREGGIO ASSOLUTO! VITTORIA CONDIVISA TRA:");
+                    for (PlayerDTO w : gameDTO.winners) {
+                        System.out.println("   🏆 " + getPlayerColorANSI(w.color) + w.nickname.toUpperCase() + ANSI_RESET);
+                    }
+                    System.out.println();
+                }
+            }
 
+            System.out.println("📊 CLASSIFICA FINALE:");
             for (int i = 0; i < gameDTO.players.size(); i++) {
                 PlayerDTO p = gameDTO.players.get(i);
-                System.out.printf("%d. %s%s%s - Prestigio Finale: ⭐ %d\n",
-                        (i + 1), getPlayerColorANSI(p.color), p.nickname, ANSI_RESET, p.prestigePoints);
+                System.out.printf("%d. %s%s%s - Prestigio: ⭐ %d | Cibo: 🍗 %d\n",
+                        (i + 1), getPlayerColorANSI(p.color), p.nickname, ANSI_RESET, p.prestigePoints, p.food);
             }
         }
+
+
     }
 
     /**

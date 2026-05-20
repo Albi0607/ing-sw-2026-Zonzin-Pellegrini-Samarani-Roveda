@@ -368,11 +368,37 @@ public class Game {
      * @return the player with the highest prestige points,
      * or null if the player list is empty
      */
-    public Player getWinner() {
-        return players.stream()
-                .max(Comparator.comparingInt(Player::getPrestigePoints)
-                        .thenComparingInt(Player::getFood))
-                .orElse(null);
+    public List<Player> getWinner() {
+        if (players == null || players.isEmpty()) return new ArrayList<>();
+
+        // Troviamo il punteggio massimo
+        int maxPrestige = players.stream()
+                .mapToInt(Player::getPrestigePoints)
+                .max()
+                .orElse(0);
+
+        // Filtriamo tutti i giocatori che hanno quel punteggio massimo
+        List<Player> topScorers = players.stream()
+                .filter(p -> p.getPrestigePoints() == maxPrestige)
+                .toList();
+
+        // Se ce n'è solo uno, ha vinto matematicamente lui
+        if (topScorers.size() == 1) {
+            return topScorers;
+        }
+
+        // SPAREGGIO: Se c'è parità di Punti Prestigio, vince chi ha più Cibo
+        int maxFood = topScorers.stream()
+                .mapToInt(Player::getFood)
+                .max()
+                .orElse(0);
+
+        // Restituiamo chi ha sia i punti massimi sia il cibo massimo
+        // (Se sono ancora pari, la lista conterrà più di un giocatore per la vittoria condivisa)
+        return topScorers.stream()
+                .filter(p -> p.getFood() == maxFood)
+                .toList();
+
     }
 
     public boolean isGameFinished() {
