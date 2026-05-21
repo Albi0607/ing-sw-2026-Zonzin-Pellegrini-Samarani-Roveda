@@ -364,4 +364,8 @@ public class ResolvingState implements GameStateLogic {
         moveToNextOccupiedTile(game);
     }
 
+    public boolean isExtraPhase() {
+        return this.isExtraDrawPhase;
+    }
+
 }
