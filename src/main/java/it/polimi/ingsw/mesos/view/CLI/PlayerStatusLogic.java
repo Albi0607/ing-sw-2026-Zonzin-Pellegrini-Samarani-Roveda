@@ -109,23 +109,27 @@ public class PlayerStatusLogic {
         // --- BUILDER ---
         List<CharacterCardJson> builders = chars.stream().filter(c -> c.type == CharacterType.BUILDER).toList();
         if (!builders.isEmpty()) {
-            Map<String, Long> builderCounts = builders.stream()
-                    .map(b -> {
-                        String s = "";
-                        if (b.discountValue != null && b.discountValue > 0) {
-                            s += "-" + b.discountValue + foodIcon;
-                        }
-                        if (b.prestigePoints != null && b.prestigePoints > 0) {
-                            s += (s.isEmpty() ? "" : "/") + "+" + b.prestigePoints + prestigeIcon;
-                        }
-                        return s;
-                    })
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
 
-            String bDetails = builderCounts.entrySet().stream()
-                    .map(e -> (e.getValue() > 1 ? e.getValue() + "x " : "") + e.getKey())
-                    .collect(Collectors.joining(", "));
+            // Sommiamo tutti gli sconti cibo
+            int totalDiscount = builders.stream()
+                    .filter(b -> b.discountValue != null)
+                    .mapToInt(b -> b.discountValue)
+                    .sum();
+
+            // Sommiamo tutti i punti prestigio
+            int totalPrestige = builders.stream()
+                    .filter(b -> b.prestigePoints != null)
+                    .mapToInt(b -> b.prestigePoints)
+                    .sum();
+
+            // Costruiamo la stringa dei dettagli solo se ci sono effettivamente dei bonus
+            String bDetails = "";
+            if (totalDiscount > 0) {
+                bDetails += "-" + totalDiscount + foodIcon;
+            }
+            if (totalPrestige > 0) {
+                bDetails += (bDetails.isEmpty() ? "" : "/") + "+" + totalPrestige + prestigeIcon;
+            }
 
             statusParts.add("BUILDER: " + builders.size() + (!bDetails.isEmpty() ? " [" + bDetails + "]" : ""));
         }

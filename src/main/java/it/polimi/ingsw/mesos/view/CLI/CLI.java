@@ -189,6 +189,14 @@ public class CLI implements View, UIContext {
             try {
                 UIEvent event = eventQueue.take();
                 handleEvent(event);
+
+                while (!eventQueue.isEmpty()) {
+                    UIEvent nextEvent = eventQueue.poll();
+                    if (nextEvent != null) {
+                        handleEvent(nextEvent);
+                    }
+                }
+
                 renderIfNeeded();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -336,13 +344,13 @@ public class CLI implements View, UIContext {
             this.awaitingServerResponse = false;
             syncStateWithGame();
         }
-        if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        //if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
         notifications.offer("❌ " + e.reason());
         this.softDirty = true;
     }
 
     private void handleActionAccepted(UIEvent.ActionAcceptedEvent e) {
-        if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        //if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
         this.awaitingServerResponse = false;
         notifications.offer("✔ " + e.message());
         this.softDirty = true;
@@ -350,7 +358,7 @@ public class CLI implements View, UIContext {
     }
 
     private void handleMessage(UIEvent.MessageEvent e) {
-        if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
+        //if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
         notifications.offer("ℹ️ " + e.message());
         this.softDirty = true;
     }
@@ -466,15 +474,7 @@ public class CLI implements View, UIContext {
     }
 
     private boolean canSkipExtraDraw() {
-        if (currentGameState == null || currentGameState.players == null) return false;
-        for (PlayerDTO player : currentGameState.players) {
-            if (player.nickname.equals(myNickname) && player.tribe != null && player.tribe.buildings != null) {
-                for (CardDTO building : player.tribe.buildings) {
-                    if (building.id.equals("BD_20")) return true;
-                }
-            }
-        }
-        return false;
+        return currentGameState != null && currentGameState.isExtraDrawPhase;
     }
 
     @Override

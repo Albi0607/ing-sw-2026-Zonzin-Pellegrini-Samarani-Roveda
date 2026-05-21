@@ -16,6 +16,7 @@ import it.polimi.ingsw.mesos.model.card.character.CharacterCard;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.FinishedState;
+import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.persistence.*;
 import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import it.polimi.ingsw.mesos.rete.VirtualView;
@@ -49,7 +50,7 @@ public class GameController {
     private final java.util.Set<String> disconnectedPlayers = ConcurrentHashMap.newKeySet();
     private ScheduledExecutorService turnTimer = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> currentTurnTimeout = null;
-    private static final long TURN_TIMEOUT_SEC = 30;
+    private static final long TURN_TIMEOUT_SEC = 50;
 
 
     //id del game che corrisponde a quello della lobby
@@ -434,9 +435,14 @@ public class GameController {
 
             //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.skipExtraDraw(player);
+            if (!replayMode) view.showActionAccepted("Azione saltata con successo!");
             if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
-            if (!replayMode) view.showActionAccepted("Azione saltata con successo!");
+            if (game.getCurrentState() instanceof FinishedState) {
+                if (game.onGameEnd != null) {
+                    game.onGameEnd.run();
+                }
+            }
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
             if (!replayMode) view.showActionRejected("Azione non saltata correttamente: " + e.getMessage());
@@ -509,6 +515,13 @@ public class GameController {
                     return pdto;
                 })
                 .collect(java.util.stream.Collectors.toList());
+
+        if (dto.currentState == GameState.RESOLVING_ACTIONS) {
+            ResolvingState rs = (ResolvingState) game.getCurrentState();
+            dto.isExtraDrawPhase = rs.isExtraPhase();
+        } else {
+            dto.isExtraDrawPhase = false;
+        }
 
         if (dto.currentState == GameState.FINISHED) {
             dto.players.sort((p1, p2) -> {

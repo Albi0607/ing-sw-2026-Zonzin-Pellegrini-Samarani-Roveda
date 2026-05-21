@@ -15,5 +15,6 @@ public class GameDTO implements Serializable {
     public GameState currentState;
     public String currentPlayerNickname;
     public boolean isUpper;
+    public boolean isExtraDrawPhase;
     public List<PlayerDTO> winners;
 }

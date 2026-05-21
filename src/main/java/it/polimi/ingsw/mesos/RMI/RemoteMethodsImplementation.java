@@ -131,7 +131,7 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             long now = System.currentTimeMillis();
             lastHeartbeat.forEach((nickname, lastTime) -> {
-                if (now - lastTime > 30_000) {
+                if (now - lastTime > 50_000) {
                     lastHeartbeat.remove(nickname);
                     System.out.println("[RMI Watchdog] Timeout per: " + nickname);
                     var controller = serverState.getController(nickname);

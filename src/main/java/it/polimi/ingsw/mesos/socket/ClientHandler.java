@@ -37,7 +37,7 @@ public class ClientHandler implements Runnable {
     private SocketVirtualView virtualView;
 
     // KeepAlive
-    private static final long TIMEOUT_MS = 30_000; // 30 secondi
+    private static final long TIMEOUT_MS = 50_000; // 50 secondi
     private volatile long lastPingTime = System.currentTimeMillis();
     private volatile PlayerStatus status = PlayerStatus.CONNECTED;
 
