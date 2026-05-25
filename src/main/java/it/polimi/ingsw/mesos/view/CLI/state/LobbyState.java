@@ -8,14 +8,48 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Manages the UI for the pre-game lobby room.
+ * This state acts as an internal Finite State Machine (wizard flow), guiding the user
+ * step-by-step to either create a new game or join an existing one, before finally transitioning
+ * to the Waiting state and sending the network command.
+ */
 public class LobbyState implements UIState {
 
-    private enum Phase { MENU, CHOOSING_PLAYERS, JOINING, CHOOSING_COLOR }
+    /**
+     * Internal sub-states representing the steps of the lobby wizard.
+     */
+    private enum Phase {
+        /** The main lobby menu (Create or Join). */
+        MENU,
+        /** Asking the host for the total number of players. */
+        CHOOSING_PLAYERS,
+        /** Asking the client for the ID of the game to join. */
+        JOINING,
+        /** The final step, asking the user to pick an available tribe color. */
+        CHOOSING_COLOR
+    }
+
+    /** The current step in the lobby setup wizard. */
     private Phase currentPhase = Phase.MENU;
+
+    /** Flag indicating whether the user chose to create a new game (true) or join an existing one (false). */
     private boolean isCreating;
+
+    /** * Temporary storage variable.
+     * If isCreating is true, holds the desired number of players.
+     * If isCreating is false, holds the ID of the target game.
+     */
     private int tempGameData;
+
+    /** Tracks the previous amount of available colors to detect live changes when other players join. */
     private int lastAvailableColorsCount = -1;
 
+    /**
+     * Processes user input based on the current internal phase of the wizard.
+     * Progresses the internal state upon valid input, and dispatches the final network
+     * command (create or join) once all required data (e.g., color) has been gathered.
+     */
     @Override
     public void handleInput(String input, UIContext context) {
         if (currentPhase == Phase.MENU) {
@@ -80,6 +114,11 @@ public class LobbyState implements UIState {
         }
     }
 
+    /**
+     * Renders the main heavy visual elements of the lobby state.
+     * Usually prints the list of available games. If the user is currently choosing a color
+     * to join a specific game, it dynamically checks for live changes in available colors.
+     */
     @Override
     public void render(UIContext context) {
         CLIPrinter.clearScreen();
@@ -123,6 +162,10 @@ public class LobbyState implements UIState {
         renderPrompt(context);
     }
 
+    /**
+     * Helper method to compute the list of colors still available for the targeted game.
+     * Parses the central Lobby DTOs to check which colors are already taken.
+     */
     private List<Color> getAvailableColors(UIContext context) {
         List<Color> availableColors = new ArrayList<>(Arrays.asList(Color.values()));
 
@@ -150,14 +193,18 @@ public class LobbyState implements UIState {
         return availableColors;
     }
 
+    /**
+     * Prints the lightweight context-sensitive question at the bottom of the screen,
+     * guiding the user on what to type next based on the active phase.
+     */
     @Override
     public void renderPrompt(UIContext context) {
         switch (currentPhase) {
             case MENU ->{
-                    System.out.println("Cosa vuoi fare?");
-                    System.out.println("1. Crea una nuova partita");
-                    System.out.println("2. Unisciti a una partita esistente");
-                    System.out.print("Scelta (1 o 2): ");
+                System.out.println("Cosa vuoi fare?");
+                System.out.println("1. Crea una nuova partita");
+                System.out.println("2. Unisciti a una partita esistente");
+                System.out.print("Scelta (1 o 2): ");
             }
             case CHOOSING_PLAYERS -> System.out.print("Quanti giocatori parteciperanno? (2-5): ");
             case JOINING -> System.out.print("Inserisci l'ID della partita a cui unirti: ");
@@ -165,6 +212,9 @@ public class LobbyState implements UIState {
         }
     }
 
+    /**
+     * Helper to render the specific prompt for color selection.
+     */
     private void printColorChoice(UIContext context) {
         List<Color> availableColors = getAvailableColors(context);
 
@@ -177,6 +227,10 @@ public class LobbyState implements UIState {
         System.out.print("Scegli il tuo colore: ");
     }
 
+    /**
+     * Resets the internal state machine back to the initial menu phase.
+     * Useful for aborting a setup sequence (e.g., trying to join a full game).
+     */
     public void resetToMenu() {
         currentPhase = Phase.MENU;
         isCreating = false;
@@ -184,10 +238,16 @@ public class LobbyState implements UIState {
         lastAvailableColorsCount = -1;
     }
 
+    /**
+     * Returns whether the wizard is currently in the final step of picking a color.
+     */
     public boolean isChoosingColor() {
         return currentPhase == Phase.CHOOSING_COLOR;
     }
 
+    /**
+     * Returns whether the wizard is currently configured to create a new game.
+     */
     public boolean isCreating() {
         return isCreating;
     }
