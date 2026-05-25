@@ -23,41 +23,89 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
+/**
+ * Main engine for the Command Line Interface.
+ * Acts as the centralized View, managing the event loop, routing network/user events
+ * to specific UI States, and handling the terminal rendering pipeline.
+ */
 public class CLI implements View, UIContext {
+
+    /** Network controller used to send commands and actions to the server. */
     private ClientController controller;
+
+    /** Scanner used to asynchronously read standard input from the user. */
     private final Scanner scanner;
+
+    /** The chosen nickname of the player running this client. */
     private String myNickname;
+
+    /** Background scheduler used for timed UI events. */
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     // --- LA CODA DEGLI EVENTI CENTRALIZZATA ---
+
+    /** Thread-safe queue containing all pending events (user inputs, network updates). */
     private final BlockingQueue<UIEvent> eventQueue = new LinkedBlockingQueue<>();
+
+    /** Flag to keep the main event loop running. */
     private volatile boolean running = true;
 
     // --- LO STATO DELLA UI ---
+
+    /** The latest game state received from the server. */
     private GameDTO currentGameState;
+
+    /** The overarching phase of the client (e.g., LOBBY, IN_GAME, END_GAME). */
     private ClientState currentClientState;
+
+    /** The list of available matches/lobbies fetched from the server. */
     private List<LobbyInfoDTO> currentLobby;
+
+    /** Flag indicating if the client is currently locked waiting for a server response. */
     private boolean awaitingServerResponse = false;
+
+    /** Registry mapping each UIEvent type to its specific handler method. */
     private final Map<Class<? extends UIEvent>, Consumer<UIEvent>> eventHandlers = new HashMap<>();
 
+    /** The active State Pattern instance handling the current specific UI screen. */
     private UIState currentState;
 
     // --- FLAG DI RENDERING ---
+
+    /** True if the entire screen needs to be cleared and completely redrawn. */
     private boolean fullDirty = true;
+
+    /** True if only the prompt or pending notifications need to be printed, without clearing the screen. */
     private boolean softDirty = false;
+
+    /** Queue of transient notifications (e.g., errors, confirmations) to be displayed on the next render pass. */
     private final Queue<String> notifications = new LinkedList<>();
+
+    /** Prevents multiple end-game timeout events from being scheduled concurrently. */
     private boolean resolutionTimeoutScheduled = false;
 
     // DB
+
+    /** Cached global leaderboard fetched from the database at the end of the game. */
     private List<GameResult> cachedLeaderboard = null;
+
+    /** The player's specific rank within the cached leaderboard. */
     private int cachedMyPosition = -1;
 
+    /**
+     * Initializes the CLI, setting up the scanner, mapping event handlers,
+     * and defaulting the starting state to Login.
+     */
     public CLI() {
         this.scanner = new Scanner(System.in);
         this.currentState = new LoginState();
         initializeEventHandlers();
     }
 
+    /**
+     * Spawns a daemon thread that continuously listens for terminal input
+     * and pushes it into the centralized event queue as a UserInputEvent.
+     */
     private void startInputThread() {
         Thread inputThread = new Thread(() -> {
             while (running) {
@@ -73,6 +121,10 @@ public class CLI implements View, UIContext {
         inputThread.start();
     }
 
+    /**
+     * Binds the network controller to this CLI instance.
+     * @param controller The ClientController instance.
+     */
     public void setController(ClientController controller) {
         this.controller = controller;
     }
@@ -123,7 +175,7 @@ public class CLI implements View, UIContext {
     public ClientState getClientState() { return this.currentClientState; }
 
     @Override
-    public void drawUI() { this.drawUIDirect(); } // Rinomina il vecchio private drawUI() in drawUIDirect() per non fare conflitti
+    public void drawUI() { this.drawUIDirect(); }
 
     @Override
     public void flushNotifications() {
@@ -177,6 +229,10 @@ public class CLI implements View, UIContext {
     // IL MOTORE PRINCIPALE (EDT - Event Dispatch Thread)
     // ==========================================================
 
+    /**
+     * Starts the main Event Loop. Blocks the current thread, processing UI and network
+     * events sequentially, triggering state logic, and rendering the UI when dirty flags are set.
+     */
     public void start() {
         CLIPrinter.clearScreen();
         System.out.println(CLIPrinter.ANSI_YELLOW + "Benvenuto in Mesos!" + CLIPrinter.ANSI_RESET);
@@ -206,6 +262,10 @@ public class CLI implements View, UIContext {
         scheduler.shutdownNow();
     }
 
+    /**
+     * Aligns the local active UIState with the central GameState received from the server.
+     * Resolves turn-taking logic, pushing the user to active states or passive Waiting states.
+     */
     private void syncStateWithGame() {
         if (currentGameState.currentState == GameState.FINISHED) {
 
@@ -232,6 +292,10 @@ public class CLI implements View, UIContext {
         }
     }
 
+    /**
+     * Registers all event handlers into the routing map, tying specific UIEvents
+     * to their respective processing methods.
+     */
     private void initializeEventHandlers() {
         eventHandlers.put(UIEvent.LoginErrorEvent.class, event -> handleLoginError((UIEvent.LoginErrorEvent) event));
         eventHandlers.put(UIEvent.GameUpdatedEvent.class, event -> handleGameUpdated((UIEvent.GameUpdatedEvent) event));
@@ -246,6 +310,10 @@ public class CLI implements View, UIContext {
         eventHandlers.put(UIEvent.LeaderboardReadyEvent.class,  event -> handleLeaderboardReady((UIEvent.LeaderboardReadyEvent) event));
     }
 
+    /**
+     * Retrieves the mapped handler for the given event and executes it.
+     * @param event The event pulled from the queue.
+     */
     private void handleEvent(UIEvent event) {
         Consumer<UIEvent> handler = eventHandlers.get(event.getClass());
         if (handler != null) {
@@ -253,6 +321,10 @@ public class CLI implements View, UIContext {
         }
     }
 
+    /**
+     * Processes a full game update from the server, replacing the local GameDTO
+     * and flagging the UI for a full redraw.
+     */
     private void handleGameUpdated(UIEvent.GameUpdatedEvent e) {
         this.currentGameState = e.game();
         if (this.currentClientState == null || this.currentClientState == ClientState.LOBBY || this.currentClientState == ClientState.WAITING_PLAYERS) {
@@ -265,6 +337,9 @@ public class CLI implements View, UIContext {
         this.fullDirty = true;
     }
 
+    /**
+     * Processes a login rejection, returning the user to the LoginState prompt.
+     */
     private void handleLoginError(UIEvent.LoginErrorEvent e) {
         transitionTo(new LoginState());
         this.awaitingServerResponse = false;
@@ -276,6 +351,10 @@ public class CLI implements View, UIContext {
         this.fullDirty = false;
     }
 
+    /**
+     * Processes a lobby update, caching the active games list and transitioning
+     * to the LobbyState if not actively creating/choosing colors.
+     */
     private void handleLobbyUpdated(UIEvent.LobbyUpdatedEvent e) {
         this.currentLobby = e.lobby();
 
@@ -293,6 +372,9 @@ public class CLI implements View, UIContext {
         this.fullDirty = true;
     }
 
+    /**
+     * Processes overarching client phase shifts (e.g., forced back to LOBBY or END_GAME).
+     */
     private void handleClientStateUpdated(UIEvent.ClientStateUpdatedEvent e) {
         this.currentClientState = e.state();
 
@@ -314,6 +396,10 @@ public class CLI implements View, UIContext {
         this.fullDirty = true;
     }
 
+    /**
+     * Processes a rejected action from the server, adding the error to the notifications queue
+     * and unlocking the local UI to allow retries.
+     */
     private void handleActionRejected(UIEvent.ActionRejectedEvent e) {
         if (currentClientState == ClientState.LOBBY &&
                 currentState instanceof WaitingState) {
@@ -349,6 +435,9 @@ public class CLI implements View, UIContext {
         this.softDirty = true;
     }
 
+    /**
+     * Processes a successful action acknowledgment, unlocking the UI and enqueuing the success message.
+     */
     private void handleActionAccepted(UIEvent.ActionAcceptedEvent e) {
         //if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
         this.awaitingServerResponse = false;
@@ -357,17 +446,26 @@ public class CLI implements View, UIContext {
 
     }
 
+    /**
+     * Enqueues a generic info message from the server to be printed on the next render.
+     */
     private void handleMessage(UIEvent.MessageEvent e) {
         //if (currentGameState != null && currentGameState.currentState == GameState.FINISHED) return;
         notifications.offer("ℹ️ " + e.message());
         this.softDirty = true;
     }
 
+    /**
+     * Delegates the raw string input from the terminal directly to the active UIState logic.
+     */
     private void handleUserInput(UIEvent.UserInputEvent e) {
-        // ECCO LA MAGIA DELLO STATE PATTERN! DELEGA PURA!
         currentState.handleInput(e.input(), this);
     }
 
+    /**
+     * Triggered by a background timeout after the game finishes. Clears the board
+     * and prints the final leaderboard and game-over screens.
+     */
     private void handleResolutionTimeout() {
         CLIPrinter.clearScreen();
         printDBLeaderboard(cachedLeaderboard, cachedMyPosition);
@@ -379,6 +477,9 @@ public class CLI implements View, UIContext {
         this.softDirty = false;
     }
 
+    /**
+     * Handles the payload received when a crashed game is successfully restored from logs.
+     */
     private void handleGameRestored(UIEvent.GameRestoredEvent e) {
         this.currentGameState = e.game();
         if (this.currentClientState != ClientState.END_GAME) {
@@ -393,11 +494,18 @@ public class CLI implements View, UIContext {
         this.softDirty = true;
     }
 
+    /**
+     * Caches the database leaderboard data to be printed alongside the end-game screen.
+     */
     private void handleLeaderboardReady(UIEvent.LeaderboardReadyEvent e) {
         this.cachedLeaderboard = e.leaderboard();
         this.cachedMyPosition = e.myPosition();
     }
 
+    /**
+     * The core rendering pipeline. Checks dirty flags to decide if the screen needs
+     * a full redraw (via the active UIState), or just appending pending notifications/prompts.
+     */
     private void renderIfNeeded() {
         if ((!fullDirty && !softDirty) || currentClientState == null) return;
         /*
@@ -414,17 +522,17 @@ public class CLI implements View, UIContext {
                 currentGameState != null &&
                 currentGameState.currentState == GameState.FINISHED) return;
 
-        // 1. RENDERING PRINCIPALE DELEGATO ALLO STATO
+        // RENDERING PRINCIPALE DELEGATO ALLO STATO
         if (fullDirty) {
             currentState.render(this);
         }else if (softDirty && currentState instanceof LobbyState) {
             currentState.renderPrompt(this);
         }
 
-        // 2. STAMPA NOTIFICHE RIMANENTI
+        // STAMPA NOTIFICHE RIMANENTI
         flushNotifications();
 
-        // 3. GESTIONE PROMPT DI GIOCO
+        // GESTIONE PROMPT DI GIOCO
         if (currentClientState == ClientState.IN_GAME && currentGameState != null) {
             if (awaitingServerResponse) {
                 if (softDirty) System.out.println("\n⏳ Mossa inviata, elaborazione del server in corso...");
@@ -441,6 +549,10 @@ public class CLI implements View, UIContext {
     // METODI DI STAMPA
     // ================
 
+    /**
+     * Clears the terminal and orchestrates the CLIPrinter to draw the full game board,
+     * headers, and player statuses.
+     */
     private void drawUIDirect() {
         if (currentGameState == null) return;
         CLIPrinter.clearScreen();
@@ -453,6 +565,11 @@ public class CLI implements View, UIContext {
         System.out.println("Fase attuale: " + CLIPrinter.ANSI_GREEN + currentGameState.currentState + CLIPrinter.ANSI_RESET + "\n");
     }
 
+    /**
+     * Formats and prints the global database leaderboard.
+     * @param leaderboard The list of historic game results.
+     * @param myPosition The player's ranking index.
+     */
     private void printDBLeaderboard(List<GameResult> leaderboard, int myPosition) {
         if (leaderboard == null || leaderboard.isEmpty()) {
             System.out.println("Classifica non disponibile.");
@@ -469,10 +586,18 @@ public class CLI implements View, UIContext {
         System.out.println(CLIPrinter.ANSI_YELLOW + "===========================================\n" + CLIPrinter.ANSI_RESET);
     }
 
+    /**
+     * Helper to determine if the local client is the current active player in the server's eyes.
+     * @return True if it's the client's turn to act.
+     */
     private boolean isMyTurn() {
         return currentGameState.currentPlayerNickname != null && currentGameState.currentPlayerNickname.equals(myNickname);
     }
 
+    /**
+     * Helper that queries the GameDTO to check if the current active phase allows skipping an extra draw.
+     * @return True if the server indicates the extra draw phase is active.
+     */
     private boolean canSkipExtraDraw() {
         return currentGameState != null && currentGameState.isExtraDrawPhase;
     }
