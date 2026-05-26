@@ -1,6 +1,7 @@
 package it.polimi.ingsw.mesos.controller;
 
 import it.polimi.ingsw.mesos.DB.DBManager;
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.common.enums.Color;
@@ -48,6 +49,7 @@ class GameControllerTest {
             @Override public void showActionRejected(String reason) {};
             @Override public void showActionAccepted(String message) {}
             @Override public void showLoginError(String message) {}
+            @Override public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {}
 
             ;
         };
@@ -283,6 +285,8 @@ class GameControllerTest {
         @Override public void showActionRejected(String reason) {};
         @Override public void showActionAccepted(String message) {}
         @Override public void showLoginError(String message) {}
+        @Override public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {}
+
 
         public List<String> getMessages() { return messages; }
     }
@@ -431,6 +435,8 @@ class GameControllerTest {
             @Override public void showActionRejected(String reason) {}
             @Override public void showActionAccepted(String message) {}
             @Override public void showLoginError(String message) {}
+            @Override public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {}
+
         };
 
         controller.reconnectPlayer("Alice", newView);
@@ -693,6 +699,8 @@ class GameControllerTest {
             @Override public void showActionRejected(String reason) {}
             @Override public void showActionAccepted(String message) {}
             @Override public void showLoginError(String message) {}
+            @Override public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {}
+
         });
         controller.addPlayer("Bob", Color.RED, mockView);
         controller.startGame();
