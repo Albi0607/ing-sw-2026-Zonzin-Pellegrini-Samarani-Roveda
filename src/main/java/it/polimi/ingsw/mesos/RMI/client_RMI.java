@@ -20,27 +20,6 @@ public class client_RMI implements Network {
 
     private final RemoteMethods remote;
 
-    private static String getLocalIPv4() {
-        try {
-            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-                if (!ni.isUp() || ni.isLoopback() || ni.isVirtual()) {
-                    continue;
-                }
-                for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
-                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                        String ip = addr.getHostAddress();
-                        if (!ip.startsWith("169.254")) {
-                            return ip;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Errore scansione rete client: " + e.getMessage());
-        }
-        return "127.0.0.1";
-    }
-
     /**
      * Constructor that initializes this class and connects to the server registry to obtain a reference to the remote
      * object, which allows invoking remote methods that implement client actions
@@ -50,8 +29,8 @@ public class client_RMI implements Network {
      * */
     public client_RMI(String serverIp, int port) throws RemoteException, NotBoundException{
 
-        String myIp = getLocalIPv4();
         try {
+            String myIp = InetAddress.getLocalHost().getHostAddress();
             System.setProperty("java.rmi.server.hostname", myIp);
             System.out.println("✔ RMI Hostname del Client configurato su: " + myIp);
         } catch (Exception e) {
