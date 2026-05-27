@@ -21,45 +21,11 @@ import java.util.Collections;
  */
 public class ServerMain {
 
-    public static String getLocalIPv4() {
-        try {
-            System.out.println("🔍 Scansione interfacce di rete in corso...");
-            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-
-                // Ignoriamo le interfacce spente, di loopback o virtuali
-                if (!ni.isUp() || ni.isLoopback() || ni.isVirtual()) {
-                    continue;
-                }
-
-                for (InetAddress addr : Collections.list(ni.getInetAddresses())) {
-
-                    // Vogliamo solo indirizzi IPv4
-                    if (addr instanceof Inet4Address && !addr.isLoopbackAddress()) {
-                        String ip = addr.getHostAddress();
-
-                        // Evitiamo gli IP APIPA o di default
-                        if (!ip.startsWith("169.254")) {
-                            System.out.println("✔ Interfaccia trovata: " + ni.getDisplayName());
-                            System.out.println("✔ IP assegnato: " + ip);
-                            return ip;
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Errore durante la scansione della rete: " + e.getMessage());
-        }
-
-        System.out.println("⚠ Nessuna interfaccia valida trovata. Fallback su localhost.");
-        return "127.0.0.1";
-    }
-
     public static void main(String[] args) throws SQLException {
-
-        String myIp = getLocalIPv4();
-
+        String myIp = "127.0.0.1";
         try {
             // FORZA RMI ad usare questo IP per evitare che i client si connettano a se stessi!
+            myIp = InetAddress.getLocalHost().getHostAddress();
             System.setProperty("java.rmi.server.hostname", myIp);
         } catch (Exception e) {
             System.err.println("Impossibile recuperare l'IP di rete locale, userò localhost.");
