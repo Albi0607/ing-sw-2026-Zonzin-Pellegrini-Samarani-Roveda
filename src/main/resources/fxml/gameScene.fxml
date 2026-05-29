@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI">
+<AnchorPane prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: radial-gradient(center 50% 50%, radius 70%, #2d5a27, #1a3a15);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI">
 <children>
    <Pane fx:id="leftPlayerArea" layoutX="10.0" layoutY="10.0" prefHeight="570.0" prefWidth="180.0"
          maxWidth="180" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">

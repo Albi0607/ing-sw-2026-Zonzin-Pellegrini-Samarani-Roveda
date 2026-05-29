@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Core;
 
+import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
@@ -9,6 +10,7 @@ import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.TotemChoiceController;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -20,11 +22,13 @@ public class SceneManager {
     private final Stage stage;
     private final GUI gui;
     private ClientState clientState;
-    private ClientController clientController;
-    private LoginController loginController;
-    private LobbyController lobbyController;
-    private TotemChoiceController totemController;
+    private ClientController clientController = null;
+    private LoginController loginController = null;
+    private LobbyController lobbyController = null;
+    private TotemChoiceController totemController = null;
+    private GameControllerGUI gameControllerGUI = null;
     private final ObservableGameModel gameModel;
+    private EndGameController endGameController;
 
     public SceneManager(Stage stage, GUI gui, ClientState clientState, ObservableGameModel gameModel) {
         this.stage = stage;
@@ -79,20 +83,25 @@ public class SceneManager {
         //rendere il lobbyController = null per non ricevere più aggiornamenti
     }
 
-    public void loadGameScene() {
+    public GameControllerGUI loadGameScene() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/gameScene.fxml"));
             Parent root = loader.load();
             if(lobbyController!=null){
                 lobbyController=null;
             }
-            GameControllerGUI controller = loader.getController();
-            controller.setController(clientController,this,gameModel,gui.getNickname());
+            if(totemController!=null){
+                totemController=null;
+            }
+            gameControllerGUI = loader.getController();
+            gameControllerGUI.setController(clientController,this,gameModel,gui.getNickname());
             Scene scene = new Scene(root);
             stage.setScene(scene);
+            return gameControllerGUI;
         } catch (Exception e) {
             System.out.println("ERRORE NEL CARICAMENTO DELLA GIOCO  : " + e.getMessage());
             e.printStackTrace();
+            return null;
         }
 
     }
@@ -127,14 +136,36 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/endGameScene.fxml"));
             Parent root = loader.load();
-            EndGameController controller = loader.getController();
-            controller.set(gameModel);
+            endGameController = loader.getController();
+            endGameController.set(gameModel);
             Scene scene = new Scene(root);
             stage.setScene(scene);
         } catch (Exception e) {
             System.out.println("ERRORE NEL CARICAMENTO DELLA FINE DEL GIOCO  : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void updateClientState(ClientState currentState){
+        this.clientState=currentState;
+    }
+
+    public void showMessage(String message){
+
+        if(clientState == ClientState.LOBBY){
+            if(lobbyController!=null){
+                lobbyController.showMessage(message);
+            } else if(totemController!=null){
+                totemController.showMessage(message);
+            }
+        } else if(clientState == ClientState.IN_GAME){
+            gameControllerGUI.showMessage(message);
+        }
+
+    }
+
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition){
+        endGameController.showLeaderboard(leaderboard,myPosition);
     }
 
     public LoginController getLoginController() {

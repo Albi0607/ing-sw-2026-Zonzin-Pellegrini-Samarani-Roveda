@@ -9,8 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" style="-fx-background-color: #2c2f33;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController">
    <children>
       <VBox alignment="CENTER" layoutX="425.0" layoutY="175.0" prefHeight="400.0" prefWidth="600.0" spacing="10.0" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 20; -fx-background-color: #e8e8e8; -fx-border-color: #cfcfcf; -fx-border-width: 1;" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="425.0" AnchorPane.rightAnchor="425.0" AnchorPane.topAnchor="175.0">
          <children>
@@ -27,7 +26,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="nicknameTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="32.0" prefWidth="250.0" promptText="Inserisci nickname" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
+            <TextField fx:id="nicknameTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="28.0" prefWidth="250.0" promptText="Inserisci nickname" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
             <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-text-fill: #555555;" text="Scegli la modalità di rete" textAlignment="CENTER">
                <font>
                   <Font size="14.0" />
@@ -43,6 +42,16 @@
                <children>
                   <TextField fx:id="ipTextField" alignment="CENTER" prefHeight="26.0" prefWidth="158.0" promptText="Indirizzo IP" />
                   <TextField fx:id="portTextField" alignment="CENTER" prefHeight="26.0" prefWidth="85.0" promptText="Porta" />
+               </children>
+            </HBox>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="241.0" style="-fx-text-fill: #555555;" text="IP di questa macchina" textAlignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="300.0">
+               <children>
+                  <TextField fx:id="clientIpTextField" alignment="CENTER" prefHeight="26.0" prefWidth="158.0" promptText="Indirizzo IP del client" />
                </children>
             </HBox>
             <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="200.0" style="-fx-text-fill: red;" textAlignment="CENTER" visible="false">
