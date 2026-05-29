@@ -27,12 +27,11 @@ public class client_RMI implements Network {
      * @throws NotBoundException if no entry is found in the registry or if there is an error in the registration of the
      * remote methods.
      * */
-    public client_RMI(String serverIp, int port) throws RemoteException, NotBoundException{
+    public client_RMI(String serverIp, int port,String clientIp) throws RemoteException, NotBoundException{
 
         try {
-            String myIp = InetAddress.getLocalHost().getHostAddress();
-            System.setProperty("java.rmi.server.hostname", myIp);
-            System.out.println("✔ RMI Hostname del Client configurato su: " + myIp);
+            System.setProperty("java.rmi.server.hostname", clientIp);
+            System.out.println("✔ RMI Hostname del Client configurato su: " + clientIp);
         } catch (Exception e) {
             System.err.println("⚠ Impossibile settare l'hostname RMI sul client.");
         }

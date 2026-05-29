@@ -10,10 +10,7 @@
 
 
 <?import javafx.scene.image.Image?>
-<VBox fx:id="playerBoardRoot" prefWidth="700"
-      prefHeight="180"
-      maxWidth="700"
-      maxHeight="180" spacing="10.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoardController">
+<VBox fx:id="playerBoardRoot" prefWidth="700" prefHeight="180" maxWidth="700" maxHeight="180" spacing="10.0" style="-fx-background-color: #3a3f44;-fx-background-radius: 12;-fx-border-color: #4a5260;-fx-border-width: 1;-fx-border-radius: 12;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.2, 0, 3);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoardController">
    <padding>
       <Insets top="10.0" />
    </padding>

@@ -9,6 +9,7 @@ import it.polimi.ingsw.mesos.view.GUI.Controllers.Board.*;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
@@ -24,6 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,11 +45,18 @@ public class GameControllerGUI {
     private TurnOrderController turnOrderController;
     private DeckController deckController;
 
+    private boolean labelLocked = false;
+
     private List<PlayerBoardController> playersController;
 
     @FXML private VBox centerBoard;
     //label creata per spiegare al client tramite visualizzazione di messaggi cosa deve fare
     private Label actionLabel;
+    //labels per stampare di fianco al deck le informazioni sul round e sull'era
+    private Label roundLabel;
+    private Label eraLabel;
+
+
     @FXML private StackPane bottomPlayerContainer;
     @FXML private StackPane topLeftPlayerContainer;
     @FXML private StackPane topRightPlayerContainer;
@@ -109,8 +118,17 @@ public class GameControllerGUI {
             bottomRowController = bottomLoader.getController();
             bottomRowController.setController(clientController,this);
 
+            //creo un VBox per potere mettere alla sinistra del deck le informazioni sul round e sull' era
+            roundLabel = new Label();
+            eraLabel = new Label();
+            VBox infoBox = new VBox(roundLabel,eraLabel);
+            infoBox.setSpacing(20);
+            infoBox.setAlignment(Pos.CENTER);
+
+
+
             //creo un HBox(allineamento orizzontale) per tenere sullo stesso piano deck, turnOrderTrack e offerTiles
-            HBox middleRow = new HBox(deck, turn, offer);
+            HBox middleRow = new HBox(infoBox,deck, turn, offer);
             middleRow.setSpacing(20);
             middleRow.setAlignment(Pos.CENTER);
             actionLabel = new Label();
@@ -249,6 +267,7 @@ public class GameControllerGUI {
         });
 
         gameModel.eraProperty().addListener((o, oldV, newV) -> {
+            updateEraLabel(newV);
             deckController.updateDeckView(newV);
         });
 
@@ -310,12 +329,17 @@ public class GameControllerGUI {
         topRowController.refreshInteraction();
         bottomRowController.refreshInteraction();
         offerTileController.refreshOfferTileInteraction();
+        updateEraLabel(gameModel.getEra());
+        updateRoundLabel(gameModel.getCurrentRound());
         updateActionLabel(gameModel.getGameState());
     }
 
 
     //scrive nella label le azioni da fare in base allo stato del gioco
     public void updateActionLabel(GameState state) {
+        if(labelLocked){
+            return;
+        }
 
         boolean myTurn = isMyTurn(state);
 
@@ -352,6 +376,21 @@ public class GameControllerGUI {
         actionLabel.setVisible(true);
     }
 
+
+    public void updateRoundLabel(int round){
+        roundLabel.setText("ROUND: " + round);
+        roundLabel.setTextFill(Color.web("#5c4033"));
+        roundLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+    }
+
+    public void updateEraLabel(String era){
+        eraLabel.setText("ERA: " + era);
+        eraLabel.setTextFill(Color.web("#8b6f47"));
+        eraLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+
+    }
+
     public boolean getIsUpper(){
         return gameModel.getIsUpper();
     }
@@ -362,8 +401,35 @@ public class GameControllerGUI {
 
     public void checkIfEnd(){
         if(gameModel.getGameState()==GameState.FINISHED){
-            Platform.runLater(sceneManager::loadEndScene);
+            sceneManager.loadEndScene();
         }
+    }
+
+    //scrive nella label del game se le azioni sono corrette e se sono state risolte o meno
+    public void setActionMessage(String message, boolean accept){
+
+        actionLabel.setText(message);
+        actionLabel.setTextFill(accept ? Color.GREEN : Color.RED);
+        actionLabel.setVisible(true);
+
+        labelLocked = true;
+
+        //metto dei timer in modo che il messaggio di buon riuscita o meno rimane visibile per qualche secondo
+        int time = accept ? 1 : 3;
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(time));
+        pause.setOnFinished(e -> {
+            labelLocked = false;
+            updateActionLabel(gameModel.getGameState());
+        });
+
+        pause.play();
+    }
+
+    public void showMessage(String message){
+        actionLabel.setText(message);
+        actionLabel.setTextFill(Color.ORANGE);
+        actionLabel.setVisible(true);
     }
 
 

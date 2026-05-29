@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class TotemChoiceController {
 
     private List<StackPane> totemSlots;
     private List<Color> totemColors;
+
+    @FXML AnchorPane rootPane;
 
     @FXML StackPane blueTotemSlot;
     @FXML ImageView blueTotemImage;
@@ -42,6 +45,30 @@ public class TotemChoiceController {
     public void setController(ClientController clientController, SceneManager sceneManager){
         this.clientController = clientController;
         this.sceneManager = sceneManager;
+
+        //metto come sfondo l'immagine di background mesos
+        try {
+            Image image = new Image(getClass().getResource("/images/tool/backgroundMesos.png").toExternalForm());
+
+            ImageView background = new ImageView(image);
+
+            // dimensione base (quella che vuoi tu)
+            background.setFitWidth(1450);
+            background.setFitHeight(750);
+
+            // scala proporzionalmente
+            background.setPreserveRatio(false); // oppure true se vuoi mantenere proporzioni
+
+            // IMPORTANTISSIMO: si adatta al resize del pane
+            background.fitWidthProperty().bind(rootPane.widthProperty());
+            background.fitHeightProperty().bind(rootPane.heightProperty());
+
+            // manda sul fondo
+            rootPane.getChildren().add(0, background);
+        } catch (Exception e) {
+            System.out.println("ERRORE NEL CARICAMENTO DELL'IMMAGINE DI BACKGROUND: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setParameter(int id, int numPlayers,LobbyInfoDTO dto){
@@ -199,6 +226,12 @@ public class TotemChoiceController {
     //metodo che rende abilitato il bottone se è stato scelto un colore di totem
     private void updateButtonState() {
         create_joinGameButton.setDisable(colorChoice == null);
+    }
+
+    public void showMessage(String message){
+        errorLabel.setText(message);
+        errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
+        errorLabel.setVisible(true);
     }
 
     //gestione del bottone che crea o accede al gioco

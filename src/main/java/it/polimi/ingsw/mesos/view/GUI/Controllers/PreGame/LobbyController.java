@@ -11,6 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
@@ -27,6 +30,7 @@ public class LobbyController {
         this.sceneManager = sceneManager;
     }
 
+    @FXML AnchorPane rootPane;
     @FXML private ScrollPane gamesContainer;
     @FXML private VBox gamesVBox;
     @FXML private ComboBox<Integer> playersComboBox;
@@ -55,6 +59,32 @@ public class LobbyController {
             createGameButton.setScaleX(1.0);
             createGameButton.setScaleY(1.0);
         });
+
+
+
+        //metto come sfondo l'immagine di background mesos
+        try {
+            Image image = new Image(getClass().getResource("/images/tool/backgroundMesos.png").toExternalForm());
+
+            ImageView background = new ImageView(image);
+
+            // dimensione base (quella che vuoi tu)
+            background.setFitWidth(1450);
+            background.setFitHeight(750);
+
+            // scala proporzionalmente
+            background.setPreserveRatio(false); // oppure true se vuoi mantenere proporzioni
+
+            // IMPORTANTISSIMO: si adatta al resize del pane
+            background.fitWidthProperty().bind(rootPane.widthProperty());
+            background.fitHeightProperty().bind(rootPane.heightProperty());
+
+            // manda sul fondo
+            rootPane.getChildren().add(0, background);
+        } catch (Exception e) {
+            System.out.println("ERRORE NEL CARICAMENTO DELL'IMMAGINE DI BACKGROUND: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     //TODO da modificare per rendere l'aggiornamento piu intelligente senza eliminare ogni volta le gameCard
@@ -82,6 +112,12 @@ public class LobbyController {
             }
         }
 
+    }
+
+    public void showMessage(String message){
+        errorLabel.setText(message);
+        errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
+        errorLabel.setVisible(true);
     }
 
 

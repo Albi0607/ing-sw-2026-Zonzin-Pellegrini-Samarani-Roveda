@@ -9,9 +9,11 @@ import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.rete.Network;
 import it.polimi.ingsw.mesos.rete.View;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -23,6 +25,7 @@ public class GUI extends Application implements View {
     private ClientController clientController;
     private ClientState clientState;
     private ObservableGameModel gameModel;
+    private GameControllerGUI gameControllerGUI;
     private String localNickname;
     private boolean gameStarted;
 
@@ -43,13 +46,13 @@ public class GUI extends Application implements View {
 
     @Override
     public void showLastUpdate(GameDTO game) {
-        javafx.application.Platform.runLater(() -> {
+       Platform.runLater(() -> {
 
             //partita appena iniziata aggiorno il modello e cambio la scene con il modello appena aggiornato
-            if(!gameStarted) {
+            if(!gameStarted&&gameControllerGUI==null) {
                 gameStarted = true;
                 gameModel.updateFromDTO(game);
-                sceneManager.loadGameScene();
+                gameControllerGUI = sceneManager.loadGameScene();
                 return;
             }
 
@@ -60,13 +63,15 @@ public class GUI extends Application implements View {
 
     @Override
     public void showMessage(String message) {
-        // DA IMPLEMENTARE: Platform.runLater() -> mostra alert o toast
+        Platform.runLater(() -> {
+            sceneManager.showMessage(message);
+        });
     }
 
     @Override
     public void showLobby(List<LobbyInfoDTO> lobby) {
         // DA IMPLEMENTARE: Platform.runLater() -> aggiorna scena lobby
-        javafx.application.Platform.runLater(()->{
+        Platform.runLater(()->{
 
             if (this.clientState == null || this.clientState != ClientState.LOBBY) {
                 this.clientState = ClientState.LOBBY;
@@ -79,20 +84,33 @@ public class GUI extends Application implements View {
 
     @Override
     public void showClientStateUpdate(ClientState currentState){
-        this.clientState = currentState;
+        if(this.clientState!=currentState) {
+            this.clientState=currentState;
+            sceneManager.updateClientState(currentState);
+        }
     }
 
     @Override
     public void showActionRejected(String reason) {
+       Platform.runLater(() -> {
+            if (gameControllerGUI != null) {
+                gameControllerGUI.setActionMessage(reason, false);
+            }
+        });
     }
 
     @Override
     public void showActionAccepted(String message) {
+       Platform.runLater(() -> {
+            if (gameControllerGUI != null) {
+                gameControllerGUI.setActionMessage(message, true);
+            }
+        });
     }
 
     @Override
     public void  showLoginError(String message) {
-        javafx.application.Platform.runLater(() -> {
+       Platform.runLater(() -> {
 
             LoginController loginController = sceneManager.getLoginController();
 
@@ -103,12 +121,12 @@ public class GUI extends Application implements View {
     }
 
     //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
-    public void handleLogin(String nickname,String ip,int port,String networkChoice){
+    public void handleLogin(String nickname,String ip,int port,String networkChoice,String clientIp){
         try {
             if (ip == null || ip.trim().isEmpty()) {
                 ip = "127.0.0.1";
             }
-            Network network = ClientChoseSetup.createNetwork(networkChoice, ip, port);
+            Network network = ClientChoseSetup.createNetwork(networkChoice, ip, port,clientIp);
             this.clientController = new ClientController(this, network);
             clientController.getLobby(nickname);
         } catch (Exception e) {
@@ -126,6 +144,6 @@ public class GUI extends Application implements View {
 
     @Override
     public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
-        // DA IMPLEMENTARE
+        Platform.runLater(()-> sceneManager.showLeaderboard(leaderboard,myPosition));
     }
 }

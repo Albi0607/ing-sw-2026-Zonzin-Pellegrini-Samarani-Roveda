@@ -5,10 +5,10 @@ import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.socket.clientSocket;
 
 public class ClientChoseSetup {
-    public static Network createNetwork(String choice, String serverIp, int port) {
+    public static Network createNetwork(String choice, String serverIp, int port,String clientIp) {
         try {
             return switch (choice) {
-                case "RMI" -> new client_RMI(serverIp, port);
+                case "RMI" -> new client_RMI(serverIp, port,clientIp);
                 case "SOCKET" -> new clientSocket(serverIp, port);
                 default -> throw new IllegalArgumentException();
             };

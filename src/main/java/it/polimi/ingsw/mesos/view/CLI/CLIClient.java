@@ -60,7 +60,8 @@ public class CLIClient {
 
             try {
                 // Tenta la connessione
-                network = ClientChoseSetup.createNetwork(netChoice, serverIp, port);
+                //TODO mettere la scelta a linea di comando magari con default in caso di invio per local
+                network = ClientChoseSetup.createNetwork(netChoice, serverIp, port,"127.0.0.1");
                 System.out.println(CLIPrinter.ANSI_GREEN + "✔ Connessione stabilita con successo!" + CLIPrinter.ANSI_RESET);
                 break;
 
