@@ -26,6 +26,8 @@ public class ObservableGameModel {
     private final StringProperty currentPlayerNickname = new SimpleStringProperty();
     private final ObjectProperty<GameState> gameState = new SimpleObjectProperty<>();
     private final BooleanProperty isUpper = new SimpleBooleanProperty();
+    private BooleanProperty extraDrawPhase = new SimpleBooleanProperty();
+
 
 
     //metodi get per ottenere gli attributi
@@ -62,6 +64,8 @@ public class ObservableGameModel {
     public BooleanProperty isUpperProperty() {
         return isUpper;
     }
+    public BooleanProperty extraDrawPhaseProperty() { return extraDrawPhase; }
+
 
     //metodi get per ottenere direttamente il valore
     public int getCurrentRound() {
@@ -79,6 +83,7 @@ public class ObservableGameModel {
     public boolean getIsUpper() {
         return isUpper.get();
     }
+    public boolean isExtraDrawPhase() { return extraDrawPhase.get(); }
 
     //Metodo update che aggiorna il modello osservabile a ogni cambiamento e a ogni chiamata di update da parte del server
     public void updateFromDTO(GameDTO game) {
@@ -94,6 +99,7 @@ public class ObservableGameModel {
         currentPlayerNickname.set(game.currentPlayerNickname);
         gameState.set(game.currentState);
         isUpper.set(game.isUpper);
+        extraDrawPhase.set(game.isExtraDrawPhase);
 
 
         BoardDTO board = game.board;

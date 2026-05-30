@@ -38,6 +38,8 @@ public class EndGameController {
 
         resultContainer.getChildren().clear();
 
+
+        //si potrebbe usare winners facendo solo il controllo delle posizioni
         List<ObservablePlayerModel> sorted = gameModel.getPlayers().stream()
                 .sorted(
                         Comparator.comparingInt(ObservablePlayerModel::getPrestigePoints).reversed()
