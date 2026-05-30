@@ -1,10 +1,13 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers;
 
+import it.polimi.ingsw.mesos.common.enums.GameState;
+import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -15,6 +18,8 @@ import java.util.List;
 
 public class PlayerBoardController {
     private ObservablePlayerModel playerModel;
+    private ClientController clientController;
+    private boolean isMainPlayer = false;
     private String colorPaint;
 
     //tengo riferimento alle carte per tipologia
@@ -58,6 +63,8 @@ public class PlayerBoardController {
     @FXML ImageView cardImage7;
     @FXML Label cardCount7;
 
+    @FXML Button skipButton;
+
 
     @FXML
     public void initialize() {
@@ -86,8 +93,10 @@ public class PlayerBoardController {
     }
 
 
-    public void setPlayer(ObservablePlayerModel playerModel) {
+    public void setPlayer(ObservablePlayerModel playerModel,ClientController clientController, boolean isMainPlayer) {
         this.playerModel = playerModel;
+        this.clientController = clientController;
+        this.isMainPlayer = isMainPlayer;
 
         bind();
     }
@@ -155,5 +164,52 @@ public class PlayerBoardController {
 
     }
 
+    // chiamato dall'esterno ogni volta che il GameDTO aggiorna il model
+    public void updateSkipButton(GameState currentState, boolean isExtraDrawPhase) {
+        if (!isMainPlayer) return; // solo per il player principale
+
+        boolean shouldShow = currentState == GameState.RESOLVING_ACTIONS && isExtraDrawPhase;
+
+        skipButton.setVisible(shouldShow);
+        skipButton.setManaged(shouldShow);
+        skipButton.setDisable(!shouldShow);
+    }
+
+    @FXML private void onSkipClicked() {
+        skipButton.setVisible(false);
+        skipButton.setManaged(false);
+        skipButton.setDisable(true);
+
+        clientController.skipOnExtraDraw(); // chiama l'azione sul server
+    }
+
+    @FXML private void onSkipHover() {
+        if (!skipButton.isDisable()) {
+            skipButton.setStyle(
+                    "-fx-background-color: #ff4400;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-font-size: 14px;" +
+                            "-fx-background-radius: 8;" +
+                            "-fx-border-radius: 8;" +
+                            "-fx-padding: 6 18 6 18;" +
+                            "-fx-cursor: hand;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(255,80,0,0.5), 10, 0.3, 0, 2);"
+            );
+        }
+    }
+
+    @FXML private void onSkipHoverExit() {
+        skipButton.setStyle(
+                "-fx-background-color: #cc3300;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-border-radius: 8;" +
+                        "-fx-padding: 6 18 6 18;" +
+                        "-fx-cursor: hand;"
+        );
+    }
 }
 

@@ -45,6 +45,8 @@ public class GameControllerGUI {
     private TurnOrderController turnOrderController;
     private DeckController deckController;
 
+    private PlayerBoardController mainPlayerBoardController;
+
     private boolean labelLocked = false;
 
     private List<PlayerBoardController> playersController;
@@ -188,8 +190,9 @@ public class GameControllerGUI {
             Parent view = loader.load();
 
             PlayerBoardController controller = loader.getController();
-            controller.setPlayer(localPlayer);
+            controller.setPlayer(localPlayer,clientController,true);
             playersController.add(controller);
+            mainPlayerBoardController = controller;
             bottomPlayerContainer.getChildren().setAll(view);
         } catch (Exception e) {
             System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEL PLAYER CORRENTE" + e.getMessage());
@@ -204,7 +207,7 @@ public class GameControllerGUI {
                 Parent view = loader.load();
 
                 PlayerBoardController controller = loader.getController();
-                controller.setPlayer(others.get(i));
+                controller.setPlayer(others.get(i),clientController,false);
                 playersController.add(controller);
 
 
@@ -291,6 +294,11 @@ public class GameControllerGUI {
             scheduledRefresh();
         });
 
+        //per pescata extra
+        gameModel.extraDrawPhaseProperty().addListener((o, oldV, newV) -> {
+            scheduledRefresh();
+        });
+
         //fatto alla prima volta in cui setto i parametri ma li creo anche nella UI
             topRowController.updateUpper(gameModel.getUpperRow());
             bottomRowController.updateLower(gameModel.getLowerRow());
@@ -332,6 +340,11 @@ public class GameControllerGUI {
         updateEraLabel(gameModel.getEra());
         updateRoundLabel(gameModel.getCurrentRound());
         updateActionLabel(gameModel.getGameState());
+
+        //aggiorna il bottone skip solo sul player principale
+        if (mainPlayerBoardController!=null) {
+            mainPlayerBoardController.updateSkipButton(gameModel.getGameState(), gameModel.isExtraDrawPhase());
+        }
     }
 
 
@@ -377,18 +390,30 @@ public class GameControllerGUI {
     }
 
 
-    public void updateRoundLabel(int round){
+    public void updateRoundLabel(int round) {
         roundLabel.setText("ROUND: " + round);
-        roundLabel.setTextFill(Color.web("#5c4033"));
-        roundLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
+        roundLabel.setStyle(
+                "-fx-font-size: 18px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: #f5e6c8;" +
+                        "-fx-background-color: rgba(0,0,0,0.35);" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 4 12 4 12;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
+        );
     }
 
-    public void updateEraLabel(String era){
+    public void updateEraLabel(String era) {
         eraLabel.setText("ERA: " + era);
-        eraLabel.setTextFill(Color.web("#8b6f47"));
-        eraLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
-
+        eraLabel.setStyle(
+                "-fx-font-size: 18px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-text-fill: #d4a017;" +
+                        "-fx-background-color: rgba(0,0,0,0.35);" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-padding: 4 12 4 12;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
+        );
     }
 
     public boolean getIsUpper(){
@@ -431,7 +456,5 @@ public class GameControllerGUI {
         actionLabel.setTextFill(Color.ORANGE);
         actionLabel.setVisible(true);
     }
-
-
 
 }
