@@ -9,7 +9,6 @@ import it.polimi.ingsw.mesos.common.enums.TriggerType;
 
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
 /**Concrete class to handle CavePaintingEvents
- * @author Alberto Roveda
  */
 public class CavePaintingEvent extends EventCard {
 
@@ -22,7 +21,8 @@ public class CavePaintingEvent extends EventCard {
     /**Prestige points gain if the number of Artists is equal to or more than gainNumber*/
     private final int gainPoints;
 
-    /**Constructor for CavePaintingEvent cards
+    /**
+     * Constructor for CavePaintingEvent cards
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game

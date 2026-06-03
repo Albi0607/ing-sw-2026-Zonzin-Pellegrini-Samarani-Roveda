@@ -13,20 +13,28 @@ import java.util.Collections;
 /**
  * Class responsible for establishing an RMI connection with the RMI server and handling all client-side remote method
  * invocations
- * */
+ */
 
-//per attivare la lobby devo avere come attribuo il game controller al quale faccio registry
 public class client_RMI implements Network {
 
+    /**
+     * Remote reference to the server-side methods exposed through RMI.
+     * This object is used to invoke remote operations on the server.
+     */
     private final RemoteMethods remote;
 
     /**
-     * Constructor that initializes this class and connects to the server registry to obtain a reference to the remote
-     * object, which allows invoking remote methods that implement client actions
-     * @throws RemoteException if there are any network or connection errors
-     * @throws NotBoundException if no entry is found in the registry or if there is an error in the registration of the
-     * remote methods.
-     * */
+     * Creates an RMI client and connects to the server registry to obtain a reference
+     * to the remote object used for invoking server-side methods.
+     * The client configures its RMI hostname and retrieves the remote reference from the
+     * server registry.
+     *
+     * @param serverIp the IP address of the server
+     * @param port the RMI registry port
+     * @param clientIp the IP address of this client used for RMI callbacks
+     * @throws RemoteException if a network communication error occurs
+     * @throws NotBoundException if the remote object is not found in the registry
+     */
     public client_RMI(String serverIp, int port,String clientIp) throws RemoteException, NotBoundException{
 
         try {
@@ -48,10 +56,11 @@ public class client_RMI implements Network {
     }
 
     /**
-     * Method that allows the client to place the totem on the OfferTile
-     * @param nickname name of the player (this player) performing the action
-     * @param position position selected on the OfferTile
-     * @return true if the action was performed successfully; otherwise, false
+     * Sends a request to the server to place the player's totem on the OfferTile.
+     *
+     * @param nickname the name of the player performing the action
+     * @param position the selected position on the OfferTile
+     * @return true if the request was successfully sent to the server; false otherwise
      */
     public boolean placeTotem(String nickname, char position){
         try {
@@ -64,11 +73,12 @@ public class client_RMI implements Network {
     }
 
     /**
-     * Method that allows the player to draw a card from the upper or lower row
-     * @param nickname name of the player (this player) performing the action
-     * @param position position indicating the selected card
-     * @param isUpper if true, the card must be taken from the upper row; otherwise, from the lower row
-     * @return true if the action was performed successfully; otherwise, false
+     * Sends a request to the server to draw a card from the upper or lower row.
+     *
+     * @param nickname the name of the player performing the action
+     * @param position the selected card position
+     * @param isUpper true if the card is drawn from the upper row, false for the lower row
+     * @return true if the request was successfully sent to the server; false otherwise
      */
     @Override
     public boolean takeCard(String nickname, int position, boolean isUpper){
@@ -80,6 +90,14 @@ public class client_RMI implements Network {
         }
     }
 
+    /**
+     * Sends a request to the server to skip the extra card draw at the end of the turn.
+     * This action is only valid if the player owns the required building card
+     * that enables the extra draw.
+     *
+     * @param nickname the name of the player performing the action
+     * @return true if the request was successfully sent to the server; false otherwise
+     */
     @Override
     public boolean skipExtraDraw(String nickname){
         try{
@@ -91,9 +109,14 @@ public class client_RMI implements Network {
         }
     }
 
-
-    //aggiunta metodi per la lobby
-
+    /**
+     * Connects the client to the lobby and retrieves the current lobby state from the server.
+     * A remote callback is created to allow the server to send updates to the client.
+     *
+     * @param nickname the player's nickname
+     * @param controller the client controller handling server updates
+     * @return the VirtualView identifier associated with the client session
+     */
     @Override
     public String getLobby(String nickname, ClientController controller) {
         try {
@@ -110,6 +133,16 @@ public class client_RMI implements Network {
         }
     }
 
+    /**
+     * Sends a request to the server to create a new game session in the lobby.
+     * The player becomes the host and selects their own color for in-game representation.
+     *
+     * @param nickname the name of the player creating the game
+     * @param expectedNumPlayers the number of players required for the game
+     * @param color the player's chosen color
+     * @param viewId the identifier of the client view connection
+     * @return true if the request was successfully sent to the server; false otherwise
+     */
     @Override
     public boolean createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId){
         try {
@@ -120,6 +153,16 @@ public class client_RMI implements Network {
         }
     }
 
+    /**
+     * Sends a request to join an existing game session in the lobby.
+     * The player is added to the specified game if it exists and has available slots.
+     *
+     * @param nickname the name of the player joining the game
+     * @param id the identifier of the game to join
+     * @param color the player's chosen color
+     * @param viewId the identifier of the client view connection
+     * @return true if the request was successfully sent to the server; false otherwise
+     */
     @Override
     public boolean joinGame(String nickname, int id, Color color, String viewId){
         try {

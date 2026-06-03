@@ -10,7 +10,8 @@ import java.util.Stack;
 
 /**
  * Class that overrides the method of the corresponding interface to implement the building deck, created so that it
- * contains only the usable buildings randomly drawn to be used during the game*/
+ * contains only the usable buildings randomly drawn to be used during the game
+ */
 public class BuildingDeckStrategy implements CreateStrategy<BuildingCard>{
 
     /**
@@ -63,7 +64,7 @@ public class BuildingDeckStrategy implements CreateStrategy<BuildingCard>{
      * @param list list from which to draw randomly
      * @param num number of cards to draw randomly
      * @return List containing only the cards drawn randomly
-     * */
+     */
     public List <BuildingCard> randomCard(List<BuildingCard> list, int num){
         List<BuildingCard> returnList = new ArrayList<>();
         Collections.shuffle(list);

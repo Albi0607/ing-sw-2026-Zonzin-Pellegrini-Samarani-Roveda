@@ -11,14 +11,14 @@ import it.polimi.ingsw.mesos.common.enums.TriggerType;
 //attenzione all'utilizzo delle carte evento che potrebbero modificare il comportamento
 
 /**Concrete class to handle SustenanceEvents
- * @author Alberto Roveda
  */
 public class SustenanceEvent extends EventCard {
 
     /**Attribute that indicates how many prestige points are lost for food that cannot be paid*/
     private final int prestigePoints;
 
-    /**Constructor for SustenanceEvent cards
+    /**
+     * Constructor for SustenanceEvent cards
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -30,7 +30,8 @@ public class SustenanceEvent extends EventCard {
         this.prestigePoints=prestigePoints;
     }
 
-    /**Method that resolves SustenanceEvents.
+    /**
+     * Method that resolves SustenanceEvents.
      For each SustenanceEvent, the player must pay 1 food for each character card in their tribe.
      If the player does not have enough food, they lose prestige points for each unpaid food.
      Gatherers provide a discount of 3 food that does not need to be paid, but this is handled through

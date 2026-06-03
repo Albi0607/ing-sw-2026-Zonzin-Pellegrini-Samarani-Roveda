@@ -6,7 +6,6 @@ import it.polimi.ingsw.mesos.common.enums.Era;
 import it.polimi.ingsw.mesos.common.enums.EventType;
 
 /**Abstract class to define all event classes
- * @author Alberto Roveda
  */
 public abstract class EventCard extends TribeCard {
 
@@ -16,12 +15,18 @@ public abstract class EventCard extends TribeCard {
      to place at the bottom of the deck*/
     private final boolean isFinal;
 
+    /**
+     * Overrides the base method and returns this card as an EventCard instance.
+     *
+     * @return this card as an EventCard
+     */
     @Override
     public EventCard getAsEventCard() {
         return this;
     }
 
-    /**General constructor for all event cards
+    /**
+     * General constructor for all event cards
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -35,20 +40,23 @@ public abstract class EventCard extends TribeCard {
         this.isFinal=isFinal;
     }
 
-    /**Abstract method that will be implemented in each subclass with the behavior of each event card
+    /**
+     * Abstract method that will be implemented in each subclass with the behavior of each event card
      *
      * @param game it is used to get the list of players whose food and prestige points will be affected
      */
     public abstract void resolve(Game game);
 
-    /**Getter method to obtain the type of the event card
+    /**
+     * Getter method to obtain the type of the event card
      *
      * @return the type of the event card
      */
     public EventType getType() {
         return type; }
 
-    /**Method to check if the event card is final and should be placed at the bottom of the deck
+    /**
+     * Method to check if the event card is final and should be placed at the bottom of the deck
      *
      * @return true if it is one of the two final cards
      */

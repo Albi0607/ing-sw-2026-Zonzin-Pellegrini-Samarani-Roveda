@@ -4,14 +4,16 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Concrete class for cards of type Shaman
- * @author Alberto Roveda
  */
 public class Shaman extends CharacterCard {
 
-    /**Attribute ranging from 1 to 3 to define the number of Shaman icons to use in ShamanicRitualEvent*/
+    /**
+     * Attribute ranging from 1 to 3 to define the number of Shaman icons to use in ShamanicRitualEvent
+     */
     private final  int numberOfIcons;
 
-    /**Constructor for Shaman Card
+    /**
+     * Constructor for Shaman Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -22,7 +24,8 @@ public class Shaman extends CharacterCard {
         this.numberOfIcons=numberOfIcons;
     }
 
-    /**Getter method to obtain the number of Shaman icons
+    /**
+     * Getter method to obtain the number of Shaman icons
      *
      * @return Shaman icons
      */

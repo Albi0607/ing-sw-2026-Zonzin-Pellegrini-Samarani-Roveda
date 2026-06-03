@@ -4,8 +4,7 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
-/**"Generic class for building cards"
- * @author Alberto Roveda
+/** Generic class for building cards
  */
 public class BuildingCard extends Card {
     /**Attribute for the cost of the building card*/
@@ -29,9 +28,23 @@ public class BuildingCard extends Card {
         this.effect = effect;
     }
 
+    /**
+     * Adds this building card to the player's tribe.
+     *
+     * This method delegates the operation to the player's tribe, inserting the building
+     * into the appropriate collection of structures.
+     *
+     * @param player the player to which this building card is added
+     */
+    @Override
+    public void addTo(Player player) {
+        player.getTribe().addBuilding(this); // Chiama il tuo metodo specifico
+    }
+
     // --- Getters ---
 
-    /**Getter method that returns the cost of the building to be paid for purchase
+    /**
+     * Getter method that returns the cost of the building to be paid for purchase
      *
      * @return the cost of the building card
      */
@@ -40,7 +53,8 @@ public class BuildingCard extends Card {
         return this.cost;
     }
 
-    /**Getter method that returns the prestige points gained from the building at the end of the game
+    /**
+     * Getter method that returns the prestige points gained from the building at the end of the game
      *
      * @return the prestige points to be gained at the end of the game
      */
@@ -48,14 +62,13 @@ public class BuildingCard extends Card {
         return this.victoryPoints;
     }
 
-    /**Getter method that @returns the effect class of the building*/
+    /**
+     * Getter method that returns the effect class of building
+     *
+     * @return the effect class of the building
+     */
     public BuildingEffect getEffect() {
         return this.effect;
-    }
-
-    @Override
-    public void addTo(Player player) {
-        player.getTribe().addBuilding(this); // Chiama il tuo metodo specifico
     }
 
 }

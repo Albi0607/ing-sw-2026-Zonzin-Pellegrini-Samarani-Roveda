@@ -8,47 +8,77 @@ import java.rmi.*;
 import java.util.List;
 
 /**
- * Remote interface that defines the actions that can be invoked remotely by the client and subsequently handled by the
- * server
+ * Remote interface that defines the actions that can be invoked remotely by the client
+ * and subsequently handled by the server
  */
 public interface RemoteMethods extends Remote {
 
     /**
-     * Method that allows the client to place the totem on the OfferTile
-     * @param nickname name chosen by the client
-     * @param position position selected on the OfferTile
-     * @return true if the action was performed successfully; otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
+     * Requests the server to place the player's totem on the OfferTile.
+     *
+     * @param nickname name of the player performing the action
+     * @param position selected position on the OfferTile
+     * @throws RemoteException if a network error occurs during the remote call
      */
     void placeTotem(String nickname,char position) throws RemoteException;
 
     /**
-     * Method that allows the player to draw a card from the upper or lower row
-     * @param nickname name chosen by the client
-     * @param position position indicating the selected card
-     * @param isUpper if true, the card must be taken from the upper row; otherwise, from the lower row
-     * @return true if the action was performed successfully; otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
+     * Requests the server to draw a card from the upper or lower row.
+     *
+     * @param nickname name of the player performing the action
+     * @param position index of the selected card
+     * @param isUpper true if the card is drawn from the upper row, false otherwise
+     * @throws RemoteException if a network error occurs during the remote call
      */
     void takeCard(String nickname,int position,boolean isUpper) throws RemoteException;
 
     /**
-     * Method that allows the client not to draw the extra card at the end of the turn if they possess the triggering
-     * building
+     * Requests to skip the extra card draw at the end of the turn.
+     * This action is only valid if the player owns the corresponding building
+     * that allows skipping the extra draw.
+     *
      * @param nickname name of the player performing the action
-     * @return true if the client has chosen not to draw the extra card due to the effect of the triggering building;
-     * otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
+     * @throws RemoteException if a network error occurs during the remote call
      */
     void skipExtraDraw(String nickname) throws RemoteException;
 
 
-    //metodi da usare nella lobby
+    /**
+     * Requests the current lobby state from the server.
+     * This method also registers the client's callback so the server can push
+     * updates asynchronously to the client.
+     *
+     * @param nickname name of the player requesting the lobby
+     * @param clientCallback remote callback used by the server to send updates
+     * @return the identifier of the associated VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     String getLobby(String nickname,CallBack clientCallback) throws RemoteException;
 
+    /**
+     * Creates a new game session in the lobby.
+     * The player becomes the host of the new game.
+     *
+     * @param nickname name of the player creating the game
+     * @param expectedNumPlayers number of players required for the game
+     * @param color selected color for the player's totem
+     * @param viewId identifier of the client's VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     void createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId) throws  RemoteException;
 
+    /**
+     * Joins an existing game session in the lobby.
+     *
+     * @param nickname name of the player joining the game
+     * @param id identifier of the game to join
+     * @param color selected color for the player's totem
+     * @param viewId identifier of the client's VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     void joinGame(String nickname, int id, Color color, String viewId) throws  RemoteException;
+
+    //TODO da fare javadoc
     void heartbeat(String nickname) throws RemoteException;
 
 }

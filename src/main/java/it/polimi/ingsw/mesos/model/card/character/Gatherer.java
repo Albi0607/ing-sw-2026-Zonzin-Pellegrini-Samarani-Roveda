@@ -4,13 +4,18 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Concrete class for cards of type Gatherer
- * @author Alberto Roveda
  */
 public class Gatherer extends CharacterCard {
 
+    /**
+     * Fixed discount applied by this card to the sustenance event cost.
+     *
+     * The discount is constant and always equals 3 food units.
+     */
     private final int discount;
 
-    /**Constructor for Gatherer Card
+    /**
+     * Constructor for Gatherer Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -21,7 +26,8 @@ public class Gatherer extends CharacterCard {
         this.discount=discount;
     }
 
-    /**Getter method to obtain the discount for the SustenanceEvent
+    /**
+     * Getter method to obtain the discount for the SustenanceEvent
      *
      * @return discount for the SustenanceEvent
      */

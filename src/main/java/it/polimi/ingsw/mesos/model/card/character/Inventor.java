@@ -4,15 +4,18 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 
-/**Concrete class for cards of type Inventor
- * @author Alberto Roveda
+/**
+ * Concrete class for cards of type Inventor
  */
 public class Inventor extends CharacterCard {
 
-    /**Attribute that distinguishes different Inventor cards to gain extra resources in case of diversity or equality*/
+    /**
+     * Attribute that distinguishes different Inventor cards to gain extra resources in case of diversity or equality
+     */
     private final InventionIcon icon;
 
-    /**Constructor for Inventor Card
+    /**
+     * Constructor for Inventor Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -23,7 +26,8 @@ public class Inventor extends CharacterCard {
         this.icon=icon;
     }
 
-    /**Getter method to obtain the Inventor's icon
+    /**
+     * Getter method to obtain the Inventor's icon
      *
      * @return Attribute that distinguishes different Inventor cards
      */

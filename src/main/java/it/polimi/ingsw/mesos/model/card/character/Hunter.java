@@ -4,15 +4,18 @@ import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
-/**Concrete class for cards of type Hunter
- * @author Alberto Roveda
+/**
+ * Concrete class for cards of type Hunter
  */
 public class Hunter extends CharacterCard {
 
-    /** If true, triggers immediate food gain when added to tribe */
+    /**
+     * If true, triggers immediate food gain when added to tribe
+     */
     private final boolean hasIcon;
 
-    /**Constructor for Hunter Card
+    /**
+     * Constructor for Hunter Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -23,6 +26,11 @@ public class Hunter extends CharacterCard {
         this.hasIcon=hasIcon;
     }
 
+    /**
+     * Specialized implementation executed when this type of card is added to a player's tribe.
+     *
+     * @param player the player whose tribe receives this card
+     */
     @Override
     public void addTo(Player player) {
         super.addTo(player);
@@ -33,6 +41,7 @@ public class Hunter extends CharacterCard {
     /**
      * Called when the card is added to a tribe.
      * If hasIcon is true, player gains 1 food per Hunter already in the tribe (including this one)
+     *
      * @param player player the player who owns the tribe
      */
 
@@ -44,7 +53,8 @@ public class Hunter extends CharacterCard {
         }
     }
 
-    /**Getter method to check if the flag for gaining food when the card enters the tribe is true
+    /**
+     * Getter method to check if the flag for gaining food when the card enters the tribe is true
      *
      * @return true if the card grants immediate food gain when added to a tribe
      */
