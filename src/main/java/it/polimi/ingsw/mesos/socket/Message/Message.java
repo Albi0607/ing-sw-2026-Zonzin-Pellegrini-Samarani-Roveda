@@ -1,6 +1,5 @@
 package it.polimi.ingsw.mesos.socket.Message;
 
-
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.rete.ClientController;
 
@@ -42,6 +41,5 @@ public abstract class Message implements Serializable {
      * @param serverController the GameController responsible for game logic
      */
     public void executeServerSide(GameController serverController) {
-        // default: non fa nulla
     }
 }

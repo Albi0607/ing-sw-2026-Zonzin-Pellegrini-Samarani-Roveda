@@ -21,11 +21,6 @@ public class RegisterMessage extends Message {
         this.nickname = nickname;
     }
 
-    /**
-     * Returns the nickname provided by the client.
-     *
-     * @return the player's nickname
-     */
     public String getNickname() {
         return nickname;
     }

@@ -32,12 +32,22 @@ public class OfferTile {
         this.minPlayers = minPlayers;
     }
 
-
-    // 1. Azione automatica (Cibo)
+    /**
+     * Grants the food bonus associated with this tile to the specified player.
+     *
+     * @param p the {@link Player} who receives the food bonus
+     */
     public void giveFoodBonus(Player p) {
         p.addFood(this.foodBonus);
     }
 
+    /**
+     * Places the specified player's token on this tile, marking it as occupied.
+     *
+     * @param player the {@link Player} placing their token on this tile
+     * @throws IllegalArgumentException if {@code player} is {@code null}
+     * @throws IllegalStateException    if this tile is already occupied by another player
+     */
     public void placeTotem(Player player) {
         if (player == null) {
             throw new IllegalArgumentException("Player cannot be null");
@@ -50,11 +60,15 @@ public class OfferTile {
         host = player;
     }
 
+    /**
+     * Resets this tile by removing the current host, making it available again
+     * for the next round.
+     */
     public void reset() {
         host = null;
     }
 
-    // --- Setters ---
+    // Setters
     public void setUpperCount(int upperCount) {
         this.upperCount = upperCount;
     }
@@ -68,7 +82,7 @@ public class OfferTile {
         this.host = host;
     }
 
-    // --- Getters ---
+    // Getters
     public int getUpperCount() { return upperCount; }
     public int getLowerCount() { return lowerCount; }
     public int getFoodBonus() { return foodBonus; }

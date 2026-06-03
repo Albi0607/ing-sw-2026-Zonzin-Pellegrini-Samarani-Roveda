@@ -26,15 +26,6 @@ public class SkipExtraDrawMessage extends Message {
     }
 
     /**
-     * Returns the nickname of the player who sent this message.
-     *
-     * @return the player's nickname
-     */
-    public String getNickname() {
-        return nickname;
-    }
-
-    /**
      * Executes the message on the server side.
      * <p>
      * Currently no logic is implemented. The server should handle the skip
@@ -47,6 +38,5 @@ public class SkipExtraDrawMessage extends Message {
     public void executeServerSide(GameController gameController) {
         gameController.onSkipExtraDraw(nickname);
     }
-
 
 }
