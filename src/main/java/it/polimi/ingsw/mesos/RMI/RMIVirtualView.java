@@ -11,20 +11,34 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Class that implements the associated interface and manages, according to the RMI protocol, server-side calls that
- * modify, update, and notify the client
+ * RMI implementation of the VirtualView interface.
+ *
+ * This class forwards server updates and notifications to a remote client
+ * through RMI callbacks, providing a network-independent communication layer.
  */
 public class RMIVirtualView implements VirtualView {
 
+    /**
+     * Nickname of the associated client.
+     */
     private final String nickname;
+    /**
+     * Remote callback used by the server to invoke methods on the client side.
+     */
     private final CallBack clientCallBack;
+    /**
+     * Unique identifier of this virtual connection.
+     */
     private final String id;
 
     /**
-     * Constructor of the class that defines the associated client nickname and the object that allows the server,
-     * in RMI, to invoke methods on the client side
-     * @param nickname client nickname
-     * @param clientCallBack object that allows the server to invoke methods on the client side
+     * Creates a new RMI-based VirtualView associated with a client.
+     *
+     * The instance is identified by a unique identifier and uses the provided
+     * remote callback to allow the server to invoke methods on the client side.
+     *
+     * @param nickname the client's nickname
+     * @param clientCallBack remote callback used by the server to communicate with the client
      */
     public RMIVirtualView(String nickname,CallBack clientCallBack){
         this.nickname=nickname;
@@ -33,9 +47,11 @@ public class RMIVirtualView implements VirtualView {
     }
 
     /**
-     * Method that sends the game updated to the latest modification to the ClientController so that it can be displayed
-     * in the client view
-     * @param game latest game update
+     * Sends the updated game state to the client.
+     *
+     * The update is forwarded to the client-side controller through the remote callback.
+     *
+     * @param game the updated game state
      */
     @Override
     public void sendGame(GameDTO game) {
@@ -47,9 +63,11 @@ public class RMIVirtualView implements VirtualView {
     }
 
     /**
-     * Method that sends the current state of the player (essential before the game starts) so that the client can
-     * determine what actions it must perform
-     * @param state latest updated client state
+     * Sends the current client state to the client.
+     *
+     * This information is used before the game starts to determine the available actions for the player.
+     *
+     * @param state the updated client state
      */
     @Override
     public void sendClientState(ClientState state){
@@ -61,7 +79,14 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
-    //metodo per mandare la lobby in caso di modifiche
+    /**
+     * Sends the updated lobby state to the client.
+     *
+     * This method is invoked whenever the lobby changes and allows the client
+     * to display the current list of available game sessions.
+     *
+     * @param lobby the updated lobby information
+     */
     public void sendLobby(List<LobbyInfoDTO> lobby){
         try {
             clientCallBack.showLobby(lobby);
@@ -71,8 +96,11 @@ public class RMIVirtualView implements VirtualView {
     }
 
     /**
-     * Method that allows the server to send error messages or general notifications to the client
-     * @param message message to be displayed in the client view
+     * Sends a generic message or notification to the client.
+     *
+     * This method is used for generic informational messages
+     *
+     * @param message the message to display on the client side
      */
     @Override
     public void showMessage(String message) {
@@ -84,6 +112,11 @@ public class RMIVirtualView implements VirtualView {
 
     }
 
+    /**
+     * Notifies the client that a requested action has been rejected.
+     *
+     * @param reason the reason for the rejection
+     */
     @Override
     public void showActionRejected(String reason) {
         try {
@@ -93,6 +126,11 @@ public class RMIVirtualView implements VirtualView {
         }
     }
 
+    /**
+     * Notifies the client that a requested action has been successfully completed.
+     *
+     * @param message confirmation message for the completed action
+     */
     @Override
     public void showActionAccepted(String message) {
         try {
@@ -102,6 +140,11 @@ public class RMIVirtualView implements VirtualView {
         }
     }
 
+    /**
+     * Notifies the client that the login attempt has failed.
+     *
+     * @param message the reason for the login failure
+     */
     @Override
     public void showLoginError(String message) {
         try {
@@ -112,19 +155,34 @@ public class RMIVirtualView implements VirtualView {
     }
 
     /**
-     * Method used to retrieve the client's name
-     * @return client nickname
+     * Returns the nickname associated with the client.
+     *
+     * @return the client's nickname
      */
     @Override
     public String getNickname() {
         return this.nickname;
     }
 
+    /**
+     * Returns the unique identifier of this virtual connection.
+     *
+     * @return the connection ID
+     */
     @Override
     public String getId(){
         return id;
     }
 
+    /**
+     * Sends the global leaderboard to the client.
+     *
+     * The leaderboard represents the ranking of all players stored in the server database,
+     * including players who have just completed a game.
+     *
+     * @param leaderboard the global ranking of all players
+     * @param myPosition the position of the current player in the ranking
+     */
     @Override
     public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
         try {

@@ -15,19 +15,61 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * General class responsible for managing the server state.
+ *
+ * It keeps track of all players currently connected to the server, whether they are:
+ * - connected and in the lobby, waiting to create or join a game,
+ * - or already assigned to an active game via a GameController.
+ *
+ * It also maintains the list of all connected player nicknames in order to prevent duplicates.
+ *
+ * This class is responsible for handling interactions with the lobby,
+ * including game creation and game joining operations.
+ *
+ * It acts as a central registry for routing player requests to the correct GameController.
+ */
 
-//classe da mettere nelle classi di rete per capire in base al nickname ricevuto in che controller fare l'azione
 public class ServerState {
 
+    /**
+     * Lobby instance responsible for managing game creation and joining logic.
+     */
     private final Lobby lobby;
+    /**
+     * Map that associates a unique VirtualView identifier with its corresponding connection.
+     * Used to communicate with connected clients.
+     */
     private final Map<String, VirtualView> connections;
-    //permette di capire il giocatore a che controller è associato
+    /**
+     * Maps each player nickname to the GameController managing their current game session.
+     * Allows routing of player actions to the correct game instance.
+     */
     private final Map<String, GameController> playerToGame;
-    //permette di vedere il nome di tutti i giocatori connessi per non avere ripetizioni
+    /**
+     * Set of all currently connected player nicknames.
+     * Ensures nickname uniqueness across the server.
+     */
     private final Set<String> nicknames;
-    //permette di separare i nickname connessi e quelli in attesa di riconnessione
+    /**
+     * Map of players that were previously in a game but disconnected,
+     * used to support reconnection to ongoing games.
+     */
     private final Map<String, Integer> pendingReconnect;
 
+    /**
+     * Constructs a new ServerState instance and initializes all internal data structures.
+     *
+     * The constructor creates:
+     * - a new Lobby instance responsible for managing game creation and joining,
+     * - a thread-safe map for active client connections,
+     * - a thread-safe mapping between player nicknames and their associated GameController,
+     * - a thread-safe set of connected player nicknames to ensure uniqueness,
+     * - and a map used to track players that are temporarily disconnected and eligible for reconnection.
+     *
+     * All collections are initialized using concurrent implementations to ensure
+     * thread safety in a multi-client network environment.
+     */
     public ServerState(){
         this.lobby = new Lobby(this);
         this.connections = new ConcurrentHashMap<>();
@@ -36,6 +78,19 @@ public class ServerState {
         this.pendingReconnect = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Handles player login and routing to the appropriate server state.
+     *
+     * The method manages three main cases:
+     * - reconnection of a previously disconnected player,
+     * - restoration of a pending game session,
+     * - or new login into the lobby.
+     *
+     * It ensures nickname uniqueness and updates the internal mappings
+     * between VirtualView connections, player nicknames, and GameController instances.
+     * @param nickname the unique identifier of the player attempting to connect
+     * @param view the VirtualView instance representing the client connection
+     */
     public synchronized void getLobby(String nickname,VirtualView view){
         GameController controllerR = getController(nickname);
         if (controllerR != null) {
@@ -86,9 +141,18 @@ public class ServerState {
         nicknames.add(nickname);
     }
 
-    public VirtualView getConnection(String virtualViewId){
-        return connections.get(virtualViewId);
-    }
+    /**
+     * Creates a new game for the specified player.
+     * The method performs validation of the input parameters if the parameters are valid, it delegates the creation of
+     * the game to the Lobby, which is responsible for instantiating the new game session.
+     *
+     * Appropriate feedback is sent to the client in case of success or failure
+     *
+     * @param nickname the nickname of the player creating the game
+     * @param expectedNumPlayers the desired number of players for the game (must be between 2 and 5)
+     * @param color the selected player color
+     * @param virtualViewId the identifier of the client connection
+     */
 
     public synchronized void createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId){
 
@@ -119,6 +183,20 @@ public class ServerState {
         }
     }
 
+    /**
+     * Adds a player to an existing game.
+     *
+     * The method validates the client connection and delegates the join operation
+     * to the Lobby, which handles the assignment of the player to the specified game.
+     *
+     * If the operation succeeds, the player is associated with the corresponding GameController.
+     * In case of errors, appropriate feedback is sent to the client.
+     *
+     * @param nickname the nickname of the player joining the game
+     * @param id the identifier of the target game session
+     * @param color the selected player color
+     * @param virtualViewId the identifier of the client connection
+     */
     public synchronized void joinGame(String nickname, int id, Color color, String virtualViewId){
         VirtualView view = connections.get(virtualViewId);
         if(view==null || !lobby.containView(virtualViewId)){
@@ -134,27 +212,26 @@ public class ServerState {
         }
     }
 
-    public synchronized void removePlayer(String nickname) {
-        nicknames.remove(nickname);
-        playerToGame.remove(nickname);
-    }
-
-    //per rimuovere connessione a tutto
-    public void removeConnection(String virtualViewId){
-        connections.remove(virtualViewId);
-        lobby.removeViewer(virtualViewId);
-    }
 
     /**
-     * Scansiona la directory corrente alla ricerca di file di log di partite
-     * interrotte (pattern: mesos_game_{id}.log) e le registra come partite
-     * ripristinabili.
+     * Initializes the server state by scanning the local filesystem for interrupted game sessions.
      *
-     * Viene chiamato una volta prima di avviare i server RMI e Socket
+     * This method searches for log files matching the pattern "mesos_game_{id}.log" and
+     * reconstructs the corresponding game sessions, making them available for restoration.
      *
-     * Le partite ripristinabili appaiono in lobby come "started=true" —
-     * i giocatori originali possono riconnettersi con lo stesso nickname
-     * e trovare la partita al punto in cui era.
+     * For each valid log file, the method:
+     * - extracts the original game ID,
+     * - retrieves the list of players involved in the game,
+     * - recreates the corresponding GameController,
+     * - and registers a GameRestorer to enable state recovery.
+     *
+     * Players involved in these sessions are marked as pending reconnection,
+     * ensuring that only the original participants can resume the game.
+     *
+     * Restored games are added to the Lobby and marked as already started,
+     * allowing players to reconnect and continue from the previous state.
+     *
+     * This method is executed once at server startup before initializing RMI and Socket services.
      */
     public synchronized void initializeFromDisk() {
         File dir = new File(".");
@@ -201,7 +278,7 @@ public class ServerState {
                 pendingReconnect.put(nick, gameId);
             }
 
-            // Aggiunge la partita alla lobby con l'ID originale
+            // Aggiunge la partita alla lobby con l'id originale
             // (così il nextId della Lobby non sovrascrive un ID già usato)
             lobby.restoreGame(gameId, controller);
 
@@ -210,10 +287,61 @@ public class ServerState {
         }
     }
 
+    //metodi di supporto e che rendono il serverState coerente in caso di disconnessioni o fine partita
+
+    /**
+     * Removes a player from the server state.
+     * The method deletes the player's nickname from the global registry
+     * and removes any association with an active GameController.
+     *
+     * @param nickname the nickname of the player to remove
+     */
+    public synchronized void removePlayer(String nickname) {
+        nicknames.remove(nickname);
+        playerToGame.remove(nickname);
+    }
+
+    /**
+     * Removes a client connection from the server.
+     * The method removes the VirtualView associated with the given identifier
+     * and unregisters it from the lobby.
+     *
+     * @param virtualViewId the identifier of the client connection to remove
+     */
+
+    //per rimuovere connessione a tutto
+    public void removeConnection(String virtualViewId){
+        connections.remove(virtualViewId);
+        lobby.removeViewer(virtualViewId);
+    }
+
+    /**
+     * Retrieves the VirtualView associated with the given connection identifier.
+     *
+     * @param virtualViewId the identifier of the client connection
+     * @return the corresponding VirtualView, or null if not found
+     */
+    public VirtualView getConnection(String virtualViewId){
+        return connections.get(virtualViewId);
+    }
+
+
+    /**
+     * Retrieves the GameController associated with the specified player.
+     *
+     * @param nickname the nickname of the player
+     * @return the GameController managing the player's game session, or null if not assigned
+     */
     public GameController getController(String nickname){
         return playerToGame.get(nickname);
     }
 
+    /**
+     * Checks whether a nickname is already in use by a connected player.
+     *
+     * @param nickname the nickname to check
+     * @return true if the nickname is already taken, false otherwise
+     */
     public synchronized boolean isNicknameTaken(String nickname){
         return nicknames.contains(nickname);
     }

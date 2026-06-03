@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**Class that allows creating all building cards for the Mesos game using the appropriate JSON file
- * @author Alberto Roveda
+/**
+ * Class that allows creating all building cards for the Mesos game using the appropriate JSON file
  */
 
 public class CreateBuildingCard {
@@ -18,11 +18,11 @@ public class CreateBuildingCard {
     /**List containing all building cards*/
     private List<BuildingCard> allBuildingCards;
 
-    /**Constructor of the class that creates all the cards from a JSON file, using BuildingCardJson as a helper class
-     *  to distinguish the creation of different building cards
-     *  @param path file JSON in resources with all building card
-     * @throws
-     *  */
+    /**
+     * Constructor of the class that creates all the cards from a JSON file, using BuildingCardJson as a helper class
+     * to distinguish the creation of different building cards
+     * @param path file JSON in resources with all building card
+     */
     public CreateBuildingCard(String path) {
         try {
             List<BuildingCardJson> buildingCardJsons = OpenFileJson.loadList(
@@ -95,8 +95,10 @@ public class CreateBuildingCard {
         }
     }
 
-    /**Method to return to the caller the list containing all the created cards
-     * @return list with all cards*/
+    /**
+     * Method to return to the caller the list containing all the created cards
+     * @return list with all cards
+     * */
     public List<BuildingCard> getAllBuildingCards() {
         return allBuildingCards;
     }

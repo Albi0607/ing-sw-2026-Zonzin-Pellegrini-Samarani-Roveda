@@ -21,6 +21,23 @@ import java.util.Collections;
  */
 public class ServerMain {
 
+    /**
+     * Entry point of the server application.
+     *
+     * This method initializes the server environment, including:
+     * - retrieval of the local network IP for RMI configuration,
+     * - creation and initialization of the ServerState,
+     * - restoration of previously saved games from disk,
+     * - optional activation of the database connection,
+     * - and startup of both RMI and Socket server instances in separate threads.
+     *
+     * The server supports dual communication protocols (RMI and Socket)
+     * and is ready to accept client connections after initialization.
+     *
+     * @param args optional command-line arguments; if provided, the first argument
+     *             is used to override the default RMI port
+     * @throws SQLException if a database-related error occurs during initialization
+     */
     public static void main(String[] args) throws SQLException {
         String myIp = "127.0.0.1";
         try {

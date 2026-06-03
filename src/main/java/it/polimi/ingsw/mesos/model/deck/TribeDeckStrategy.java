@@ -12,7 +12,7 @@ import java.util.Stack;
 
 /**Class that overrides the method of the corresponding interface to create the main game deck in era order,
  * placing the two isFinal cards at the end of the deck, and returning a stack
- * @author Alberto Roveda*/
+ */
 public class TribeDeckStrategy implements CreateStrategy<TribeCard>{
 
     /**

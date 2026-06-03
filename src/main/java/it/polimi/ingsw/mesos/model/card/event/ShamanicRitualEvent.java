@@ -9,7 +9,6 @@ import it.polimi.ingsw.mesos.common.enums.EventType;
 //attenzione a regola dell'edificio sui doppi punti per più giocatori con stessi punti shamano
 //attenzione a regola dell'edificio sui punti non persi per più giocatori con stessi punti shamano
 /**Concrete class to handle ShamanicRitualEvent
- * @author Alberto Roveda
  */
 public class ShamanicRitualEvent extends EventCard {
     /**Prestige points gained if the player has the most Shaman icons*/
@@ -17,7 +16,8 @@ public class ShamanicRitualEvent extends EventCard {
     /**Prestige points lost if the player has the fewest Shaman icons*/
     private final int losePrestige;
 
-    /**Constructor for ShamanicRitualEvent cards
+    /**
+     * Constructor for ShamanicRitualEvent cards
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game

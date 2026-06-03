@@ -13,7 +13,6 @@ import it.polimi.ingsw.mesos.common.enums.TriggerType;
  * 6:During the Shamanic Ritual Event, your tribe gains 3 additional Shaman icons.
  * 7:During the Shamanic Ritual Event, if you have more Shaman icons than all other players, you gain double the specified prestige points.
  * If you gain prestige points together with other players (because you have the same number of icons), you do not gain the double.
- * @author ALberto Roveda
  */
 public class EventModifierEffect implements BuildingEffect {
 
@@ -30,7 +29,8 @@ public class EventModifierEffect implements BuildingEffect {
     /**If true, activates the effect that prevents losing prestige points when having fewer Shaman icons*/
     private final boolean noLosePrestige;
 
-    /**Constructor for the effect of the 4 defined building types
+    /**
+     * Constructor for the effect of the 4 defined building types
      *
      * @param eventContext event in which to activate the effect
      * @param countRef the type of character that multiplies the points during the effect
@@ -49,7 +49,8 @@ public class EventModifierEffect implements BuildingEffect {
         this.noLosePrestige=noLosePrestige;
     }
 
-    /**Override of the interface method to handle the effects of the buildings
+    /**
+     * Override of the interface method to handle the effects of the buildings
      * @param player the player who benefits from the effect
      * @param game the game on which the building's effect acts
      * @param trigger the moment when the effect is triggered, to be evaluated with the TriggerType of the invoked building
@@ -57,20 +58,20 @@ public class EventModifierEffect implements BuildingEffect {
     @Override
     public void applyEffect(Player player, Game game, TriggerType trigger) {
         if (trigger==TriggerType.ON_PURCHASE){
-            /**Handles effect 7, which doubles the prestige points gained if the player has the most Shaman icons*/
+            /*Handles effect 7, which doubles the prestige points gained if the player has the most Shaman icons*/
             if (doublePrestige){
                 player.setShamanDoublePoints();
             }
-            /**Handles effect 3, which prevents losing prestige points if you have fewer Shaman icons than the other players*/
+            /*Handles effect 3, which prevents losing prestige points if you have fewer Shaman icons than the other players*/
             if(noLosePrestige){
                 player.setShamanNotLosePoints();
             }
-            /**Handles effect 6, which adds 3 Shaman icons to your tribe*/
+            /*Handles effect 6, which adds 3 Shaman icons to your tribe*/
             if(virtualIcons>0){
                 player.setExtraShamanIcons(virtualIcons);
             }
         }
-            /**Handles effect 2, which grants a food discount during the Sustenance event based on the number of
+            /*Handles effect 2, which grants a food discount during the Sustenance event based on the number of
              * characters of a specific type in your tribe*/
         if(trigger==TriggerType.ON_SUSTENANCE_EVENT&&eventContext==EventType.SUSTENANCE&&discount>0){
             int calculatedDiscount = discount*player.getTribe().getCharactersTypeCount(countRef);

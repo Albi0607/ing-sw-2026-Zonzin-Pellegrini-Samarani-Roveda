@@ -15,20 +15,35 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Class that implements the associated remote interface and provides the methods invoked by the client on the server
- * side, enabling the client to perform actions in the game
+ * Implementation of the RemoteMethods interface.
+ *
+ * This class represents the server-side entry point for all RMI client requests.
+ * It receives remote invocations from clients and delegates the execution of game
+ * and lobby actions to the ServerState and GameController components.
+ * All game-related actions are executed asynchronously using an ExecutorService
+ * to avoid blocking the RMI thread pool and to ensure better scalability.
  */
 public class RemoteMethodsImplementation extends UnicastRemoteObject implements RemoteMethods {
 
+    /**
+     * Central server state containing all active games, players, and lobby data.
+     */
     private final ServerState serverState;
 
-    //da capire se è meglio avere una gestione centralizzata in serverState con tutto
+    /**
+     * Thread pool used to execute client requests asynchronously.
+     */
     private final ExecutorService executor;
 
     // gestione keepAlive Message
     private final Map<String, Long> lastHeartbeat = new ConcurrentHashMap<>();
 
-
+    /**
+     * Creates a new RemoteMethodsImplementation instance
+     *
+     * @param serverState central server state managing games and lobby
+     * @throws RemoteException if RMI export fails
+     */
     public RemoteMethodsImplementation(ServerState serverState) throws RemoteException {
         this.serverState = serverState;
         this.executor = Executors.newCachedThreadPool();
@@ -37,10 +52,12 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
 
 
     /**
-     * Method that allows the client to place the totem on the OfferTile
-     * @param nickname name chosen by the client
-     * @param position position selected on the OfferTile
-     * @throws RemoteException if there are network errors during the method invocation
+     * Requests the server to place the player's totem on the OfferTile.
+     * The request is executed asynchronously on the server thread pool.
+     *
+     * @param nickname name of the player performing the action
+     * @param position selected position on the OfferTile
+     * @throws RemoteException if a network error occurs during the remote call
      */
     @Override
     public void placeTotem(String nickname, char position) throws RemoteException {
@@ -55,11 +72,13 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     }
 
     /**
-     * Method that allows the player to draw a card from the upper or lower row
-     * @param nickname name chosen by the client
-     * @param position position indicating the selected card
-     * @param isUpper if true, the card must be taken from the upper row; otherwise, from the lower row
-     * @throws RemoteException if there are network errors during the method invocation
+     * Requests the server to draw a card from the upper or lower row.
+     * The request is executed asynchronously on the server thread pool.
+     *
+     * @param nickname name of the player performing the action
+     * @param position index of the selected card
+     * @param isUpper true if selecting from upper row, false otherwise
+     * @throws RemoteException if a network error occurs during the remote call
      */
     @Override
     public void takeCard(String nickname, int position, boolean isUpper) throws RemoteException {
@@ -73,11 +92,12 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
     }
 
     /**
-     * Method that allows the client not to draw the extra card at the end of the turn if they possess the triggering
-     * building
+     * Requests to skip the extra card draw at the end of the turn.
+     * The action is valid only if the player owns the corresponding building.
+     * The request is executed asynchronously on the server thread pool.
+     *
      * @param nickname name of the player performing the action
-     * otherwise, false
-     * @throws RemoteException if there are network errors during the method invocation
+     * @throws RemoteException if a network error occurs during the remote call
      */
     @Override
     public void skipExtraDraw(String nickname) throws RemoteException{
@@ -90,9 +110,14 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         });
     }
 
-    //metodi remoti da usare nella lobby
-
-    //gestire questo metodo con l'utilizzo di una view con nome gia scelto univoco
+    /**
+     * Registers a client in the lobby and returns its VirtualView identifier.
+     *
+     * @param nickname name of the connecting player
+     * @param clientCallback remote callback used by the server to communicate with the client
+     * @return unique identifier of the associated VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     public String getLobby(String nickname,CallBack clientCallback) throws RemoteException{
         try {
             String clientIP = RemoteServer.getClientHost();
@@ -105,6 +130,16 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         return view.getId();
     }
 
+    /**
+     * Requests the creation of a new game in the lobby.
+     * The request is executed asynchronously.
+     *
+     * @param nickname name of the player creating the game
+     * @param expectedNumPlayers number of players required for the game
+     * @param color selected color for the new player
+     * @param virtualViewId identifier of the client's VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     public void createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId) throws  RemoteException{
         executor.submit(()-> {
             //passo virtualViewId poiché utilizzo la stessa view creata in getLobby
@@ -112,6 +147,16 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         });
     }
 
+    /**
+     * Requests to join an existing game in the lobby.
+     * The request is executed asynchronously on the server thread pool.
+     *
+     * @param nickname name of the player joining the game
+     * @param id identifier of the game
+     * @param color selected color for the new player
+     * @param virtualViewId identifier of the client's VirtualView
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     public void joinGame(String nickname, int id, Color color, String virtualViewId) throws RemoteException{
         executor.submit(()-> {
             //passo virtualViewId poiché utilizzo la stessa view creata in getLobby

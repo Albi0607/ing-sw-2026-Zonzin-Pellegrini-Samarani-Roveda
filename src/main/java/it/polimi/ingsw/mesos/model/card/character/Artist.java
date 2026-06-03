@@ -4,11 +4,11 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Concrete class for cards of type Artist
- * @author Alberto Roveda
  */
 public class Artist extends CharacterCard {
 
-    /**Constructor for Artist cards
+    /**
+     * Constructor for Artist cards
      *
      * @param era the era of the card
      * @param playersRequired the number of player required to use the card in the game

@@ -18,7 +18,6 @@ import it.polimi.ingsw.mesos.model.card.character.Inventor;
  * (i.e., with the same invention icon). Do not gain food for pairs that were already owned at the time of acquiring the building.
  * 8:During the Hunt Event, for each Hunter in your tribe, gain 1 food and 1 additional prestige point.
  * 10:During the Cave Painting Event, gain 1 food for each Artist in your tribe."
- * @author  Alberto Roveda
  * */
 public class ResourceBonusEffect implements BuildingEffect {
     /**
@@ -68,10 +67,10 @@ public class ResourceBonusEffect implements BuildingEffect {
             //condizione per gestire l'effetto 1 che da 5 di cibo per ogni volta che si completa un set di 6 character
             //controllo che il numero di carte con lo stesso tipo di quello appena aggiunto sia il numero minimo o
             // uguale rispetto agli altri
-            /**gets the last card added to the tribe*/
+            /*gets the last card added to the tribe*/
             CharacterCard lastCard = player.getTribe().getLastCard();
 
-            /**Condition to handle effect 1, which gives 5 food each time a set of 6 character cards is completed
+            /*Condition to handle effect 1, which gives 5 food each time a set of 6 character cards is completed
              * Check that the number of cards of the same type as the one just added is the minimum
              * or equal compared to the other types*/
             if (countRef == null && reward == ResourceType.FOOD) {
@@ -86,7 +85,7 @@ public class ResourceBonusEffect implements BuildingEffect {
                 player.addFood(amount);
             }
 
-            /**Condition to handle effect 5: gain 3 food each time a pair of identical Inventors is obtained*/
+            /*Condition to handle effect 5: gain 3 food each time a pair of identical Inventors is obtained*/
             if (countRef == CharacterType.INVENTOR && lastCard instanceof Inventor) {
                 Inventor inv = (Inventor) lastCard;
                 int sameIconCount = (int) player.getTribe().getInventors().stream()
@@ -98,17 +97,17 @@ public class ResourceBonusEffect implements BuildingEffect {
             }
         }
 
-        /**Processing effects 8*/
+        /*Processing effects 8*/
         if (trigger == TriggerType.ON_HUNT_EVENT && eventContext == EventType.HUNT) {
-            /**During the Hunt event, gain 1 food and 1 additional prestige point*/
+            /*During the Hunt event, gain 1 food and 1 additional prestige point*/
             int num1 = player.getTribe().getCharactersTypeCount(CharacterType.HUNTER);
             player.addFood(num1 * amount);
             player.updatePrestige(num1 * amount);
         }
 
-        /**Processing effects 10*/
+        /*Processing effects 10*/
         if (trigger == TriggerType.ON_PAINTING_EVENT && eventContext == EventType.PAINTING) {
-            /**During the CavePaintingEvent, gain 1 food for each Artist in your tribe*/
+            /*During the CavePaintingEvent, gain 1 food for each Artist in your tribe*/
             int num2 = player.getTribe().getCharactersTypeCount(CharacterType.ARTIST);
             player.addFood(num2 * amount);
         }

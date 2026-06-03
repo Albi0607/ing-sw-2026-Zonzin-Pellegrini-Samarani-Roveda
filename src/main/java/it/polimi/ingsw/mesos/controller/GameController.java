@@ -760,7 +760,7 @@ public class GameController {
     // gestione dei player disconnessi
     public synchronized void onPlayerDisconnected(String nickname) {
         if (disconnectedPlayers.contains(nickname)) return;
-        // devo salvare i nickname dei player disconnessi per poermettere l'eventuale riconnessione
+        // devo salvare i nickname dei player disconnessi per permettere l'eventuale riconnessione
         disconnectedPlayers.add(nickname);
 
         System.out.println("[GameController] Giocatore disconnesso: " + nickname);

@@ -4,7 +4,6 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 
 /**Concrete class for cards of type Builder
- * @author Alberto Roveda
  */
 public class Builder extends CharacterCard {
 
@@ -14,7 +13,8 @@ public class Builder extends CharacterCard {
     /**Prestige points gained at the end of the game thanks to the builder*/
     private final int prestigePoints;
 
-    /**Constructor for Building Card
+    /**
+     * Constructor for Building Card
      *
      * @param era the era of the card
      * @param playersRequired the number of players required to use the card in the game
@@ -27,7 +27,8 @@ public class Builder extends CharacterCard {
         this.prestigePoints=prestigePoints;
     }
 
-    /**Getter method to obtain the discount on buildings
+    /**
+     * Getter method to obtain the discount on buildings
      *
      * @return discount on buildings
      */
@@ -40,7 +41,8 @@ public class Builder extends CharacterCard {
         return prestigePoints;
     }
 
-    /**Getter method to obtain the discount on buildings
+    /**
+     * Getter method to obtain the discount on buildings
      *
      * @return discount on buildings
      */
