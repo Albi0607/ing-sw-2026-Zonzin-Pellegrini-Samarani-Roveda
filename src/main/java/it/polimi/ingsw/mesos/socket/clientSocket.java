@@ -90,6 +90,14 @@ public class clientSocket implements Network {
         return sendMessage(new SkipExtraDrawMessage(nickname));
     }
 
+    /**
+     * Registers the player in the lobby and stores the associated {@link ClientController}
+     * for handling incoming server messages.
+     *
+     * @param nickname   the nickname chosen by the player
+     * @param controller the {@link ClientController} to which server messages will be dispatched
+     * @return an empty string, as the response is handled asynchronously
+     */
     @Override
     public String getLobby(String nickname, ClientController controller) {
         this.controller = controller;
@@ -97,11 +105,29 @@ public class clientSocket implements Network {
         return "";
     }
 
+    /**
+     * Sends a request to create a new game with the specified settings.
+     *
+     * @param nickname            the nickname of the player creating the game
+     * @param expectedNumPlayers  the number of players expected to join the game
+     * @param color               the color chosen by the creating player
+     * @param viewId              the identifier of the player's virtual view (unused over socket)
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean createNewGame(String nickname, int expectedNumPlayers, Color color, String viewId) {
         return sendMessage(new CreateGameMessage(expectedNumPlayers, color));
     }
 
+    /**
+     * Sends a request to join an existing game.
+     *
+     * @param nickname the nickname of the player joining the game
+     * @param id       the identifier of the game to join
+     * @param color    the color chosen by the joining player
+     * @param viewId   the identifier of the player's virtual view (unused over socket)
+     * @return always returns {@code true} (message is sent asynchronously)
+     */
     @Override
     public boolean joinGame(String nickname, int id, Color color, String viewId) {
         return  sendMessage(new JoinGameMessage(id, color));
@@ -110,7 +136,9 @@ public class clientSocket implements Network {
     /**
      * Sends a serialized message to the server through the output stream.
      *
-     * @param message the message to be sent
+     * @param message the {@link Message} to be sent
+     * @return {@code true} if the message was sent successfully;
+     *         {@code false} if an I/O error occurred
      */
     private boolean sendMessage(Message message) {
         try {

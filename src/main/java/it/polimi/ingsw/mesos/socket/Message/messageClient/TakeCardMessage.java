@@ -41,23 +41,10 @@ public class TakeCardMessage extends Message {
     }
 
     /**
-     * Returns the nickname of the player who sent the request.
-     *
-     * @return the player's nickname
-     */
-    public String getNickname() { return nickname; }
-
-    /**
-     * Returns the position of the selected card.
-     *
-     * @return the card position
-     */
-    public int getPosition() { return position; }
-
-    /**
      * Indicates whether the card selected is in the upper row.
      *
      * @return true if the card is in the upper row, false otherwise
      */
     public boolean isUpper() { return isUpper; }
+
 }

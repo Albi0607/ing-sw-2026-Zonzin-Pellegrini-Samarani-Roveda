@@ -37,17 +37,8 @@ public class PlaceTotemMessage extends Message {
         controller.onPlaceTotem(nickname, position);
     }
 
-    /**
-     * Returns the nickname of the player who sent the request.
-     *
-     * @return the player's nickname
-     */
+
     public String getNickname() { return nickname; }
 
-    /**
-     * Returns the chosen position for placing the totem.
-     *
-     * @return the position character
-     */
     public char getPosition() { return position; }
 }

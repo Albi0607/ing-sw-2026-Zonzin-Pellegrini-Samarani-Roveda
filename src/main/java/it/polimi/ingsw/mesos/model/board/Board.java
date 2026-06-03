@@ -154,7 +154,26 @@ public class Board {
         return upperRow.remove(index);
     }
 
-    // --- Getters ---
+    public void setTurnOrderTrack(TurnOrderTrack turnOrderTrack) {
+        if (turnOrderTrack == null) {
+            throw new IllegalArgumentException("TurnOrderTrack cannot be null");
+        }
+        this.turnOrderTrack = turnOrderTrack;
+    }
+
+    public void setTiles(List<OfferTile> tiles) {
+        if (tiles == null) {
+            throw new IllegalArgumentException("Offer tiles cannot be null");
+        }
+        this.tiles = tiles;
+    }
+
+    // getters
+    public Deck<BuildingCard> getBuildingDeck() { return this.buildingDecks; }
+
+    public Deck<TribeCard> getTribeDeck() {
+        return this.tribeDeck;
+    }
 
     public TurnOrderTrack getTurnOrderTrack() {
         return turnOrderTrack;
@@ -174,7 +193,6 @@ public class Board {
 
     public OfferTile getTile(char id) {
         if (tiles == null) return null;
-
         for (OfferTile tile : tiles) {
             if (tile.getId() == id) {
                 return tile;
@@ -202,24 +220,5 @@ public class Board {
 
         return available;
     }
-
-    public Deck<TribeCard> getTribeDeck() {
-        return this.tribeDeck;
-    }
-
-    public Deck<BuildingCard> getBuildingDeck() { return this.buildingDecks; }
-
-    public void setTurnOrderTrack(TurnOrderTrack turnOrderTrack) {
-        if (turnOrderTrack == null) {
-            throw new IllegalArgumentException("TurnOrderTrack cannot be null");
-        }
-        this.turnOrderTrack = turnOrderTrack;
-    }
-
-    public void setTiles(List<OfferTile> tiles) {
-        if (tiles == null) {
-            throw new IllegalArgumentException("Offer tiles cannot be null");
-        }
-        this.tiles = tiles;
-    }
 }
+

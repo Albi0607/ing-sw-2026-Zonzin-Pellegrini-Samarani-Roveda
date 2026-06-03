@@ -104,8 +104,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // rende lo status del giocatore = disconnesso
-    // notifica il controller che gestisce la partita che quel giocatore non è più attivo
+    /**
+     * Marks the player as disconnected and notifies the associated {@link GameController}.
+     *
+     * <p>If the player was part of an active game, the controller is informed via
+     * {@link GameController#onPlayerDisconnected(String)}. Repeated calls are ignored
+     * to avoid duplicate disconnection handling.
+     */
     private void handleDisconnection() {
         if (status == PlayerStatus.DISCONNECTED) return; // evita doppia chiamata
         status = PlayerStatus.DISCONNECTED;
@@ -176,7 +181,14 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Gestisce la registrazione alla lobby.
+     * Handles the initial lobby registration for a connecting client.
+     *
+     * <p>Assigns the player's nickname, creates a {@link SocketVirtualView} for them,
+     * and delegates lobby registration to {@link ServerState}. If registration fails,
+     * an {@link ErrorMessage} is sent to the client and the socket is closed.
+     *
+     * @param msg the {@link GetLobbyMessage} containing the player's chosen nickname
+     * @throws IOException if sending the error response or closing the socket fails
      */
     private void handleGetLobby(GetLobbyMessage msg) throws IOException {
         try {
@@ -199,9 +211,19 @@ public class ClientHandler implements Runnable {
     }
 
     /**
-     * Chiamato sempre quando il client si disconnette, sia per errore
-     * che per chiusura normale. Rimuove il nickname e la connessione
-     * da ServerState così il client può riconnettersi con lo stesso nome.
+     * Releases all resources associated with this client connection.
+     *
+     * <p>Always called when the client disconnects, whether due to an error or a
+     * normal closure. Specifically:
+     * <ul>
+     *   <li>If the player was part of an active game, their slot is preserved to
+     *       allow reconnection; disconnection is already handled by
+     *       {@link #handleDisconnection()}.</li>
+     *   <li>If the player had not yet joined any game, they are removed from
+     *       {@link ServerState} entirely.</li>
+     * </ul>
+     * In both cases, the virtual view connection is unregistered and the socket
+     * is closed.
      */
     private void cleanup() {
         System.out.println("[ClientHandler] Cleanup per: " + nickname);

@@ -22,7 +22,6 @@ public class TurnOrderTrack {
     private final int[] slots;
     private boolean effectsActive = false;
 
-
     /**
      * Constructs a TurnOrderTrack with the given slots.
      *
@@ -53,7 +52,6 @@ public class TurnOrderTrack {
      * @param p the player to occupy the slot
      * @throws IndexOutOfBoundsException if the index is invalid
      */
-
     public void setPlayerAt(int index, Player p) {
         if (index < 0 || index >= positions.size()) {
             throw new IndexOutOfBoundsException("Index not valid: " + index);
@@ -91,6 +89,7 @@ public class TurnOrderTrack {
         }
         throw new IllegalStateException("No free slots available"); // no free slots available
     }
+
     /**
      * Resets the turn order track by clearing all player positions.
      * <p>
@@ -104,6 +103,15 @@ public class TurnOrderTrack {
         }
     }
 
+    /**
+     * Removes the given player from the track, freeing their slot.
+     *
+     * <p>Used when a player places their token on an offer tile and must therefore
+     * vacate their current position in the turn order track. Only the slot belonging
+     * to {@code p} is cleared; all other positions remain unchanged.
+     *
+     * @param p the {@link Player} to remove from the track
+     */
     public void removePlayer(Player p) { //aggiunto qeusto metodo per eliminare i player dalla turn orderatrack ogni volta ch epiazzano un totem sulla tessera offerta
         for (int i = 0; i < positions.size(); i++) {
             if (p.equals(positions.get(i))) {
@@ -114,7 +122,6 @@ public class TurnOrderTrack {
     }
 
     // --- Getters ---
-
     public Player getPlayerAt(int index) {
         if (index < 0 || index >= positions.size()) {
             throw new IndexOutOfBoundsException("Invalid slot index");
@@ -131,7 +138,15 @@ public class TurnOrderTrack {
     }
 
     // --- Setters ---
-    //flag che si attiva dopo lo startGame() per attivare gli effetti della track dopo l'inizio del gioco
+    /**
+     * Enables or disables the application of slot effects when players are placed.
+     *
+     * <p>Effects are inactive by default and should be enabled by calling
+     * {@code setEffectsActive(true)} once the game has started, so that
+     * pre-game token placement does not trigger food bonuses or penalties.
+     *
+     * @param active {@code true} to enable slot effects; {@code false} to disable them
+     */
     public void setEffectsActive(boolean active) {
         this.effectsActive = active;
     }
