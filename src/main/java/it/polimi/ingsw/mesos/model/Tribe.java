@@ -10,19 +10,28 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a player's tribe, containing their acquired character and building cards.
+ * Provides methods to calculate total discounts and icons based on the cards in the tribe.
+ */
 public class Tribe {
 
     private final List<CharacterCard> characters;
     private final List<BuildingCard> buildings;
 
+    /**
+     * Constructs an empty Tribe with no characters or buildings.
+     */
     public Tribe() {
         this.characters = new ArrayList<>();
         this.buildings = new ArrayList<>();
     }
 
     /**
-     * adds a carachter to the tribe, in the characters list tail
-     * @param c: the new carachterCard added to the tribe
+     * Adds a character card to the tribe.
+     *
+     * @param c the CharacterCard to add
+     * @throws IllegalArgumentException if the character is null
      */
     public void addCharacter(CharacterCard c) {
         if (c == null) {
@@ -32,21 +41,24 @@ public class Tribe {
     }
 
     /**
-     * adds a building to the tribe, in the buildings list tail
-     * @param b: the new buildingCard added to the tribe
+     * Adds a building card to the tribe.
+     *
+     * @param b the BuildingCard to add
+     * @throws IllegalArgumentException if the building is null
      */
     public void addBuilding(BuildingCard b) {
         if (b == null) {
-            throw new IllegalArgumentException("character cannot be null");
+            throw new IllegalArgumentException("building cannot be null");
         }
         buildings.add(b);
     }
 
     /**
-     *  Sum of all Builder discount values in the tribe.
-     * @return total food discount for building payments
-     * as the number of builder in the tribe
-     * */
+     * Calculates the total food discount for building payments.
+     * Sums the discount values of all Builder characters in the tribe.
+     *
+     * @return the total building discount
+     */
     public int getBuildingDiscount() {
         return characters.stream()
                 .filter(c -> c.getType() == CharacterType.BUILDER)
@@ -56,30 +68,24 @@ public class Tribe {
     }
 
     /**
-     * Sum of all Gatherer food discounts in the tribe.
-     * @return total food discount of the tribe
-     * as 3 * number of gatherer in the tribe
+     * Calculates the total sustenance discount for the tribe.
+     * Sums the fixed discount (3 food units) for each Gatherer character in the tribe.
+     *
+     * @return the total sustenance discount
      */
     public int getSustenanceDiscount() {
         return characters.stream()
                 .filter(c -> c.getType() == CharacterType.GATHERER)
                 .mapToInt(c -> 3)
                 .sum();
-
-        /*
-        alternativa:
-        long count = characters.stream()
-                .filter( c -> c.getType() == CharacterType.GATHERER)
-                .count();
-
-        return (int) count * 3;
-        */
     }
 
     /**
-     * Total shaman star icons across all Shamans.
-     * @return total number of Shaman star icons
-     * */
+     * Calculates the total number of Shaman star icons in the tribe.
+     * Sums the icons of all Shaman characters.
+     *
+     * @return the total number of star icons
+     */
     public int getTotalShamanIcons() {
         return characters.stream()
                 .filter(c -> c.getType() == CharacterType.SHAMAN)
@@ -89,9 +95,10 @@ public class Tribe {
     }
 
     /**
-     * Number of distinct InventionIcon values among Inventors.
-     * @return total distinct icons of inventors card
-     * */
+     * Counts the number of distinct invention icons among the Inventors in the tribe.
+     *
+     * @return the number of unique invention icons
+     */
     public long getDistinctInventionCount() {
         return characters.stream()
                 .filter(c -> c.getType() == CharacterType.INVENTOR)
@@ -101,11 +108,21 @@ public class Tribe {
                 .count();
     }
 
+    /**
+     * Returns the total number of characters in the tribe.
+     *
+     * @return the character count
+     */
     public int getCharactersCount() {
         return characters.size();
     }
 
-    //per contare quanti character dello stesso tipo ci sono
+    /**
+     * Returns the number of characters of a specific type in the tribe.
+     *
+     * @param type the CharacterType to count
+     * @return the number of characters of that type
+     */
     public int getCharactersTypeCount(CharacterType type){
         return characters.stream()
                 .filter( c -> c.getType() == type)
@@ -113,27 +130,45 @@ public class Tribe {
                 .sum();
     }
 
+    /**
+     * Returns the total number of buildings in the tribe.
+     *
+     * @return the building count
+     */
     public int getBuildingsCount() {
         return buildings.size();
     }
 
+    /**
+     * Returns a copy of the list of characters in the tribe.
+     *
+     * @return a list of CharacterCard instances
+     */
     public List<CharacterCard> getCharacters() {
         return new ArrayList<>(characters);
     }
 
+    /**
+     * Returns a copy of the list of buildings in the tribe.
+     *
+     * @return a list of BuildingCard instances
+     */
     public List<BuildingCard> getBuildings() { return new ArrayList<>(buildings); }
 
-
-    //attenzione il giocatore sceglie 2 carte in un round si potrebbe perdere effetto della penultima carta
-    // luca: due soluzioni, la prima fai prendere a questo metodo una sottolista con le utlime due carte e
-    // lo gestisci nel metodo con un doppio controllo, oppure usi quel metodo iterandolo ad ogni aggiunta e va bene cosi
+    /**
+     * Returns the last character card added to the tribe.
+     *
+     * @return the last CharacterCard, or throws an exception if the tribe is empty
+     */
     public CharacterCard getLastCard(){
-        /*if (//selezione del player è di tipo character && player selected two card)
-            //return characters.get(-i)
-          */
         return characters.get(characters.size() -1);
     }
 
+    /**
+     * Returns all Inventor characters in the tribe.
+     *
+     * @return a list of Inventor instances
+     */
     public List<Inventor> getInventors(){
         return characters.stream()
                 .filter( c -> c.getType() == CharacterType.INVENTOR)
