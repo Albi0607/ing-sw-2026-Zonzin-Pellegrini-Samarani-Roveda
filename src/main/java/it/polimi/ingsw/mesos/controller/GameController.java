@@ -28,34 +28,56 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 
+/**
+ * The GameController class manages the logic for a single game instance.
+ * It acts as the mediator between the model (Game) and the network layer (VirtualViews).
+ * It handles player connections, game state transitions, move logging for persistence,
+ * and turn timeouts.
+ */
 public class GameController {
 
-    //istanza del model
     private Game game;
-    //capire come gestire le virtual view per poi usare il protocollo di rete adeguato
+    
+    /** Map associating each player's nickname with their corresponding VirtualView. */
     private final Map<String, VirtualView> players = new ConcurrentHashMap<>();
+
     private final Map<String, Color> chosenColors = new ConcurrentHashMap<>();
-    //private View view;
-    private final  List<String> pendingNicknames;
-    private int expectedNumPlayers=0;
+
+    /** List of nicknames that have joined but are waiting for the game to start. */
+    private final List<String> pendingNicknames;
+
+    private int expectedNumPlayers = 0;
+
     private LeaderboardService leaderboardService;
-    //persistenza
+
     private MoveLogger moveLogger;
+
     private StateSerializer stateSerializer;
-    private boolean replayMode = false;  // true durante il replay, disabilita broadcast
+
+    private boolean replayMode = false;
+
     private GameRestorer restorer = null;
+
+    /** Callback executed when the game has finished. */
     private Runnable onGameFinished;
 
-    //controllo KeepAlive
+    /** Nicknames of players who have disconnected and are eligible for reconnection. */
     private final java.util.Set<String> disconnectedPlayers = ConcurrentHashMap.newKeySet();
+
     private ScheduledExecutorService turnTimer = Executors.newSingleThreadScheduledExecutor();
+
     private ScheduledFuture<?> currentTurnTimeout = null;
-    private static final long TURN_TIMEOUT_SEC = 50;
 
+    private static final long TURN_TIMEOUT_SEC = 60;
 
-    //id del game che corrisponde a quello della lobby
     private final int gameId;
 
+    /**
+     * Constructs a new GameController for a specific game ID.
+     * Initializes the persistence components and the leaderboard service.
+     *
+     * @param gameId the unique ID of the game
+     */
     public GameController(int gameId) {
         this.gameId = gameId;
         this.pendingNicknames = new ArrayList<>();
@@ -65,23 +87,22 @@ public class GameController {
     }
 
     /**
-     * Number of players required to start the game, setted by the first player.
+     * Sets the number of players required to start the game.
+     * This should be called by the first player joining the lobby.
+     * If the number of players is already set, subsequent calls are ignored.
+     * If the current number of connected players matches the newly set expected number,
+     * the game starts immediately.
      *
-     * @param expectedNumPlayers the number of players
-     * @throws IllegalArgumentException if maxPlayers is less than or equal to 1 or grater than 5
+     * @param expectedNumPlayers the number of players (must be between 2 and 5)
+     * @throws IllegalArgumentException if expectedNumPlayers is not between 2 and 5
      */
-    //controllo che se 2 giocatori settano il numero di player solo il primo lo scelga veramente ed il secodno invece no
-
-    //bisogna ripensarlo poiché se viene messo un numero di giocatori errato il gioco si ferma e non permette più di
-    //inserirne
     public synchronized void setNumPlayers(int expectedNumPlayers) {
-        //con lobby dovrebbe essere impossibile ricorrere a questo caso
         if(this.expectedNumPlayers != 0){
-            System.out.println("Numero di player gia settato da un altro giocatore");
+            System.out.println("Player count already set by another player.");
             return;
         }
         if (expectedNumPlayers <= 1 || expectedNumPlayers > 5) {
-            throw new IllegalArgumentException("The number of players is not valid!");
+            throw new IllegalArgumentException("The number of players must be between 2 and 5!");
         }
 
         this.expectedNumPlayers = expectedNumPlayers;
@@ -91,7 +112,6 @@ public class GameController {
         }
 
         if (pendingNicknames.size() == this.expectedNumPlayers) {
-
             createGame();
             game.startGame();
 
@@ -103,64 +123,62 @@ public class GameController {
             }).start();
 
         } else {
-
             for (VirtualView view : players.values()) {
                 view.sendClientState(ClientState.WAITING_PLAYERS);
-                view.showMessage("Partita impostata a " + expectedNumPlayers + " giocatori. In attesa degli sfidanti...");
+                view.showMessage("Game set to " + expectedNumPlayers + " players. Waiting for opponents...");
             }
         }
     }
 
     /**
-     * Adds a player nickname.
-     * When the required number of players is reached, the game is automatically created.
+     * Adds a player to the game or handles their reconnection.
      *
-     * @param nickname the player's nickname
-     * @throws IllegalStateException if the game has already been created
-     * @throws IllegalStateException if the maximum number of players is already reached
-     * @throws IllegalArgumentException if the nickname is already used or invalid
+     * This method handles three main scenarios:
+     * 1. Replay mode: The controller is replaying moves from a log.
+     * 2. Restoration: A player is reconnecting to a game that crashed or was closed,
+     *    triggering a replay once all players have reconnected.
+     * 3. Normal connection: A player is joining a new game instance.
+     *
+     * @param nickname    the player's nickname
+     * @param chosenColor the color chosen by the player
+     * @param view        the player's VirtualView for communication
+     * @throws IllegalStateException    if the game has already started or the room is full
+     * @throws IllegalArgumentException if the nickname is invalid, already in use, or the color is taken
      */
-
     public synchronized void addPlayer(String nickname, Color chosenColor, VirtualView view) {
 
         if (replayMode) {
             chosenColors.put(nickname, chosenColor);
             pendingNicknames.add(nickname);
-            //ricreiamo il game in modo possa essere chiamato startGame() nel replay di START_GAME
             if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
                 createGame();
             }
             return;
         }
 
-        // Caso ripristino: il gioco non è ancora stato creato
-        // (il log esiste ma il replay non è ancora partito)
+        // Scenario: Reconnecting to a game that needs restoration (game not yet created)
         if (restorer != null && game == null) {
-            // Registra la VirtualView reale del giocatore
             players.put(nickname, view);
 
-            // Leggi quanti giocatori si aspettava la partita dal log
             List<GameMove> moves = restorer.getMoveLogger().readAll();
             long expectedFromLog = moves.stream()
                     .filter(m -> m.type == GameMove.MoveType.ADD_PLAYER)
                     .count();
 
             if (players.size() == expectedFromLog) {
-                // Tutti riconnessi: esegui il replay
                 restorer.restore(this, players);
-                restorer = null; // ripristino completato
+                restorer = null;
             } else {
                 view.sendClientState(ClientState.WAITING_PLAYERS);
-                view.showMessage("Riconnessione in corso... in attesa degli altri giocatori.");
+                view.showMessage("Reconnecting... waiting for other players.");
             }
             return;
         }
 
-        // Caso: riconnessione a partita in ripristino, dunque game è già stato creato
+        // Scenario: Reconnecting while restoration is already in progress
         if (restorer != null && game != null) {
             reconnectPlayer(nickname, view);
 
-            // Se tutti i giocatori si sono riconnessi, termina il replay
             boolean allReconnected = players.values().stream()
                     .noneMatch(v -> v instanceof DummyVirtualView);
             if (allReconnected) {
@@ -170,7 +188,6 @@ public class GameController {
             return;
         }
 
-        // Caso: normale connessione ad un game appena creato
         if (game != null) {
             throw new IllegalStateException("Game has already been created");
         }
@@ -183,13 +200,12 @@ public class GameController {
             throw new IllegalStateException("Maximum number of players reached");
         }
 
-        // check pendingNicknames
         if (pendingNicknames.contains(nickname)) {
             throw new IllegalArgumentException("Nickname already in use");
         }
 
         if (chosenColors.containsValue(chosenColor)) {
-            throw new IllegalArgumentException("Colore già scelto da un altro giocatore");
+            throw new IllegalArgumentException("Color already chosen by another player");
         }
 
         pendingNicknames.add(nickname);
@@ -197,33 +213,22 @@ public class GameController {
         chosenColors.put(nickname, chosenColor);
         if (moveLogger != null) moveLogger.append(GameMove.addPlayer(nickname, chosenColor));
 
-        /* Non si fa piu questo controllo poiché esiste un metodo apposta per creare i game
-        if (expectedNumPlayers == 0 && pendingNicknames.size() == 1) {
-            // È il primissimo giocatore a entrare! Gli chiediamo di scegliere i posti.
-            view.sendClientState(ClientState.CHOOSE_PLAYERS);
-        }
-
-        else*/
         if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
-            // La stanza è piena. Creiamo la partita...
             createGame();
-
-            // Usiamo un Thread per sbloccare i giocatori e mandare la prima plancia
             new Thread(() -> startGame()).start();
         }
         else {
-            // È entrato un giocatore, ma la stanza non è ancora piena.
             view.sendClientState(ClientState.WAITING_PLAYERS);
         }
     }
 
     /**
-     * Creates the game using the collected nicknames.
-     * Converts nicknamee into Player objects.
+     * Creates the Game model instance using the collected nicknames and colors.
+     * Initializes the player objects and sets up the game end callback.
+     * Clears temporary storage used during the registration phase.
      */
-
     private void createGame() {
-        List<Player> players = new ArrayList<>();
+        List<Player> playersList = new ArrayList<>();
         /*
         Color[] availableColors = Color.values();
 
@@ -232,45 +237,37 @@ public class GameController {
             players.add(new Player(pendingNicknames.get(i), color));
         }
          */
-
         for (String nick : pendingNicknames) {
             Color color = chosenColors.get(nick);
-            players.add(new Player(nick, color));
+            playersList.add(new Player(nick, color));
         }
 
-        this.game = new Game(players);
+        this.game = new Game(playersList);
 
         this.game.setOnGameEnd(() -> {
             try {
                 endGame();
             } catch (SQLException e) {
-                e.printStackTrace();
+                System.err.println("Error while ending game: " + e.getMessage());
             }
         });
 
-        // Clear temporary data after game creation
         pendingNicknames.clear();
-
         chosenColors.clear();
-        //alternativa a clear se il controller è inteso come unico
-        //e ci dovessero essere più di 5 player in attesa magari di
-        //un'altra lobby
-        //for (int i = 0; i < expectedNumPLayer; i++) {
-        //  pendingNicknames.remove(i);
-        // }
-        //broadcastUpdate();
-
-
     }
 
     /**
      * Starts the game.
+     * This involves saving the initial state of the decks (to allow deterministic replay),
+     * initializing the model, and saving the resulting player order.
+     * Finally, it notifies all clients that the game has started.
+     *
+     * @throws IllegalStateException if the game model has not been created yet
      */
-
     public void startGame() {
         if (game == null) throw new IllegalStateException("Game not created");
 
-        // Salviamo i mazzi INTERI prima che startGame li consumi per il setup del Round 1
+        // Save the FULL decks before the model consumes them for the Round 1 setup
         if (moveLogger != null && !replayMode) {
             stateSerializer.saveDeck(game.getBoard().getTribeDeck(), true);
             stateSerializer.saveDeck(game.getBoard().getBuildingDeck(), false);
@@ -291,21 +288,27 @@ public class GameController {
     }
 
     /**
-     * Ends the latest game.
+     * Ends the game and handles cleanup and result persistence.
+     *
+     * This method:
+     * 1. Saves player results (prestige points) to the database.
+     * 2. Retrieves the final leaderboard and notifies each client of their position.
+     * 3. Sends the END_GAME state to all clients.
+     * 4. Deletes persistence logs as they are no longer needed.
+     * 5. Executes the onGameFinished callback and shuts down the turn timer.
+     *
+     * @throws SQLException if a database error occurs while saving results
      */
-
     public void endGame() throws SQLException {
         List<Player> gamePlayers = game.getPlayers();
         int numPlayers = gamePlayers.size();
 
-        // 1. Salva i risultati di tutti i giocatori
         for (Player p : gamePlayers) {
             if (DBManager.isActive()) {
                 leaderboardService.addResult(p.getNickname(), p.getPrestigePoints(), numPlayers);
             }
         }
 
-        // 2. Recupera la leaderboard UNA VOLTA SOLA e inviala a ogni client
         if (DBManager.isActive()) {
             List<GameResult> leaderboard = leaderboardService.getLeaderboard(numPlayers);
 
@@ -320,31 +323,29 @@ public class GameController {
             }
         }
 
-        // 3. Notifica fine partita e pulizia (invariato)
         sendClientStateToAll(ClientState.END_GAME);
+
         if (moveLogger != null) moveLogger.delete();
         stateSerializer.delete();
+
         if (onGameFinished != null) {
             onGameFinished.run();
         }
         turnTimer.shutdownNow();
     }
-
-    // AZIONI DEL GIOCATORE
-    // Queste verranno chiamate dal layer di rete una volta implementato.
-    // Per ora possono essere chiamate direttamente nei test.
-
+    
     /**
-     * Player place totem on the offer tile.
-     * Validates the state of the game and the fact that the tile exists and it is free.
+     * Handles the player's action of placing a totem on an offer tile.
+     * Validates the game state, ensures the player is connected, and checks if the tile is available.
+     * If successful, the move is logged for persistence and all clients are updated.
      *
-     * @param nickname player placing the totem
-     * @param tileId tile the totem will be positioned
-     **/
-
+     * @param nickname the nickname of the player placing the totem
+     * @param tileId   the identifier of the tile where the totem is placed
+     * @return true if the action was successful, false otherwise
+     */
     public boolean onPlaceTotem(String nickname, char tileId) {
         VirtualView view = players.get(nickname);
-        if(view==null){
+        if(view == null){
             return false;
         }
         try {
@@ -353,32 +354,37 @@ public class GameController {
 
             Player player = requirePlayer(nickname);
 
-            // controlla se il payer è disconnesso e salta le sue azioni
             if (disconnectedPlayers.contains(nickname)) {
                 return false;
             }
             OfferTile tile = requireTile(tileId);
 
-            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.placeTotemOnOffer(player, tile);
 
             if (moveLogger != null) moveLogger.append(GameMove.placeTotem(nickname, tileId));
 
-            if (!replayMode) view.showActionAccepted("Totem piazzato con successo!");
+            if (!replayMode) view.showActionAccepted("Totem placed successfully!");
 
             broadcastUpdate();
-
             return true;
 
         } catch (Exception e) {
-
-            if (!replayMode) view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
-            System.err.println("⚠️ Mossa rifiutata per " + nickname + ": " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Failed to place totem: " + e.getMessage());
+            System.err.println("⚠️ Action rejected for " + nickname + ": " + e.getMessage());
             return false;
         }
     }
 
-    //aggiungo valore di ritorno booleano per capire se l'azione è andata a buon fine
+    /**
+     * Handles the player's action of taking a card from the board.
+     * Validates the game state and ensures the player is connected.
+     * If successful, the move is logged for persistence and all clients are updated.
+     *
+     * @param nickname  the nickname of the player taking the card
+     * @param cardIndex the index of the card on the board
+     * @param isUpper   true if the card is from the upper row, false otherwise
+     * @return true if the action was successful, false otherwise
+     */
     public boolean onTakeCard(String nickname, int cardIndex, boolean isUpper) {
         VirtualView view = players.get(nickname);
         if (view == null) {
@@ -389,55 +395,58 @@ public class GameController {
             requireState(GameState.RESOLVING_ACTIONS);
             cancelTurnTimer();
             Player player = requirePlayer(nickname);
-            // controlla se il payer è disconnesso e salta le sue azioni
+
             if (disconnectedPlayers.contains(nickname)) {
                 return false;
             }
 
-            // forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
-
             game.takeCard(player, cardIndex, isUpper);
-            if (!replayMode) view.showActionAccepted("Carta scelta con successo!");
+            if (!replayMode) view.showActionAccepted("Card chosen successfully!");
 
             if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
 
             broadcastUpdate();
 
             if (game.getCurrentState() instanceof FinishedState) {
-                    if (game.onGameEnd != null) {
-                        game.onGameEnd.run();
-                    }
+                if (game.onGameEnd != null) {
+                    game.onGameEnd.run();
+                }
             }
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            if (!replayMode) view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Failed to choose card: " + e.getMessage());
             return false;
         }
     }
 
-    //meglio metterlo booleano così il client sa se l'azione è stata svolta correttamente
-    //attenzione che sia questo metodo sia onTakeCard si svolgono con lo stesso stato potrebbe essere necessario
-    // distinguerli in qualche modo altrimenti il client non sa bene quale azione tocca fare
+    /**
+     * Handles the player's decision to skip an extra draw phase.
+     * Validates the game state and ensures the player is connected.
+     * If successful, the move is logged for persistence and all clients are updated.
+     *
+     * @param nickname the nickname of the player skipping the action
+     * @return true if the action was successful, false otherwise
+     */
     public boolean onSkipExtraDraw(String nickname) {
         VirtualView view = players.get(nickname);
-        if(view==null){
+        if(view == null){
             return false;
         }
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             cancelTurnTimer();
             Player player = requirePlayer(nickname);
-            // controlla se il payer è disconnesso e salta le sue azioni
+
             if (disconnectedPlayers.contains(nickname)) {
                 return false;
             }
 
-            //forse ci vuole una verifica se il giocatore è corretto per mandare un messaggio "non è il tuo turno di giocare"
             game.skipExtraDraw(player);
-            if (!replayMode) view.showActionAccepted("Azione saltata con successo!");
+            if (!replayMode) view.showActionAccepted("Action skipped successfully!");
             if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
+
             if (game.getCurrentState() instanceof FinishedState) {
                 if (game.onGameEnd != null) {
                     game.onGameEnd.run();
@@ -445,15 +454,17 @@ public class GameController {
             }
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            if (!replayMode) view.showActionRejected("Azione non saltata correttamente: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Failed to skip action: " + e.getMessage());
             return false;
         }
     }
 
-    //protected perchè deve essere visibile dagli altri ma non utilizzabile dal player nell'app
-    //metodo che dicevamo aggiornare tutte le altre view
-    //capire cosa fare quando cade la rete
-    //capire cosa fare quando un player si disconnette: chi fa le sue azioni? Si saltano?
+    /**
+     * Broadcasts the current game state to all connected players.
+     * This method builds a GameDTO representing the visible state of the game
+     * and sends it to each VirtualView. It also checks if the current player
+     * is disconnected and should be skipped, and manages the turn timer.
+     */
     public synchronized void broadcastUpdate() {
         if (game == null || replayMode) return;
         GameState state = game.getCurrentState().getStateId();
@@ -463,13 +474,12 @@ public class GameController {
             try {
                 view.sendGame(dto);
             } catch (Exception e) {
-                System.err.println("Errore: invio update al client");
-            } // per gestire l'eccezione quando cade la rete
+                System.err.println("Error: sending update to client");
+            }
         }
 
         game.clearLastResolvedEvents();
 
-        // controlla se il payer è disconnesso e salta le sue azioni
         skipIfCurrentPlayerDisconnected();
 
         String current = game.getCurrentPlayerNickname();
@@ -478,7 +488,12 @@ public class GameController {
         }
     }
 
-    // metodo che ricostruisce lo stato attuale del gioco valido, per ogni aggiornamento
+    /**
+     * Constructs a Data Transfer Object (DTO) representing the current game state.
+     * This DTO is sent to clients to update their local views.
+     *
+     * @return a populated GameDTO instance
+     */
     private GameDTO buildLastGameDTO() {
         GameDTO dto = new GameDTO();
         dto.currentState         = game.getCurrentState().getStateId();
@@ -498,12 +513,8 @@ public class GameController {
         }
 
         dto.board = buildBoardDTO(game.getBoard());
-
-        // Giocatore corrente: per ora il primo con un totem sulla board,
-        // da sistemare per quando PlacingState/ResolvingState essendo che dovrebbe dipendere dallo stato della partita
         dto.currentPlayerNickname = game.getCurrentPlayerNickname();
 
-        // Stato dei giocatori
         dto.players = game.getPlayers().stream()
                 .map(p -> {
                     PlayerDTO pdto = new PlayerDTO();
@@ -544,6 +555,12 @@ public class GameController {
         return dto;
     }
 
+    /**
+     * Populates a BoardDTO based on the current board state.
+     *
+     * @param board the Board model instance
+     * @return a populated BoardDTO
+     */
     private BoardDTO buildBoardDTO(Board board) {
         BoardDTO dto = new BoardDTO();
 
@@ -556,9 +573,9 @@ public class GameController {
                 .collect(java.util.stream.Collectors.toList());
 
         dto.offerTiles = new ArrayList<>();
-        for (OfferTile tile : board.getTiles()) { // Assumo tu abbia un getOfferTiles()
+        for (OfferTile tile : board.getTiles()) {
             OfferTileDTO tileDto = new OfferTileDTO();
-            tileDto.id = String.valueOf(tile.getId()); // "A", "B", ecc...
+            tileDto.id = String.valueOf(tile.getId());
 
             if (tile.getHost() != null) {
                 tileDto.occupantNickname = tile.getHost().getNickname();
@@ -569,12 +586,8 @@ public class GameController {
 
         dto.turnOrderSlots = new ArrayList<>();
 
-
         int[] modifiers = board.getTurnOrderTrack().getSlots();
         List<Player> positions = board.getTurnOrderTrack().getPositions();
-
-        System.out.println("DEBUG DTO: Numero giocatori nella track: " +
-                positions.stream().filter(Objects::nonNull).count());
 
         for (int i = 0; i < positions.size(); i++) {
             TurnOrderSlotDTO slotDto = new TurnOrderSlotDTO();
@@ -585,15 +598,19 @@ public class GameController {
                 slotDto.occupantColor = p.getColor();
             }
 
-            // Passiamo il numero intero così com'è!
             slotDto.modifier = (i < modifiers.length) ? modifiers[i] : 0;
-
             dto.turnOrderSlots.add(slotDto);
         }
 
         return dto;
     }
 
+    /**
+     * Converts a Card model to its DTO representation.
+     *
+     * @param c the Card model instance
+     * @return a populated CardDTO
+     */
     private CardDTO buildCardDTO(Card c) {
         CardDTO dto = new CardDTO();
         dto.id = c.getId();
@@ -603,9 +620,14 @@ public class GameController {
         return dto;
     }
 
+    /**
+     * Converts a Tribe model to its DTO representation.
+     *
+     * @param tribe the Tribe model instance
+     * @return a populated TribeDTO
+     */
     private TribeDTO buildTribeDTO(Tribe tribe) {
         TribeDTO dto = new TribeDTO();
-
         dto.characters = new ArrayList<>();
 
         for (CharacterCard c : tribe.getCharacters()) {
@@ -625,26 +647,38 @@ public class GameController {
         return dto;
     }
 
-    //notifica il cambio state agli altri player
+    /**
+     * Sends a new ClientState to all connected players.
+     *
+     * @param state the new state to notify
+     */
     public void sendClientStateToAll(ClientState state) {
         for  (VirtualView view : players.values()) {
             try {
                 view.sendClientState(state);
-            }catch (Exception e) {
-                System.err.println("Errore: invio clientState ai client");
-            } // per gestire l'eccezione quando cade la rete
+            } catch (Exception e) {
+                System.err.println("Error: sending clientState to clients");
+            }
         }
     }
 
-    // Metodi helper — rendono i metodi pubblici leggibili spostando il check
-    // da effettuare su ogni azione esternamente ad ogni metodo
-
+    /**
+     * Ensures that the game has been initialized.
+     *
+     * @throws IllegalStateException if the game is null
+     */
     private void requireGame() {
         if (game == null) {
             throw new IllegalStateException("Game has not been initialized yet.");
         }
     }
 
+    /**
+     * Validates that the game is in the expected state for an action.
+     *
+     * @param expected the GameState required for the action
+     * @throws IllegalStateException if the game is in a different state
+     */
     private void requireState(GameState expected) {
         requireGame();
         GameState current = game.getCurrentState().getStateId();
@@ -655,7 +689,13 @@ public class GameController {
         }
     }
 
-
+    /**
+     * Retrieves a Player instance by their nickname.
+     *
+     * @param nickname the player's nickname
+     * @return the Player instance
+     * @throws IllegalArgumentException if no player with the given nickname is found
+     */
     private Player requirePlayer(String nickname) {
         return game.getPlayers().stream()
                 .filter(p -> p.getNickname().equals(nickname))
@@ -663,6 +703,13 @@ public class GameController {
                 .orElseThrow(() -> new IllegalArgumentException("Player " + nickname + " not found!"));
     }
 
+    /**
+     * Retrieves an OfferTile instance by its ID.
+     *
+     * @param tileId the identifier of the tile
+     * @return the OfferTile instance
+     * @throws IllegalArgumentException if no tile with the given ID is found
+     */
     private OfferTile requireTile(char tileId) {
         OfferTile tile = game.getBoard().getTile(tileId);
         if (tile == null) {
@@ -671,105 +718,173 @@ public class GameController {
         return tile;
     }
 
-
+    /**
+     * Removes a player from the controller's tracking.
+     *
+     * @param nickname the nickname of the player to remove
+     */
     private void RemovePlayer(String nickname){
         players.remove(nickname);
     }
 
-    // manca un metodo che rispedisce la notifica dal controller al client
-
-    // persistenza
+    /**
+     * Sets the replay mode for the controller.
+     *
+     * @param replayMode true to enable replay mode, false to disable
+     */
     public void setReplayMode(boolean replayMode) {
         this.replayMode = replayMode;
     }
 
+    /**
+     * Sets the GameRestorer instance for state reconstruction.
+     *
+     * @param restorer the restorer to use
+     */
     public void setRestorer(GameRestorer restorer) {
         this.restorer = restorer;
     }
 
+    /**
+     * Handles the reconnection of a player.
+     * Updates their VirtualView, removes them from the disconnected set,
+     * and notifies other players of their return.
+     *
+     * @param nickname the nickname of the reconnecting player
+     * @param newView  the new VirtualView for communication
+     * @throws IllegalArgumentException if the player is not found in the initial player list
+     */
     public synchronized void reconnectPlayer(String nickname, VirtualView newView) {
         if (!players.containsKey(nickname)) {
-            throw new IllegalArgumentException("Giocatore non trovato: " + nickname);
+            throw new IllegalArgumentException("Player not found: " + nickname);
         }
         players.put(nickname, newView);
         disconnectedPlayers.remove(nickname);
 
-        System.out.println("[GameController] Giocatore riconnesso: " + nickname);
+        System.out.println("[GameController] Player reconnected: " + nickname);
 
-        // Notifica tutti gli altri player sullo stato del giocatore
         for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
             if (!entry.getKey().equals(nickname)) {
                 try {
-                    entry.getValue().showMessage(nickname + " si è riconnesso!");
+                    entry.getValue().showMessage(nickname + " has reconnected!");
                 } catch (Exception ignored) {}
             }
         }
 
-        // Aggiorna lo stato del giocatore che si era disconnesso
         newView.sendClientState(ClientState.IN_GAME);
         broadcastUpdate();
     }
 
+    /**
+     * Returns the move logger associated with this controller.
+     *
+     * @return the MoveLogger instance
+     */
     public MoveLogger getMoveLogger() {
         return moveLogger;
     }
 
+    /**
+     * Returns the state serializer associated with this controller.
+     *
+     * @return the StateSerializer instance
+     */
     public StateSerializer getStateSerializer() {
         return stateSerializer;
     }
 
+    /**
+     * Checks if the controller has an active restorer.
+     *
+     * @return true if a restorer is present, false otherwise
+     */
     public boolean hasRestorer() {
         return restorer != null;
     }
 
+    /**
+     * Sets the callback to be executed when the game is finished.
+     *
+     * @param callback the callback runnable
+     */
     public void setOnGameFinished(Runnable callback) {
         this.onGameFinished = callback;
     }
 
-    // GETTERS
-
+    /**
+     * Returns the game model instance.
+     *
+     * @return the Game instance
+     */
     public Game getGame() {
         return game;
     }
 
+    /**
+     * Returns the expected number of players for this game.
+     *
+     * @return the expected player count
+     */
     public int getExpectedNumPlayers() {
         return expectedNumPlayers;
     }
 
-    //per passare alla lobby il numero di giocatori che sono attualmente in attesa della partita
-    //(principalmente per mostrarlo nella view)
+    /**
+     * Returns the number of players currently connected or registered.
+     *
+     * @return the number of players
+     */
     public int getNumPlayersConnected(){
         if (game != null) {
             return game.getPlayers().size();
         }
-
         return pendingNicknames.size();
     }
 
+    /**
+     * Sets the leaderboard service.
+     *
+     * @param service the service instance
+     */
     public void setLeaderboardService(LeaderboardService service) {
         this.leaderboardService = service;
     }
+
+    /**
+     * Returns the leaderboard service.
+     *
+     * @return the service instance
+     */
     public LeaderboardService getLeaderboardService() {
         return this.leaderboardService;
     }
 
+    /**
+     * Returns the list of colors already chosen by players.
+     *
+     * @return a list of Color enums
+     */
     public List<Color> getTakenColors() {
         return new ArrayList<>(chosenColors.values());
     }
 
-    // gestione dei player disconnessi
+    /**
+     * Handles the event of a player disconnecting.
+     * Marks the player as disconnected, notifies others, and skips their turn
+     * if they were the active player.
+     *
+     * @param nickname the nickname of the disconnected player
+     */
     public synchronized void onPlayerDisconnected(String nickname) {
         if (disconnectedPlayers.contains(nickname)) return;
-        // devo salvare i nickname dei player disconnessi per permettere l'eventuale riconnessione
         disconnectedPlayers.add(nickname);
 
-        System.out.println("[GameController] Giocatore disconnesso: " + nickname);
+        System.out.println("[GameController] Player disconnected: " + nickname);
 
         for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
             if (!entry.getKey().equals(nickname)) {
                 try {
-                    // avviso che quel player verrà saltato nella dinamica del gioco
-                    entry.getValue().showMessage(nickname + " si è disconnesso. Il suo turno verrà saltato.");
+                    entry.getValue().showMessage(nickname + " has disconnected. Their turn will be skipped.");
                 } catch (Exception ignored) {}
             }
         }
@@ -780,8 +895,10 @@ public class GameController {
     }
 
     /**
-     * Avanza il turno saltando i giocatori disconnessi.
-     * Chiama il metodo esistente del model per passare al prossimo.
+     * Advances the turn by skipping the current player if they are disconnected.
+     * If all players are disconnected, the game ends.
+     *
+     * @param nickname the nickname of the disconnected player
      */
     private void skipDisconnectedTurn(String nickname) {
         try {
@@ -790,7 +907,7 @@ public class GameController {
                     .count();
 
             if (connectedCount == 0) {
-                System.out.println("[GameController] Tutti disconnessi, fine partita.");
+                System.out.println("[GameController] All players disconnected, ending game.");
                 try { endGame(); } catch (Exception ignored) {}
                 return;
             }
@@ -799,30 +916,41 @@ public class GameController {
             broadcastUpdate();
 
         } catch (Exception e) {
-            System.err.println("[GameController] Errore nel saltare il turno: " + e.getMessage());
+            System.err.println("[GameController] Error skipping turn: " + e.getMessage());
         }
     }
 
+    /**
+     * Automatically skips the current player's turn if they are marked as disconnected.
+     */
     private void skipIfCurrentPlayerDisconnected() {
         if (game == null) return;
         String current = game.getCurrentPlayerNickname();
         if (current != null && disconnectedPlayers.contains(current)) {
-            System.out.println("[GameController] Turno di " + current + " ma è disconnesso, salto automatico.");
+            System.out.println("[GameController] It is " + current + "'s turn but they are disconnected. Skipping automatically.");
             skipDisconnectedTurn(current);
         }
     }
 
-    // Avvia il timer per il player corrente -> viene ogni volta riportato a zero
+    /**
+     * Starts the turn timeout timer for a specific player.
+     * If the player does not perform an action within the limit, they are treated as disconnected.
+     *
+     * @param nickname the nickname of the player whose turn is timed
+     */
     public synchronized void startTurnTimer(String nickname) {
         cancelTurnTimer();
 
         currentTurnTimeout = turnTimer.schedule(() -> {
-            System.out.println("[TurnTimer] Timeout per: " + nickname);
+            System.out.println("[TurnTimer] Timeout for: " + nickname);
             onPlayerDisconnected(nickname);
         }, TURN_TIMEOUT_SEC, TimeUnit.SECONDS);
     }
 
-    // Cancella il timer (chiamato quando il giocatore fa una mossa)
+    /**
+     * Cancels the current turn timeout timer.
+     * Should be called when a player performs a valid action.
+     */
     public synchronized void cancelTurnTimer() {
         if (currentTurnTimeout != null && !currentTurnTimeout.isDone()) {
             currentTurnTimeout.cancel(false);
@@ -830,8 +958,23 @@ public class GameController {
         }
     }
 
+    /**
+     * Checks if a player is currently marked as disconnected.
+     *
+     * @param nickname the player's nickname
+     * @return true if disconnected, false otherwise
+     */
     public boolean isPlayerDisconnected(String nickname) {
         return disconnectedPlayers.contains(nickname);
+    }
+
+    /**
+     * Returns the unique ID for this game.
+     *
+     * @return the game ID
+     */
+    public int getGameId() {
+        return gameId;
     }
 }
 
