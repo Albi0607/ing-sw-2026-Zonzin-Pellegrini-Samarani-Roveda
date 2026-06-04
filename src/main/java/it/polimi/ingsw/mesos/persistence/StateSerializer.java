@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Salva e ripristina lo stato iniziale della partita (mazzi e ordine giocatori) su disco.
- * Questi dati rappresentano la componente "casuale" generata all'inizio che non è catturata dai log delle mosse.
+ * Saves and restores the initial game state (decks and player order) to disk.
+ * This data represents the "random" component generated at the beginning that is not captured by move logs.
  */
 public class StateSerializer {
 
@@ -24,6 +24,11 @@ public class StateSerializer {
     private final String buildingFile;
     private final String orderFile;
 
+    /**
+     * Constructs a StateSerializer for a specific game ID.
+     *
+     * @param gameId the unique identifier for the game
+     */
     public StateSerializer(int gameId) {
         this.tribeFile    = "mesos_tribe_"    + gameId + ".txt";
         this.buildingFile = "mesos_building_" + gameId + ".txt";
@@ -31,7 +36,9 @@ public class StateSerializer {
     }
 
     /**
-     * Salva l'ordine iniziale dei giocatori (dopo lo shuffle di startGame).
+     * Saves the initial player order (after the shuffle in startGame).
+     *
+     * @param players the list of players in their starting order
      */
     public void savePlayerOrder(List<it.polimi.ingsw.mesos.model.Player> players) {
         List<String> nicknames = new ArrayList<>();
@@ -42,7 +49,9 @@ public class StateSerializer {
     }
 
     /**
-     * Ripristina l'ordine dei giocatori salvato.
+     * Restores the saved player order.
+     *
+     * @return the list of player nicknames in their saved order, or null if no order was saved
      */
     public List<String> restorePlayerOrder() {
         if (!Files.exists(Paths.get(orderFile))) return null;
@@ -50,7 +59,14 @@ public class StateSerializer {
     }
 
     /**
-     * Svuota il mazzo, salva gli ID su disco e lo ripristina.
+     * Saves the current deck state by draining it, writing the card IDs to disk in order,
+     * and then restoring the deck to its original state.
+     * The cards are re-inserted in reverse order to maintain the original sequence,
+     * as the deck's put() method adds cards to the top.
+     *
+     * @param deck    the deck to save
+     * @param isTribe true if it is a tribe deck, false for a building deck
+     * @param <T>     the type of cards in the deck
      */
     public <T extends Card> void saveDeck(Deck<T> deck, boolean isTribe) {
         List<T> cards = drainDeck(deck);
@@ -60,7 +76,6 @@ public class StateSerializer {
             ids.add(card.getId());
         }
         writeIdsToFile(ids, path);
-        // Rimette le carte in ordine inverso (put() aggiunge in cima)
         for (int i = cards.size() - 1; i >= 0; i--) {
             deck.put(cards.get(i));
         }
@@ -68,85 +83,97 @@ public class StateSerializer {
 
 
     /**
-     * Carica l'ordine salvato e lo applica al mazzo attuale.
+     * Loads the saved deck order from disk and applies it to the current deck.
+     * This method reconstructs the deck by matching saved IDs against the full pool
+     * of available cards (loaded from JSON configurations).
+     * The current deck is drained before the saved cards are re-inserted in the correct order.
+     *
+     * @param currentDeck the deck to restore
+     * @param isTribe     true if it is a tribe deck, false for a building deck
+     * @param <T>         the type of cards in the deck
+     * @return true if restoration was successful, false otherwise
      */
     public <T extends Card> boolean restoreDeck(Deck<T> currentDeck, boolean isTribe) {
         String path = isTribe ? tribeFile : buildingFile;
 
         if (!Files.exists(Paths.get(path))) {
-            System.err.println("[StateSerializer] File non trovato: " + path);
+            System.err.println("[StateSerializer] File not found: " + path);
             return false;
         }
 
         if(isTribe) {
-            // creo il pool intero di carte tribe da cui matchare gli indici (SOLUZIONE PIù ESTENDIBILE??)
             List<TribeCard> allCards = new ArrayList<>();
             allCards.addAll(new CreateCharacterCard("cards/characters.json").getAllCharacterCards());
             allCards.addAll(new CreateEventCard("cards/events.json").getAllEventCards());
-            // Svuota il deck attuale (quello generato casualmente)
             drainDeck(currentDeck);
-            // itera in tutto il pool per matchare l'id
             java.util.Map<String, TribeCard> byId = new java.util.HashMap<>();
             for (TribeCard card : allCards) {
                 byId.put(card.getId(), card);
             }
-            // Legge l'ordine originale dal file
             List<String> savedIds = readIdsFromFile(path);
             if (savedIds == null || savedIds.isEmpty()) return false;
 
             for (int i = savedIds.size() - 1; i >= 0; i--) {
                 TribeCard card = byId.get(savedIds.get(i));
                 if (card != null) currentDeck.put((T) card);
-                else System.err.println("[StateSerializer] Carta tribe non trovata per id: " + savedIds.get(i));
+                else System.err.println("[StateSerializer] Tribe card not found for ID: " + savedIds.get(i));
             }
-            System.out.println("[StateSerializer] Tribe deck ripristinato (" + savedIds.size() + " carte)");
+            System.out.println("[StateSerializer] Tribe deck restored (" + savedIds.size() + " cards)");
             return true;
         }
         else {
-            // creo il pool intero di carte building da cui matchare gli indici (SOLUZIONE PIù ESTENDIBILE??)
             List<BuildingCard> allCards = new ArrayList<>();
             allCards.addAll(new CreateBuildingCard("cards/buildings.json").getAllBuildingCards());
-            // itera in tutto il pool per matchare l'id
             java.util.Map<String, BuildingCard> byId = new java.util.HashMap<>();
             for (BuildingCard card : allCards) {
                 byId.put(card.getId(), card);
             }
-            // Svuota il deck attuale (quello generato casualmente)
             drainDeck(currentDeck);
-            // Legge l'ordine originale dal file
             List<String> savedIds = readIdsFromFile(path);
             if (savedIds == null || savedIds.isEmpty()) return false;
 
             for (int i = savedIds.size() - 1; i >= 0; i--) {
                 BuildingCard card = byId.get(savedIds.get(i));
                 if (card != null) currentDeck.put((T) card);
-                else System.err.println("[StateSerializer] Carta building non trovata per id: " + savedIds.get(i));
+                else System.err.println("[StateSerializer] Building card not found for ID: " + savedIds.get(i));
             }
-            System.out.println("[StateSerializer] Building deck ripristinato (" + savedIds.size() + " carte)");
+            System.out.println("[StateSerializer] Building deck restored (" + savedIds.size() + " cards)");
             return true;
         }
     }
 
     /**
-     * Elimina i file di persistenza di questa partita.
+     * Deletes the persistence files for this game.
      */
     public void delete() {
         try {
             Files.deleteIfExists(Paths.get(tribeFile));
             Files.deleteIfExists(Paths.get(buildingFile));
             Files.deleteIfExists(Paths.get(orderFile));
-            System.out.println("[StateSerializer] File persistenza eliminati.");
+            System.out.println("[StateSerializer] Persistence files deleted.");
         } catch (IOException e) {
-            System.err.println("[StateSerializer] Errore eliminazione file: " + e.getMessage());
+            System.err.println("[StateSerializer] Error deleting files: " + e.getMessage());
         }
     }
 
+    /**
+     * Checks if a saved state exists.
+     *
+     * @return true if all required persistence files exist
+     */
     public boolean hasSavedState() {
         return Files.exists(Paths.get(tribeFile))
                 && Files.exists(Paths.get(buildingFile))
                 && Files.exists(Paths.get(orderFile));
     }
 
+    /**
+     * Drains all cards from a deck and returns them as a list.
+     *
+     * @param deck the deck to drain
+     * @param <T>  the type of cards in the deck
+     * @return a list containing all cards that were in the deck
+     */
     private <T extends Card> List<T> drainDeck(Deck<T> deck) {
         List<T> cards = new ArrayList<>();
         while (!deck.isEmpty()) {
@@ -155,23 +182,35 @@ public class StateSerializer {
         return cards;
     }
 
+    /**
+     * Serializes a list of strings (IDs or nicknames) and writes them to a file.
+     *
+     * @param ids  the list of strings to serialize
+     * @param path the destination file path
+     */
     private void writeIdsToFile(List<String> ids, String path) {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(path))) {
             oos.writeObject(ids);
             oos.flush();
         } catch (IOException e) {
-            System.err.println("[StateSerializer] Errore scrittura " + path + ": " + e.getMessage());
+            System.err.println("[StateSerializer] Error writing to " + path + ": " + e.getMessage());
         }
     }
 
+    /**
+     * Deserializes a list of strings from a file.
+     *
+     * @param path the source file path
+     * @return the deserialized list of strings, or null if an error occurs
+     */
     @SuppressWarnings("unchecked")
     private List<String> readIdsFromFile(String path) {
         try (ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(path))) {
             return (List<String>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[StateSerializer] Errore lettura " + path + ": " + e.getMessage());
+            System.err.println("[StateSerializer] Error reading from " + path + ": " + e.getMessage());
             return null;
         }
     }
