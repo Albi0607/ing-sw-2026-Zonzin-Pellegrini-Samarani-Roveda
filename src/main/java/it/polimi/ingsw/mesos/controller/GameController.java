@@ -719,15 +719,6 @@ public class GameController {
     }
 
     /**
-     * Removes a player from the controller's tracking.
-     *
-     * @param nickname the nickname of the player to remove
-     */
-    private void RemovePlayer(String nickname){
-        players.remove(nickname);
-    }
-
-    /**
      * Sets the replay mode for the controller.
      *
      * @param replayMode true to enable replay mode, false to disable
@@ -839,15 +830,6 @@ public class GameController {
             return game.getPlayers().size();
         }
         return pendingNicknames.size();
-    }
-
-    /**
-     * Sets the leaderboard service.
-     *
-     * @param service the service instance
-     */
-    public void setLeaderboardService(LeaderboardService service) {
-        this.leaderboardService = service;
     }
 
     /**
