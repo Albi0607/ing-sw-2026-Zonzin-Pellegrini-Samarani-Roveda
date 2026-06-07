@@ -6,38 +6,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Scrive le mosse su disco e le rilegge per il ripristino.
+ * Writes moves to disk and reads them back for game restoration.
  *
- * Formato del file: sequenza di oggetti Java serializzati (ObjectOutputStream),
- * uno per mossa, appesi in coda ad ogni azione.
+ * File format: a sequence of serialized Java objects (ObjectOutputStream),
+ * one per move, appended to the end of the file after each action.
  *
- * Scelta: usiamo serializzazione Java (stesso meccanismo dei messaggi socket)
- * invece di JSON per coerenza con il resto del progetto.
+ * Design choice: Java serialization is used (the same mechanism as socket messages)
+ * instead of JSON for consistency with the rest of the project.
  *
- * Thread-safety: append() è synchronized perché può essere chiamato
- * da thread di ClientHandler diversi (uno per ogni client connesso).
+ * Thread-safety: append() is synchronized because it can be called
+ * from different ClientHandler threads (one for each connected client).
  */
 public class MoveLogger {
 
     private final Path logFile;
 
     /**
-     * @param logFilePath percorso del file di log, es. "mesos_game.log"
+     * Constructs a MoveLogger.
+     *
+     * @param logFilePath path to the log file, e.g., "mesos_game.log"
      */
     public MoveLogger(String logFilePath) {
         this.logFile = Paths.get(logFilePath);
     }
 
-    // ── Scrittura ────────────────────────────────────────────────────────────
-
     /**
-     * Aggiunge una mossa in coda al file di log.
-     * Crea il file se non esiste.
+     * Appends a move to the end of the log file.
+     * Creates the file if it does not exist.
      *
-     * ObjectOutputStream ha un problema: ogni istanza scrive un header
-     * di stream. Se aprissimo un nuovo ObjectOutputStream ad ogni append,
-     * il file avrebbe header multipli e ObjectInputStream non riuscirebbe
-     * a leggerlo. Usiamo AppendingObjectOutputStream per evitarlo.
+     * ObjectOutputStream has a limitation: each instance writes a stream header.
+     * If a new ObjectOutputStream were opened for every append, the file would
+     * contain multiple headers, making it unreadable by ObjectInputStream.
+     * AppendingObjectOutputStream is used to circumvent this.
+     *
+     * @param move the game move to log
      */
     public synchronized void append(GameMove move) {
         try {
@@ -53,14 +55,14 @@ public class MoveLogger {
             }
 
         } catch (IOException e) {
-            System.err.println("[MoveLogger] Errore scrittura mossa: " + e.getMessage());
+            System.err.println("[MoveLogger] Error writing move: " + e.getMessage());
         }
     }
 
     /**
-     * Legge tutte le mosse dal file di log nell'ordine in cui sono state scritte.
+     * Reads all moves from the log file in the order they were written.
      *
-     * @return lista ordinata delle mosse, vuota se il file non esiste
+     * @return a sorted list of moves, empty if the file does not exist
      */
     public List<GameMove> readAll() {
         List<GameMove> moves = new ArrayList<>();
@@ -77,41 +79,43 @@ public class MoveLogger {
                     GameMove move = (GameMove) ois.readObject();
                     moves.add(move);
                 } catch (EOFException e) {
-                    break; // fine file, lettura completata
+                    break;
                 }
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[MoveLogger] Errore lettura log: " + e.getMessage());
+            System.err.println("[MoveLogger] Error reading log: " + e.getMessage());
         }
 
         return moves;
     }
 
     /**
-     * Elimina il file di log.
-     * Chiamato quando la partita termina normalmente — non serve più il log.
+     * Deletes the log file.
+     * Called when the game terminates normally and the log is no longer needed.
      */
     public void delete() {
         try {
             Files.deleteIfExists(logFile);
-            System.out.println("[MoveLogger] Log eliminato.");
+            System.out.println("[MoveLogger] Log deleted.");
         } catch (IOException e) {
-            System.err.println("[MoveLogger] Errore eliminazione log: " + e.getMessage());
+            System.err.println("[MoveLogger] Error deleting log: " + e.getMessage());
         }
     }
 
     /**
-     * Restituisce true se esiste un log da cui ripristinare una partita.
+     * Returns true if a log exists from which a game can be restored.
+     *
+     * @return true if a non-empty log file exists
      */
     public boolean hasSavedGame() {
         return Files.exists(logFile) && logFile.toFile().length() > 0;
     }
 
     /**
-     * ObjectOutputStream che sovrascrive writeStreamHeader() con un no-op,
-     * in modo da poter appendere oggetti a un file già esistente senza
-     * duplicare l'header dello stream.
+     * An ObjectOutputStream that overrides writeStreamHeader() as a no-op,
+     * allowing objects to be appended to an existing file without duplicating
+     * the stream header, the file already has one from the initial opening.
      */
     private static class AppendingObjectOutputStream extends ObjectOutputStream {
 
@@ -121,7 +125,6 @@ public class MoveLogger {
 
         @Override
         protected void writeStreamHeader() throws IOException {
-            // Non scrivere l'header: il file ne ha già uno dall'apertura iniziale.
             reset();
         }
     }
