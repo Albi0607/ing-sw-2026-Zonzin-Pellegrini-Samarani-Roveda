@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
+import static it.polimi.ingsw.mesos.rete.ClientModel.ClientState.END_GAME;
+
 public class SceneManager {
     private final Stage stage;
     private final GUI gui;
@@ -29,6 +31,9 @@ public class SceneManager {
     private GameControllerGUI gameControllerGUI = null;
     private final ObservableGameModel gameModel;
     private EndGameController endGameController;
+
+    private List<GameResult> pendingLeaderboard = null;
+    private int pendingPosition = 0;
 
     public SceneManager(Stage stage, GUI gui, ClientState clientState, ObservableGameModel gameModel) {
         this.stage = stage;
@@ -140,6 +145,10 @@ public class SceneManager {
             endGameController.set(gameModel);
             Scene scene = new Scene(root);
             stage.setScene(scene);
+            if (pendingLeaderboard != null) {
+                endGameController.showLeaderboard(pendingLeaderboard, pendingPosition);
+                pendingLeaderboard = null;
+            }
         } catch (Exception e) {
             System.out.println("ERRORE NEL CARICAMENTO DELLA FINE DEL GIOCO  : " + e.getMessage());
             e.printStackTrace();
@@ -148,6 +157,9 @@ public class SceneManager {
 
     public void updateClientState(ClientState currentState){
         this.clientState=currentState;
+        if(clientState== END_GAME) {
+            Platform.runLater(this::loadEndScene);
+        }
     }
 
     public void showMessage(String message){
@@ -164,8 +176,17 @@ public class SceneManager {
 
     }
 
-    public void showLeaderboard(List<GameResult> leaderboard, int myPosition){
-        endGameController.showLeaderboard(leaderboard,myPosition);
+    public void showLeaderboard(List<GameResult> leaderboard, int position) {
+        Platform.runLater(() -> {
+            if (endGameController != null) {
+                // scena già caricata, applica subito
+                endGameController.showLeaderboard(leaderboard, position);
+            } else {
+                // scena non ancora caricata, salva per dopo
+                pendingLeaderboard = leaderboard;
+                pendingPosition = position;
+            }
+        });
     }
 
     public LoginController getLoginController() {

@@ -7,105 +7,124 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
-
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Button?>
-<VBox fx:id="playerBoardRoot" prefWidth="700" prefHeight="180" maxWidth="700" maxHeight="180" spacing="10.0" style="-fx-background-color: #3a3f44;-fx-background-radius: 12;-fx-border-color: #4a5260;-fx-border-width: 1;-fx-border-radius: 12;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 12, 0.2, 0, 3);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoardController">
+
+<VBox fx:id="playerBoardRoot" prefWidth="600" prefHeight="160" maxWidth="600" maxHeight="160" style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #484d54, #2e3236);-fx-background-radius: 12;-fx-border-radius: 12;-fx-border-color: #5a6170;-fx-border-width: 1;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.3, 0, 4);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard.PlayerBoardController">
    <padding>
       <Insets top="10.0" />
    </padding>
    <children>
-      <HBox fx:id="headerBox" alignment="CENTER" prefHeight="50.0" maxHeight="18.0" prefWidth="700.0" spacing="40.0">
+      <HBox fx:id="headerBox" alignment="CENTER" prefHeight="50.0" maxHeight="18.0"
+            prefWidth="600.0" spacing="20.0">
          <children>
-            <Label fx:id="playerNameLabel" text="Player" textAlignment="CENTER" prefHeight="30.0">
-               <font>
-                  <Font size="20.0" />
-               </font>
+
+            <!-- Spazio flessibile a sinistra per centrare -->
+            <HBox HBox.hgrow="ALWAYS" />
+
+            <Label fx:id="playerNameLabel" text="Player" textAlignment="CENTER"
+                   prefHeight="30.0" HBox.hgrow="NEVER">
+               <font><Font size="20.0" /></font>
             </Label>
-            <HBox fx:id="pointsBox" prefHeight="30.0" maxHeight="18.0" prefWidth="200.0" spacing="20.0">
+
+            <HBox fx:id="pointsBox" prefHeight="30.0" maxHeight="18.0"
+                  spacing="20.0" alignment="CENTER" HBox.hgrow="NEVER">
                <HBox spacing="4" alignment="CENTER">
                   <Label fx:id="foodPointsLabel">
-                     <font>
-                        <Font size="20.0"/>
-                     </font>
+                     <font><Font size="20.0"/></font>
                   </Label>
-
                   <ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                     <image>
-                        <Image url="/images/food_PP/1_food.png"/>
-                     </image>
+                     <image><Image url="/images/food_PP/1_food.png"/></image>
                   </ImageView>
                </HBox>
-
-               <!-- PRESTIGE -->
                <HBox spacing="4" alignment="CENTER">
                   <Label fx:id="prestigePointsLabel">
-                     <font>
-                        <Font size="20.0"/>
-                     </font>
+                     <font><Font size="20.0"/></font>
                   </Label>
-
                   <ImageView fitWidth="40" fitHeight="40" preserveRatio="true">
-                     <image>
-                        <Image url="/images/food_PP/1_PP.png"/>
-                     </image>
+                     <image><Image url="/images/food_PP/1_PP.png"/></image>
                   </ImageView>
                </HBox>
             </HBox>
-            <!-- Separatore: spinge il bottone a destra -->
+
+            <!-- Spazio flessibile a destra — stesso peso di quello a sinistra -->
             <HBox HBox.hgrow="ALWAYS" />
 
-            <!-- Bottone SKIP: invisibile di default -->
-            <Button fx:id="skipButton" text="SKIP" visible="false" managed="false" disable="true" style="-fx-background-color: #cc3300;-fx-text-fill: white;-fx-font-weight: bold;-fx-font-size: 14px;-fx-background-radius: 8;-fx-border-radius: 8;-fx-padding: 6 18 6 18;-fx-cursor: hand;"
+            <!-- SKIP rimane all'estrema destra fuori dal centro -->
+            <Button fx:id="skipButton" text="SKIP" visible="false" managed="false"
+                    disable="true"
+                    style="-fx-background-color: #cc3300;-fx-text-fill: white;
+                     -fx-font-weight: bold;-fx-font-size: 14px;
+                     -fx-background-radius: 8;-fx-border-radius: 8;
+                     -fx-padding: 6 18 6 18;-fx-cursor: hand;"
                     onMouseEntered="#onSkipHover"
                     onMouseExited="#onSkipHoverExit"
                     onAction="#onSkipClicked">
-               <HBox.margin>
-                  <Insets right="10.0"/>
-               </HBox.margin>
+               <HBox.margin><Insets right="10.0"/></HBox.margin>
             </Button>
+
          </children>
       </HBox>
-      <HBox fx:id="cardsContainer" alignment="CENTER" prefHeight="100.0" maxHeight="100" prefWidth="200.0" spacing="5.0">
+      <HBox fx:id="cardsContainer" alignment="CENTER" prefHeight="140.0" maxHeight="140" prefWidth="600.0" spacing="5.0" VBox.vgrow="NEVER">
          <children>
-            <StackPane fx:id="cardSlot1" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot1" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage1" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount1" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot2" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot2" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage2" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount2" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot3" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot3" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage3" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount3" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot4" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot4" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage4" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount4" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot5" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot5" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage5" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount5" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot6" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot6" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage6" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount6" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />
                </children>
             </StackPane>
-            <StackPane fx:id="cardSlot7" prefHeight="140.0" prefWidth="80.0" maxWidth="180" maxHeight="140.0">
+            <StackPane fx:id="cardSlot7" prefHeight="140.0" prefWidth="80.0" maxWidth="80" maxHeight="140.0">
+               <HBox.margin>
+                  <Insets bottom="5.0"/>
+               </HBox.margin>
                <children>
                   <ImageView fx:id="cardImage7" fitHeight="140.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true" />
                   <Label fx:id="cardCount7" alignment="TOP_LEFT" contentDisplay="TOP" text="0" textAlignment="CENTER" StackPane.alignment="TOP_LEFT" />

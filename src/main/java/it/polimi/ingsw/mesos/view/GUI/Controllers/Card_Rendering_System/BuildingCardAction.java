@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.view.GUI.Controllers.Card_Rendering_System;
 public class BuildingCardAction implements CardAction{
     @Override
     public void onClickCard(CardController c) {
-        c.setClickEffect("-fx-effect: dropshadow(gaussian, lime, 18, 0.8, 0, 0); -fx-scale-x: 0.95; -fx-scale-y: 0.95;");
+    c.setClickEffect("-fx-effect: dropshadow(gaussian, orange, 18, 0.8, 0, 0); -fx-scale-x: 0.95; -fx-scale-y: 0.95;");
     }
 
     @Override
