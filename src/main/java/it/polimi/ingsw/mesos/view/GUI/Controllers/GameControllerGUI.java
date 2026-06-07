@@ -6,6 +6,7 @@ import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.OfferTileDTO;
 import it.polimi.ingsw.mesos.rete.ClientModel.TurnOrderSlotDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.Board.*;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard.PlayerBoardController;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
@@ -18,12 +19,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
@@ -58,17 +55,21 @@ public class GameControllerGUI {
     private Label roundLabel;
     private Label eraLabel;
 
+    @FXML private AnchorPane rootPane;
 
     @FXML private StackPane bottomPlayerContainer;
     @FXML private StackPane topLeftPlayerContainer;
     @FXML private StackPane topRightPlayerContainer;
     @FXML private StackPane topCenterPlayerContainer;
-    @FXML private StackPane leftPlayerContainer;
-    @FXML private StackPane rightPlayerContainer;
+    @FXML private Pane leftPlayerContainer;
+    @FXML private Pane rightPlayerContainer;
 
     @FXML private StackPane topRightPlayerArea;
     @FXML private StackPane topCenterPlayerArea;
     @FXML private StackPane topLeftPlayerArea;
+
+    @FXML private Pane leftPlayerArea;
+    @FXML private Pane rightPlayerArea;
 
 
 
@@ -90,6 +91,7 @@ public class GameControllerGUI {
 
             centerBoard.setScaleX(0.9);
             centerBoard.setScaleY(0.9);
+            centerBoard.setTranslateX(-30);
             //creo la fila superiore delle carte che possono essere pescate dai giocatori
             FXMLLoader topLoader = new FXMLLoader(getClass().getResource("/fxml/topRowCards.fxml"));
             Parent top = topLoader.load();
@@ -170,7 +172,7 @@ public class GameControllerGUI {
                 .filter(p -> !p.getNickname().equals(localNickname))
                 .toList();
 
-        List<StackPane> usedSlots = switch(players.size()){
+        List<Pane> usedSlots = switch(players.size()){
             case 2 -> List.of(topCenterPlayerContainer);
 
             case 3 -> List.of(topLeftPlayerContainer, topRightPlayerContainer);
@@ -184,7 +186,7 @@ public class GameControllerGUI {
                 yield List.of();}
         };
 
-        //assegno il player corrente al bottomSlot
+        // player corrente in basso — nessuna rotazione, nessun wrapper
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/playerBoardView.fxml"));
             Parent view = loader.load();
@@ -195,7 +197,7 @@ public class GameControllerGUI {
             mainPlayerBoardController = controller;
             bottomPlayerContainer.getChildren().setAll(view);
         } catch (Exception e) {
-            System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEL PLAYER CORRENTE" + e.getMessage());
+            System.out.println("ERRORE NELLA CREAZIONE DELLA BOARD DEL PLAYER CORRENTE" + e.getMessage());
             e.printStackTrace();;
         }
 
@@ -211,43 +213,55 @@ public class GameControllerGUI {
                 playersController.add(controller);
 
 
-                StackPane targetSlot = usedSlots.get(i);
+                Pane targetSlot = usedSlots.get(i);
 
-                //compio le rotazioni cosi che le mani dei giocatori siano settate correttamente
                 if(targetSlot == topCenterPlayerContainer) {
 
                     view.setRotate(180);
                     topCenterPlayerArea.setManaged(true);
+                    targetSlot.getChildren().setAll(view);
+                    controller.setHeaderFlipped();
 
-                } else if(targetSlot == topLeftPlayerContainer){
-
+                } else if (targetSlot == topLeftPlayerContainer) {
                     view.setRotate(180);
                     topLeftPlayerArea.setManaged(true);
+                    targetSlot.getChildren().setAll(view);
+                    controller.setHeaderFlipped();
 
-                } else if(targetSlot == topRightPlayerContainer){
-
+                } else if (targetSlot == topRightPlayerContainer) {
                     view.setRotate(180);
                     topRightPlayerArea.setManaged(true);
+                    targetSlot.getChildren().setAll(view);
+                    controller.setHeaderFlipped();
 
-                } else if(targetSlot == leftPlayerContainer){
-
+                } else if (targetSlot == leftPlayerContainer) {
+                    view.setScaleX(0.9);
+                    view.setScaleY(0.9);
                     view.setRotate(90);
+                    view.setTranslateX(-210.9);
+                    view.setTranslateY(203.5);
+                    Group group = new Group(view);
+                    group.setLayoutX(0);
+                    group.setLayoutY(0);
+                    leftPlayerContainer.getChildren().setAll(group);
 
-                } else if(targetSlot == rightPlayerContainer){
-
+                } else if (targetSlot == rightPlayerContainer) {
+                    view.setScaleX(0.9);
+                    view.setScaleY(0.9);
                     view.setRotate(-90);
-
+                    view.setTranslateX(-218.1);
+                    view.setTranslateY(203.5);
+                    Group group = new Group(view);
+                    group.setLayoutX(0);
+                    group.setLayoutY(0);
+                    rightPlayerContainer.getChildren().setAll(group);
                 }
 
-                Group wrapper = new Group(view);
-
-                targetSlot.getChildren().setAll(wrapper);
             } catch (Exception e) {
-                System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEI PLAYER" + e.getMessage());
-                e.printStackTrace();;
+                System.out.println("ERRORE NELLA CREAZIONE DELLE BOARD DEI PLAYER: " + e.getMessage());
+                e.printStackTrace();
             }
         }
-
     }
 
     //associo al gameModel degli osservatori che chiamano i metodi di update quando ricevono un cambiamento

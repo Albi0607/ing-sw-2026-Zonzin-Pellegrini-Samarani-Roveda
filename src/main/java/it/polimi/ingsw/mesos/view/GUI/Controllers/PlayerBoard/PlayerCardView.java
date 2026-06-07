@@ -1,43 +1,48 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+import java.util.List;
 import java.util.Objects;
 
 public class PlayerCardView {
 
-    public static void addNewCard(String id, StackPane stackPane, ImageView imageView, Label label) {
+    public static void addNewCard(String id, StackPane stackPane, ImageView imageView, Label label, List<String> cardIds) {
 
-        System.out.println("immagine stampata");
-        //abilito lo slot se è la prima chiamata
         if (!stackPane.isVisible()) {
             stackPane.setVisible(true);
             stackPane.setManaged(true);
         }
 
-        //aggiorno contatore
         int count = 0;
         try {
             count = Integer.parseInt(label.getText());
             label.setText(String.valueOf(++count));
-        }catch (Exception e){
+            label.setStyle(
+                    "-fx-font-size: 11px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: white;" +
+                            "-fx-background-color: rgba(0,0,0,0.70);" +
+                            "-fx-background-radius: 10;" +
+                            "-fx-padding: 1 4 1 4;" +
+                            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.9), 3, 0.5, 0, 0);"
+            );
+        } catch (Exception e){
             System.out.println("ERRORE NEL MOSTARE LA LABEL PER IL NUMERO DI CARTE: " + e.getMessage());
             e.printStackTrace();
         }
 
-        //stampo immagine
         Image img = loadCardImage(id);
         if(img!=null) {
             imageView.setImage(img);
         }
 
-        //aggiungo effetto hover
+        // hover
         stackPane.setOnMouseEntered(e -> {
             stackPane.setEffect(new DropShadow(20, Color.BLACK));
             stackPane.setScaleX(1.05);
@@ -50,12 +55,10 @@ public class PlayerCardView {
             stackPane.setScaleY(1.0);
         });
 
-        // aggiungo effetto click
-        /*
-        stackPane.setOnMouseClicked((MouseEvent e) -> {
-            CardOverlayView.show(id, count, imageView.getImage());
-        });
-        */
+        // click — apre overlay con tutte le carte della tipologia
+        if (cardIds != null && !cardIds.isEmpty()) {
+            stackPane.setOnMouseClicked(e -> CardOverlayView.show(cardIds));
+        }
     }
 
     private static Image loadCardImage(String id) {
