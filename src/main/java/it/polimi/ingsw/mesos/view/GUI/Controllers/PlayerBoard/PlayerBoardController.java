@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientController;
@@ -10,10 +10,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class PlayerBoardController {
@@ -36,7 +38,7 @@ public class PlayerBoardController {
     List<ImageView> imagesView;
     List<Label> cardsCount;
 
-
+    @FXML private HBox headerBox;
     @FXML Label playerNameLabel;
     @FXML Label foodPointsLabel;
     @FXML Label prestigePointsLabel;
@@ -140,7 +142,10 @@ public class PlayerBoardController {
 
     private void addBuildingCard(CardDTO card) {
 
-        Platform.runLater(() -> PlayerCardView.addNewCard(card.id, cardSlot7, cardImage7, cardCount7));
+        Platform.runLater(() -> PlayerCardView.addNewCard(card.id, cardSlot7, cardImage7, cardCount7,  playerModel.getTribe().getBuildings().stream()
+                .map(c -> c.id)
+                .collect(Collectors.toList())
+        ));
     }
 
     private void addCharacterCard(CardDTO card) {
@@ -160,8 +165,13 @@ public class PlayerBoardController {
         characters.get(selector).add(card.id);
 
         Platform.runLater(()->
-                PlayerCardView.addNewCard(card.id, stackPanes.get(selector), imagesView.get(selector), cardsCount.get(selector)));
+                PlayerCardView.addNewCard(card.id, stackPanes.get(selector), imagesView.get(selector), cardsCount.get(selector), characters.get(selector)));
 
+    }
+
+    //per ruotare il nome e i punti quando la playerBoard è quella di un giocatore che si trova in alto
+    public void setHeaderFlipped() {
+        headerBox.setRotate(180);
     }
 
     // chiamato dall'esterno ogni volta che il GameDTO aggiorna il model
