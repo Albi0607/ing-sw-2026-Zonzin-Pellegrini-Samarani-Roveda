@@ -10,36 +10,80 @@ import it.polimi.ingsw.mesos.view.CLI.UIEvent;
 import java.util.List;
 
 /**
- * VirtualView fittizia usata durante il replay per i giocatori
- * che non si sono ancora riconnessi.
- * il giocatore riceverà lo stato aggiornato quando si riconnette e il controller
- * sostituisce questa DummyVirtualView con la sua vera VirtualView.
+ * A placeholder VirtualView used during replay for players who have not yet reconnected.
+ * The player will receive the updated state once they reconnect and the controller
+ * replaces this DummyVirtualView with their actual VirtualView.
  */
 public class DummyVirtualView implements VirtualView {
 
     private final String nickname;
 
+    /**
+     * Constructs a DummyVirtualView for the specified player.
+     *
+     * @param nickname the player's nickname
+     */
     public DummyVirtualView(String nickname) {
         this.nickname = nickname;
     }
 
-    @Override public void sendGame(GameDTO game)          { /* scarta */ }
-    @Override public void sendClientState(ClientState s)  { /* scarta */ }
-    @Override public void showMessage(String message)     { /* scarta */ }
+    /**
+     * {@inheritDoc}
+     * This implementation discards the game state update.
+     */
+    @Override public void sendGame(GameDTO game)          { /* discard */ }
+
+    /**
+     * {@inheritDoc}
+     * This implementation discards the state update.
+     */
+    @Override public void sendClientState(ClientState s)  { /* discard */ }
+
+    /**
+     * {@inheritDoc}
+     * This implementation discards the message.
+     */
+    @Override public void showMessage(String message)     { /* discard */ }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override public String getNickname()                 { return nickname; }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override public void showActionRejected(String reason) {}
+
+    /**
+     * {@inheritDoc}
+     */
     @Override public void showActionAccepted(String message) {}
+
+    /**
+     * {@inheritDoc}
+     */
     @Override public void showLoginError(String message) {}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendLobby(List<LobbyInfoDTO> lobby) {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getId() {
         return "";
     }
 
+    /**
+     * {@inheritDoc}
+     * This implementation discards the leaderboard.
+     */
     @Override
-    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) { /* scarta */ }
+    public void showLeaderboard(List<GameResult> leaderboard, int myPosition) { /* discard */ }
 }

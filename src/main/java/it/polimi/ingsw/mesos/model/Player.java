@@ -2,6 +2,10 @@ package it.polimi.ingsw.mesos.model;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
 
+/**
+ * Represents a player in the game.
+ * Maintains the player's resources, prestige points, their tribe, and various game modifiers.
+ */
 public class Player {
 
     private final String nickname;
@@ -10,7 +14,6 @@ public class Player {
     private final Tribe tribe;
     private final Color color;
 
-    //parametri che servono per gli edifici settati di default in modo che non siano in utilizzo
     private boolean shamanNotLosePoints = false;
     private boolean shamanDoublePoints = false;
     private int extraShamanIcons = 0;
@@ -18,6 +21,13 @@ public class Player {
     private boolean foodOnTotemSlot = false;
     private boolean extraDraw = false;
 
+    /**
+     * Constructs a new Player with a nickname and color.
+     * Initializes food and prestige points to zero and creates a new empty tribe.
+     *
+     * @param nickname the player's unique identifier
+     * @param color    the player's assigned color
+     */
     public Player(String nickname, Color color) {
         this.nickname = nickname;
         this.color = color;
@@ -26,6 +36,12 @@ public class Player {
         this.tribe = new Tribe();
     }
 
+    /**
+     * Adds a specified amount of food to the player's resources.
+     *
+     * @param amount the amount of food to add
+     * @throws IllegalArgumentException if the amount is negative
+     */
     public void addFood(int amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("Invalid amount of food!");
@@ -34,18 +50,12 @@ public class Player {
     }
 
     /**
-     * checks for food availability on a payment action
+     * Checks for food availability and updates the food count if the payment is successful.
+     *
      * @param amount the amount of food to be paid
-     * @return true if there is enough amount of food to pay, food attribute is updated
-     * otherwise, false if there is not enough amount, food attribute still
+     * @return true if there is enough food to pay, false otherwise
+     * @throws IllegalArgumentException if the amount is negative
      */
-    // il caso in cui food < amount va gestito direttamente sulla chiamata del metodo payfood ad ogni check
-    // della disponibilitò durante l'evento sostentamento (tenendo conto dello sconto dato dai raccoglitori)
-    // e durante l'acquisto di edifici (tenendo conto dello sconto dato dai costruttori)
-    // per ora l'alternativa più semplice per chi implementerà queste cose è ritornare un booleano che
-    // mi dice se il player può in quell'azione permettersi di pagare, se falso, food rimane invariato,
-    // non dovrebbe andare in contrassto con la dinamica dell'evento sostentamento perchè l'azione converrà iterarla
-    // per ogni personaggio
     public boolean payFood(int amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("Invalid amount of food!");
@@ -57,78 +67,156 @@ public class Player {
         return false;
     }
 
+    /**
+     * Updates the player's prestige points.
+     *
+     * @param points the points to add (or subtract if negative)
+     */
     public void updatePrestige(int points) {
         this.prestigePoints += points;
     }
 
-    // --- Getters ---
-
+    /**
+     * Returns the player's nickname.
+     *
+     * @return the nickname
+     */
     public String getNickname() {
         return this.nickname;
     }
 
+    /**
+     * Returns the current amount of food the player has.
+     *
+     * @return the food count
+     */
     public int getFood() {
         return this.food;
     }
 
+    /**
+     * Returns the player's current prestige points.
+     *
+     * @return the prestige points
+     */
     public int getPrestigePoints() {
         return this.prestigePoints;
     }
 
+    /**
+     * Returns the player's tribe.
+     *
+     * @return the Tribe instance
+     */
     public Tribe getTribe() {
         return tribe;
     }
 
+    /**
+     * Returns the player's assigned color.
+     *
+     * @return the Color enum value
+     */
     public Color getColor() {
         return color;
     }
 
-    //metodi che servono per i building
-
+    /**
+     * Enables the modifier that prevents losing points from Shaman effects.
+     */
     public void setShamanNotLosePoints(){
         this.shamanNotLosePoints=true;
     }
 
+    /**
+     * Enables the modifier that doubles points gained from Shaman effects.
+     */
     public void setShamanDoublePoints(){
         this.shamanDoublePoints=true;
     }
 
+    /**
+     * Checks if the player is protected from losing Shaman-related points.
+     *
+     * @return true if the protection is active
+     */
     public boolean getShamanNotLosePoints(){
         return shamanNotLosePoints;
     }
 
+    /**
+     * Checks if the player receives double points from Shamans.
+     *
+     * @return true if the double points modifier is active
+     */
     public boolean getShamanDoublePoints(){
         return shamanDoublePoints;
     }
 
+    /**
+     * Sets the number of extra Shaman icons granted to the player.
+     *
+     * @param num the number of extra icons
+     */
     public void setExtraShamanIcons(int num){
         extraShamanIcons=num;
     }
 
+    /**
+     * Returns the number of extra Shaman icons the player has.
+     *
+     * @return the number of extra icons
+     */
     public int getExtraShamanIcons(){
         return extraShamanIcons;
     }
 
+    /**
+     * Sets the food discount for player sustenance.
+     *
+     * @param num the discount value
+     */
     public void setSustenanceDiscount(int num){
         sustenanceDiscount=num;
     }
 
+    /**
+     * Returns the player's food discount for sustenance.
+     *
+     * @return the sustenance discount
+     */
     public int getSustenanceDiscount(){
         return sustenanceDiscount;
     }
 
+    /**
+     * Enables the ability to store food on a totem slot.
+     */
     public void setFoodOnTotemSlot(){
         this.foodOnTotemSlot=true;
     }
 
+    /**
+     * Checks if the player can store food on a totem slot.
+     *
+     * @return true if the ability is active
+     */
     public boolean getFoodOnTotemSlot(){
         return foodOnTotemSlot;
     }
 
+    /**
+     * Enables the extra draw ability for the player.
+     */
     public void setExtraDraw(){
         this.extraDraw=true;
     }
 
+    /**
+     * Checks if the player has an extra draw available.
+     *
+     * @return true if an extra draw is available
+     */
     public boolean getExtraDraw(){
         return extraDraw;
     }

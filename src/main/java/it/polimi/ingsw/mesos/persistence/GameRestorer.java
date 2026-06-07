@@ -8,75 +8,88 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Ricostruisce lo stato della partita rigiocando le mosse salvate su disco.
+ * Reconstructs the game state by replaying moves saved on disk.
  *
- * Funzionamento:
- *   1. Legge la lista di GameMove dal MoveLogger.
- *   2. Le rigioca una per una sul GameController passato.
- *   3. Le VirtualView vengono sostituite da dummies se il giocatore non si è ancora riconnesso con stesso nickname.
+ * Workflow:
+ *   1. Reads the list of GameMoves from the MoveLogger.
+ *   2. Replays them one by one on the provided GameController.
+ *   3. VirtualViews are replaced by dummies if a player has not yet reconnected with the same nickname.
  */
 public class GameRestorer {
 
     private final MoveLogger logger;
 
+    /**
+     * Constructs a GameRestorer with the specified logger.
+     *
+     * @param logger the move logger to read from
+     */
     public GameRestorer(MoveLogger logger) {
         this.logger = logger;
     }
 
     /**
-     * Rigioca tutte le mosse sul controller fornito.
+     * Replays all saved moves on the provided controller.
      *
-     * Le mosse ADD_PLAYER hanno bisogno di una VirtualView: vengono prese
-     * dalla Map views man mano che i giocatori si riconnettono.
+     * ADD_PLAYER moves require a VirtualView: they are retrieved from the views Map
+     * as players reconnect.
      *
-     * Le mosse di gioco (PLACE_TOTEM, TAKE_CARD, SKIP_EXTRA_DRAW) vengono
-     * eseguite normalmente — il broadcast è disabilitato durante il replay.
+     * Gameplay moves (PLACE_TOTEM, TAKE_CARD, SKIP_EXTRA_DRAW) are executed normally.
+     * Broadcast is disabled during replay to avoid flooding reconnected clients.
+     * After the replay sends the current state to all reconnected clients
      *
-     * @param controller  controller su cui le mosse vengono rigiocate
-     * @param views       Map nickname → VirtualView dei client riconnessi
-     * @return true se il ripristino è andato a buon fine, false in caso di errore
+     * @param controller the controller on which to replay the moves
+     * @param views      a Map mapping nicknames to VirtualViews of reconnected clients
+     * @return true if restoration was successful, false otherwise
      */
     public boolean restore(GameController controller, Map<String, VirtualView> views) {
         List<GameMove> moves = logger.readAll();
 
         if (moves.isEmpty()) {
-            System.out.println("[GameRestorer] Nessuna mossa salvata, partita nuova.");
+            System.out.println("[GameRestorer] No moves saved, starting new game.");
             return false;
         }
 
-        System.out.println("[GameRestorer] Ripristino partita con " + moves.size() + " mosse...");
+        System.out.println("[GameRestorer] Restoring game with " + moves.size() + " moves...");
 
-        // Disabilita il broadcast durante il replay: i client riceveranno
-        // solo lo stato finale, non tutti gli stati intermedi.
+        // Disable broadcast during replay: clients will receive only the final state.
         controller.setReplayMode(true);
 
         try {
             for (GameMove move : moves) {
-                System.out.println("[GameRestorer] Rieseguo: " + move);
+                System.out.println("[GameRestorer] Re-executing: " + move);
                 replayMove(move, controller, views);
             }
         } catch (Exception e) {
-            System.err.println("[GameRestorer] Errore durante il ripristino: " + e.getMessage());
+            System.err.println("[GameRestorer] Error during restoration: " + e.getMessage());
             controller.setReplayMode(false);
             return false;
         }
 
         controller.setReplayMode(false);
         controller.sendClientStateToAll(ClientState.IN_GAME);
-
-        // Invia lo stato attuale a tutti i client riconnessi
         controller.broadcastUpdate();
 
-        System.out.println("[GameRestorer] Ripristino completato.");
+        System.out.println("[GameRestorer] Restoration complete.");
         return true;
     }
 
     /**
-     * Esegue una singola mossa sul controller.
+     * Executes a single move on the controller.
      *
-     * @param move mossa da rigiocare
-     * @param controller controller su cui rigiocare la mossa
-     * @param views Map da cui ripristinare la view per la mossa ADD_PLAYER
+     * ADD_PLAYER:
+     * Use the reconnected client's VirtualView if the player is reconnected
+     * Use a DummyVirtualView if the player is not reconnected yet.
+     * The non reconnected player receives the update at the end.
+     *
+     * START_GAME:
+     * Restore the entire decks before calling startGame
+     * After startGame call the correct cards are drawn from restored decks
+     * Restore playerOrder after the call since startGame shuffles it
+     *
+     * @param move       the move to replay
+     * @param controller the controller on which to replay the move
+     * @param views      Map of reconnected views to use for ADD_PLAYER moves
      */
     private void replayMove(GameMove move, GameController controller,
                             Map<String, VirtualView> views) {
@@ -85,9 +98,6 @@ public class GameRestorer {
             case SET_NUM_PLAYERS -> controller.setNumPlayers(move.intPayload);
 
             case ADD_PLAYER -> {
-                // Usa la VirtualView del client riconnesso, oppure una
-                // DummyVirtualView se il client non si è ancora riconnesso
-                // (riceverà l'aggiornamento completo alla fine del replay).
                 VirtualView view = views.getOrDefault(
                         move.nickname,
                         new DummyVirtualView(move.nickname)
@@ -99,15 +109,15 @@ public class GameRestorer {
                 StateSerializer ss = controller.getStateSerializer();
 
                 if(ss.hasSavedState()) {
-                    // 1. Ripristiniamo i mazzi INTERI prima di chiamare startGame
+                    // 1. Restore the ENTIRE decks before calling startGame
                     ss.restoreDeck(controller.getGame().getBoard().getTribeDeck(), true);
                     ss.restoreDeck(controller.getGame().getBoard().getBuildingDeck(), false);
                 }
 
-                // 2. Chiamiamo startGame: pescherà le carte giuste dal mazzo ripristinato!
+                // 2. Calling startGame will now draw the correct cards from the restored deck
                 controller.startGame();
 
-                // 3. Sistemiamo l'ordine dei giocatori (perché startGame ha rimescolato)
+                // 3. Fix player order (as startGame shuffles it)
                 if(ss.hasSavedState()) {
                     List<String> order = ss.restorePlayerOrder();
                     if (order != null) {
@@ -124,6 +134,11 @@ public class GameRestorer {
         }
     }
 
+    /**
+     * Returns the move logger.
+     *
+     * @return the MoveLogger instance
+     */
     public MoveLogger getMoveLogger() {
         return logger;
     }

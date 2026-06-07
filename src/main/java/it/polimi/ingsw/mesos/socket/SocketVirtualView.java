@@ -14,11 +14,14 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 
 /**
- * Implementazione di VirtualView per il protocollo Socket.
- * Traduce i metodi del controller in messaggi
- * serializzati sull'ObjectOutputStream.
- * Creata dal ClientHandler dopo aver ricevuto RegisterMessage,
- * quando il nickname è noto e gli stream sono pronti.
+ * Implementation of the {@link VirtualView} interface for the Socket-based communication protocol.
+ *
+ * This class acts as a bridge between the server-side GameController and a remote client.
+ * It translates high-level game events and controller calls into serialized message objects
+ * that are sent over a TCP socket using an {@link ObjectOutputStream}.
+ *
+ * Instances of this class are typically created by a {@link ClientHandler} once a player
+ * has successfully registered with a unique nickname and the communication streams are established.
  */
 public class SocketVirtualView implements VirtualView {
 
@@ -27,14 +30,22 @@ public class SocketVirtualView implements VirtualView {
 
     private final String id = java.util.UUID.randomUUID().toString();
 
+    /**
+     * Constructs a new SocketVirtualView for a specific player.
+     *
+     * @param nickname the player's nickname
+     * @param out      the output stream to the client
+     */
     public SocketVirtualView(String nickname, ObjectOutputStream out) {
         this.nickname = nickname;
         this.out      = out;
     }
 
     /**
-     * Invia lo stato aggiornato del gioco al client.
-     * Chiamato da GameController.broadcastUpdate() dopo ogni azione.
+     * Sends the updated game state to the client.
+     * Called by GameController.broadcastUpdate() after each action.
+     *
+     * @param game the game state DTO
      */
     @Override
     public synchronized void sendGame(GameDTO game) {
@@ -42,7 +53,9 @@ public class SocketVirtualView implements VirtualView {
     }
 
     /**
-     * Notifica il client di un cambio di stato.
+     * Notifies the client of a change in their state.
+     *
+     * @param state the new client state
      */
     @Override
     public synchronized void sendClientState(ClientState state) {
@@ -50,64 +63,100 @@ public class SocketVirtualView implements VirtualView {
     }
 
     /**
-     * Invia un messaggio testuale al client
-     * Non viene fatto broadcast — va solo a questo client.
+     * Sends a text message to the client.
+     * This is not broadcasted; it is sent only to this specific client.
+     *
+     * @param message the message content
      */
     @Override
     public synchronized void showMessage(String message) {
         send(new ErrorMessage(message));
     }
 
+    /**
+     * Notifies the client that their action was rejected.
+     *
+     * @param reason the reason for rejection
+     */
     @Override
     public synchronized void showActionRejected(String reason) {
         send(new ActionRejectedMessage(reason));
     }
 
+    /**
+     * Notifies the client that their action was accepted.
+     *
+     * @param message a confirmation message
+     */
     @Override
     public synchronized void showActionAccepted(String message) {
         send(new ActionAcceptedMessage(message));
     }
 
+    /**
+     * Notifies the client of an error during the login process.
+     *
+     * @param message the error message
+     */
     @Override
     public synchronized void showLoginError(String message) { send(new LoginErrorMessage(message)); }
 
     /**
-     * Scrive l'oggetto sullo stream out.
+     * Writes an object to the output stream.
+     * Uses reset() to prevent the ObjectOutputStream from caching objects,
+     * ensuring that subsequent updates to the same object are sent correctly.
+     *
+     * @param message the object to send
      */
     private synchronized void send(Object message) {
         try {
             out.writeObject(message);
             out.flush();
-            // reset() evita che ObjectOutputStream tenga in cache
-            // oggetti già inviati: senza reset, invii successivi dello stesso
-            // oggetto (anche se modificato) potrebbero mandare la cache invece
-            // del nuovo stato.
             out.reset();
         } catch (IOException e) {
-            System.err.println("Errore invio a " + nickname + ": " + e.getMessage());
+            System.err.println("Error sending message to " + nickname + ": " + e.getMessage());
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNickname() {
         return this.nickname;
     }
 
-
+    /**
+     * Sends the current lobby information to the client.
+     *
+     * @param lobby the list of lobby info DTOs
+     */
     @Override
     public synchronized void sendLobby(List<LobbyInfoDTO> lobby) {
         send(new LobbyUpdateMessage(lobby));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getId() {
         return id;
     }
 
+    /**
+     * Sends a ping message to the client to keep the connection alive.
+     */
     public synchronized void sendPing() {
         send(new PingMessage());
     }
 
+    /**
+     * Sends the final leaderboard and the player's position to the client.
+     *
+     * @param leaderboard the list of game results
+     * @param myPosition  the player's rank
+     */
     @Override
     public synchronized void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
         send(new LeaderboardMessage(leaderboard, myPosition));
