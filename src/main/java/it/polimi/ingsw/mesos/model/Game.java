@@ -52,7 +52,18 @@ public class Game {
         this.currentState = new PlacingState();
     }
 
-
+    /**
+     * Orchestrates the initialization of the game world and prepares the board for the first round.
+     * <p>
+     * This method performs the following setup sequence:
+     * <ul>
+     * <li>Initializes game components (Offer Tiles and Turn Order Track) based on the player count.</li>
+     * <li>Shuffles player order and assigns initial food resources according to the turn position.</li>
+     * <li>Populates the Lower Row with tribe cards, filtering out event cards to the Upper Row.</li>
+     * <li>Fills the Upper Row with the required number of cards and Era I building cards.</li>
+     * <li>Triggers the initial game state execution to begin the match.</li>
+     * </ul>
+     */
     public void startGame() {
         System.out.println("--- SYSTEM: Starting the game and initializing... ---");
 

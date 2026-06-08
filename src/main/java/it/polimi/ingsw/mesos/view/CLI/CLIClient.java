@@ -30,8 +30,12 @@ public class CLIClient {
             System.out.println(CLIPrinter.ANSI_CYAN + "\n=== CONFIGURAZIONE RETE ===" + CLIPrinter.ANSI_RESET);
 
             System.out.print("Inserisci IP del Server (o 'local' per 127.0.0.1): ");
-            String userInput = scanner.nextLine().trim();
-            String serverIp = userInput.equalsIgnoreCase("local") ? "127.0.0.1" : userInput;
+            String userInputS = scanner.nextLine().trim();
+            String serverIp = userInputS.equalsIgnoreCase("local") ? "127.0.0.1" : userInputS;
+
+            System.out.print("Inserisci IP del Client (o 'local' per 127.0.0.1): ");
+            String userInputC = scanner.nextLine().trim();
+            String clientIp = userInputC.equalsIgnoreCase("local") ? "127.0.0.1" : userInputC;
 
             String netChoice = "";
             int port = 0;
@@ -59,14 +63,12 @@ public class CLIClient {
             System.out.println("\n⏳ Connessione al server " + serverIp + " sulla porta " + port + " tramite " + netChoice + " in corso...");
 
             try {
-                // Tenta la connessione
-                //TODO mettere la scelta a linea di comando magari con default in caso di invio per local
-                network = ClientChoseSetup.createNetwork(netChoice, serverIp, port,"127.0.0.1");
+                network = ClientChoseSetup.createNetwork(netChoice, serverIp, port, clientIp);
                 System.out.println(CLIPrinter.ANSI_GREEN + "✔ Connessione stabilita con successo!" + CLIPrinter.ANSI_RESET);
                 break;
 
             } catch (Exception e) {
-                // Se la connessione fallisce, stampiamo l'errore e il ciclo ricomincerà da capo!
+                // Se la connessione fallisce, stampiamo l'errore e il ciclo ricomincerà da capo
                 System.out.println(CLIPrinter.ANSI_RED + "❌ Impossibile connettersi al server all'IP: " + serverIp + CLIPrinter.ANSI_RESET);
                 System.out.println("Assicurati che il Server sia acceso, che l'IP sia corretto e che il firewall non blocchi la connessione.");
                 System.out.println("Riprova.\n");
