@@ -53,6 +53,15 @@ public class EventState implements GameStateLogic {
 
     }
 
+    /**
+     * Resolves all visible event cards remaining on the board at the very end of the game.
+     * <p>
+     * This method collects events from both the Upper and Lower rows,ensuring that {@code SUSTENANCE} effects are applied
+     *      * only after all other events have been resolved.
+     * It is designed specifically for the final endgame resolution phase.
+     * </p>
+     * * @param g The current game instance.
+     */
     public void resolveAllVisibleEvents(Game g){
         Board board = g.getBoard();
         List<EventCard> allEvents = new ArrayList<>();
@@ -94,7 +103,15 @@ public class EventState implements GameStateLogic {
 
     }
 
-
+    /**
+     * Resolves only the event cards present in the Lower Row during standard game rounds.
+     * <p>
+     * Unlike the endgame resolution, this method focuses exclusively on the Lower Row.
+     * It sorts events by Era, ensuring that {@code SUSTENANCE} effects are applied
+     * only after all other events have been resolved.
+     * </p>
+     * * @param g The current game instance.
+     */
     public void resolveLowerRowEvents(Game g){
         // 1. Recuperiamo SOLO gli eventi dalla fila inferiore
         List<EventCard> eventsToResolve = g.getBoard().getLowerRow().stream()

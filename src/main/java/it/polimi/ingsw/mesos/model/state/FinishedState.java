@@ -69,7 +69,20 @@ public class FinishedState implements GameStateLogic {
         }
          */
     }
-
+    /**
+     * Calculates the final prestige score for a player's tribe at the end of the game.
+     * <p>
+     * The scoring logic aggregates points from four distinct sources:
+     * <ul>
+     * <li><b>Builders:</b> Sum of static prestige points printed on each Builder card.</li>
+     * <li><b>Inventors:</b> A multiplicative bonus calculated as (number of Inventors) * (number of distinct invention icons).</li>
+     * <li><b>Artists:</b> A set bonus of 10 points for every pair of Artist cards.</li>
+     * <li><b>Buildings:</b> The sum of victory points provided by all constructed buildings.</li>
+     * </ul>
+     *
+     * @param tribe The {@code Tribe} object containing the player's characters, buildings, and assets.
+     * @return The total calculated prestige points for the tribe.
+     */
     private int calculateFinalPrestige(Tribe tribe) {
         int points = 0;
 
