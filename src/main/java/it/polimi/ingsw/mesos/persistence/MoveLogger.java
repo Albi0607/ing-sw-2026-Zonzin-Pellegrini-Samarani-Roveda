@@ -2,6 +2,9 @@ package it.polimi.ingsw.mesos.persistence;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,15 +94,56 @@ public class MoveLogger {
     }
 
     /**
-     * Deletes the log file.
-     * Called when the game terminates normally and the log is no longer needed.
+     * Deletes the log file and all other persistence files associated with
+     * this game session: the tribe deck file, the building deck
+     * file, and the player order file.
+     *
+     * <p>Called when a stale session is detected at startup so that orphaned
+     * files do not accumulate on disk.
+     *
+     * @param gameId the game ID whose files should all be removed
      */
-    public void delete() {
+    public static void deleteAll(int gameId) {
+        String[] paths = {
+                "mesos_game_"    + gameId + ".log",
+                "mesos_tribe_"   + gameId + ".txt",
+                "mesos_building_" + gameId + ".txt",
+                "mesos_order_"   + gameId + ".txt"
+        };
+        for (String p : paths) {
+            try {
+                boolean deleted = Files.deleteIfExists(Paths.get(p));
+                if (deleted) {
+                    System.out.println("Deleted stale file: " + p);
+                }
+            } catch (IOException e) {
+                System.err.println("Could not delete " + p
+                        + ": " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Returns {@code true} if the log file exists and its last-modified timestamp
+     * is older than {@code thresholdMinutes} minutes.
+     *
+     * <p>Used at server startup to detect sessions that crashed and were never
+     * resumed: if the log is stale the session is considered abandoned and its
+     * files can be safely deleted without attempting a restore.
+     *
+     * @param thresholdMinutes minutes of inactivity after which the session is
+     *                         considered abandoned
+     * @return {@code true} if the log is stale, {@code false} otherwise
+     */
+    public boolean isStale(long thresholdMinutes) {
+        if (!Files.exists(logFile)) return false;
         try {
-            Files.deleteIfExists(logFile);
-            System.out.println("[MoveLogger] Log deleted.");
+            FileTime lastModified = Files.getLastModifiedTime(logFile);
+            Duration age = Duration.between(lastModified.toInstant(), Instant.now());
+            return age.toMinutes() >= thresholdMinutes;
         } catch (IOException e) {
-            System.err.println("[MoveLogger] Error deleting log: " + e.getMessage());
+            System.err.println("[MoveLogger] Could not read log timestamp: " + e.getMessage());
+            return false;
         }
     }
 
