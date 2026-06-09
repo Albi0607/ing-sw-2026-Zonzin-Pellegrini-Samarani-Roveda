@@ -37,6 +37,21 @@ public class CLIClient {
             String userInputC = scanner.nextLine().trim();
             String clientIp = userInputC.equalsIgnoreCase("local") ? "127.0.0.1" : userInputC;
 
+            try {
+                java.net.InetAddress inet = java.net.InetAddress.getByName(clientIp);
+                java.net.NetworkInterface ni = java.net.NetworkInterface.getByInetAddress(inet);
+
+                if (ni == null && !clientIp.equals("127.0.0.1")) {
+                    System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: L'IP " + clientIp + " non appartiene a questo PC!" + CLIPrinter.ANSI_RESET);
+                    System.out.println("Assicurati di aver digitato il tuo vero indirizzo IP locale.\n");
+                    continue;
+                }
+            } catch (Exception e) {
+                System.out.println(CLIPrinter.ANSI_RED + "❌ Errore: Formato IP non valido." + CLIPrinter.ANSI_RESET);
+                System.out.println();
+                continue;
+            }
+
             String netChoice = "";
             int port = 0;
 
