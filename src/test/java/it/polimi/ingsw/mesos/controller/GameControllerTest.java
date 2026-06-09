@@ -32,9 +32,7 @@ class GameControllerTest {
     private GameController controller;
     private VirtualView mockView;
 
-    // -----------------------------------------------------------------------
     // Helper: implementazione minimale di VirtualView usata in tutti i test
-    // -----------------------------------------------------------------------
 
     static class StubView implements VirtualView {
         private final String nick;
@@ -52,15 +50,18 @@ class GameControllerTest {
         @Override public void showLeaderboard(List<GameResult> lb, int pos) {}
     }
 
-    // -----------------------------------------------------------------------
     // Helpers di supporto per portare il controller a stati comuni
-    // -----------------------------------------------------------------------
 
-    /** Aggiunge N giocatori e avvia la partita (2 giocatori di default). */
+    /**
+     * Aggiunge 2 giocatori e avvia la partita in modo sincrono.
+     * I giocatori vengono registrati PRIMA di setNumPlayers: in questo modo
+     * setNumPlayers trova già i giocatori nella pending list e chiama
+     * game.startGame() direttamente (non in un thread separato).
+     */
     private void initGameWith2Players() {
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
     }
 
     /**
@@ -82,9 +83,7 @@ class GameControllerTest {
                 controller.getGame().getCurrentState().getStateId());
     }
 
-    // -----------------------------------------------------------------------
     // Setup
-    // -----------------------------------------------------------------------
 
     @BeforeEach
     void setUp() {
@@ -92,9 +91,14 @@ class GameControllerTest {
         mockView   = new StubView("mock");
     }
 
-    // =====================================================================
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        if (controller.getMoveLogger() != null) {
+            controller.getMoveLogger().deleteAll(controller.getGameId());
+        }
+    }
+
     // setNumPlayers
-    // =====================================================================
 
     @Test
     void setNumPlayers_validValue_setsExpectedCount() {
@@ -122,9 +126,9 @@ class GameControllerTest {
     @Test
     void setNumPlayers_triggersGameCreationWhenPlayersAlreadyPresent() throws InterruptedException {
         // I giocatori arrivano prima di setNumPlayers
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
         Thread.sleep(200); // attende il thread di avvio
         assertNotNull(controller.getGame());
     }
@@ -137,9 +141,7 @@ class GameControllerTest {
         assertNull(controller.getGame());
     }
 
-    // =====================================================================
     // addPlayer – flusso normale
-    // =====================================================================
 
     @Test
     void addPlayer_validPlayer_isAddedToPendingList() {
@@ -188,7 +190,7 @@ class GameControllerTest {
     }
 
     @Test
-    void addPlayer_lastPlayer_triggersGameCreation() {
+    void addPlayer_lastPlayer_triggersGameCreation() throws InterruptedException {
         controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
@@ -203,9 +205,7 @@ class GameControllerTest {
                 () -> controller.addPlayer("Carlo", Color.PURPLE, mockView));
     }
 
-    // =====================================================================
     // addPlayer – replay mode
-    // =====================================================================
 
     @Test
     void addPlayer_replayMode_doesNotCreateGameUntilAllPlayersAdded() {
@@ -224,9 +224,7 @@ class GameControllerTest {
         assertNotNull(controller.getGame());
     }
 
-    // =====================================================================
     // addPlayer – flusso restorer (game == null)
-    // =====================================================================
 
     @Test
     void addPlayer_restorerGameNull_waitsForAllPlayers() throws IOException {
@@ -261,24 +259,23 @@ class GameControllerTest {
         Files.deleteIfExists(Paths.get(logFile));
     }
 
-    // =====================================================================
     // addPlayer – flusso restorer (game != null, riconnessione)
-    // =====================================================================
 
     @Test
-    void addPlayer_restorerGameAlreadyCreated_reconnectsPlayer() {
+    void addPlayer_restorerGameAlreadyCreated_reconnectsPlayer() throws IOException {
         initGameWith2Players();
-        GameRestorer restorer = new GameRestorer(new MoveLogger("temp_gc.log"));
+        MoveLogger tempLogger = new MoveLogger("temp_gc.log");
+        GameRestorer restorer = new GameRestorer(tempLogger);
         controller.setRestorer(restorer);
 
         // Bob si riconnette mentre il gioco è già in corso
         controller.addPlayer("Bob", Color.RED, mockView);
         assertNotNull(controller.getGame());
+        
+        tempLogger.deleteAll(controller.getGameId());
     }
 
-    // =====================================================================
     // startGame
-    // =====================================================================
 
     @Test
     void startGame_withoutGame_throwsIllegalState() {
@@ -286,29 +283,25 @@ class GameControllerTest {
     }
 
     @Test
-    void startGame_afterGameCreated_stateIsPlacingTotems() {
+    void startGame_afterGameCreated_stateIsPlacingTotems() throws InterruptedException {
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
-
         assertEquals(GameState.PLACING_TOTEMS,
                 controller.getGame().getCurrentState().getStateId());
     }
 
     @Test
-    void startGame_logsStartGameMove() {
+    void startGame_logsStartGameMove() throws InterruptedException {
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
-
         boolean found = controller.getMoveLogger().readAll().stream()
                 .anyMatch(m -> m.type == GameMove.MoveType.START_GAME);
         assertTrue(found);
     }
 
-    // =====================================================================
     // onPlaceTotem
-    // =====================================================================
 
     @Test
     void onPlaceTotem_unknownPlayer_returnsFalse() {
@@ -378,9 +371,7 @@ class GameControllerTest {
                 controller.getGame().getCurrentState().getStateId());
     }
 
-    // =====================================================================
     // onTakeCard
-    // =====================================================================
 
     @Test
     void onTakeCard_unknownPlayer_returnsFalse() {
@@ -453,9 +444,7 @@ class GameControllerTest {
         assertTrue(found);
     }
 
-    // =====================================================================
     // onSkipExtraDraw
-    // =====================================================================
 
     @Test
     void onSkipExtraDraw_unknownPlayer_returnsFalse() {
@@ -497,9 +486,7 @@ class GameControllerTest {
         assertTrue(found);
     }
 
-    // =====================================================================
     // endGame
-    // =====================================================================
 
     @Test
     void endGame_dbInactive_doesNotThrow() {
@@ -523,17 +510,15 @@ class GameControllerTest {
             @Override public void sendClientState(ClientState s) { received.add(s); }
         };
 
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, capturingView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
         controller.endGame();
 
         assertTrue(received.contains(ClientState.END_GAME));
     }
 
-    // =====================================================================
     // broadcastUpdate
-    // =====================================================================
 
     @Test
     void broadcastUpdate_beforeGameCreated_doesNotThrow() {
@@ -541,13 +526,12 @@ class GameControllerTest {
     }
 
     @Test
-    void broadcastUpdate_gameCreatedButNotStarted_doesNotSendDTO() {
-        // Dopo addPlayer il gioco è creato (non null) ma startGame non è ancora stato chiamato.
-        // In quel momento lo stato interno è PlacingState (non SETUP), quindi broadcastUpdate
-        // invierebbe il DTO... ma poiché mockView non fa nulla, verifichiamo solo che non lanci.
+    void broadcastUpdate_afterGameStarted_doesNotThrow() {
+        // Avviamo il gioco in modo sincrono e verifichiamo che broadcastUpdate
+        // non propaghi eccezioni durante una normale partita in corso.
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
         assertNotNull(controller.getGame());
         assertDoesNotThrow(() -> controller.broadcastUpdate());
     }
@@ -557,10 +541,9 @@ class GameControllerTest {
         VirtualView throwingView = new StubView("Alice") {
             @Override public void sendGame(GameDTO dto) { throw new RuntimeException("Network error"); }
         };
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, throwingView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
-        controller.startGame();
         assertDoesNotThrow(() -> controller.broadcastUpdate());
     }
 
@@ -573,9 +556,34 @@ class GameControllerTest {
         assertDoesNotThrow(() -> controller.broadcastUpdate());
     }
 
-    // =====================================================================
+    // sendClientStateToAll
+
+    @Test
+    void sendClientStateToAll_throwingView_doesNotPropagate() {
+        // Usiamo una view che lancia RuntimeException su sendClientState
+        // La registriamo DOPO l'avvio per non interferire con i sendClientState di setup
+        controller.setNumPlayers(2);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+        controller.addPlayer("Bob",   Color.RED,  mockView);
+
+        // Sostituiamo la view di Alice con una che lancia eccezione
+        VirtualView throwingView = new StubView("Alice") {
+            private boolean first = true;
+            @Override public void sendClientState(ClientState s) {
+                if (first) {
+                    first = false;
+                } else {
+                    throw new RuntimeException();
+                }
+            }
+        };
+        controller.reconnectPlayer("Alice", throwingView);
+
+        // sendClientStateToAll deve catturare l'eccezione internamente e non propagarla
+        assertDoesNotThrow(() -> controller.sendClientStateToAll(ClientState.IN_GAME));
+    }
+
     // reconnectPlayer
-    // =====================================================================
 
     @Test
     void reconnectPlayer_unknownPlayer_throwsIllegalArgument() {
@@ -600,7 +608,6 @@ class GameControllerTest {
         controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  bobView);
-        controller.startGame();
 
         controller.onPlayerDisconnected("Alice");
         controller.reconnectPlayer("Alice", new StubView("Alice"));
@@ -609,9 +616,7 @@ class GameControllerTest {
         assertTrue(bobView.messages.stream().anyMatch(m -> m.contains("Alice")));
     }
 
-    // =====================================================================
     // onPlayerDisconnected
-    // =====================================================================
 
     @Test
     void onPlayerDisconnected_marksPlayerAsDisconnected() {
@@ -640,9 +645,9 @@ class GameControllerTest {
     @Test
     void onPlayerDisconnected_allPlayersDisconnect_doesNotThrow() {
         controller.setOnGameFinished(() -> {});  // callback vuoto per evitare NPE su onGameFinished
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  mockView);
-        controller.setNumPlayers(2);
 
         // Disconnettere il primo giocatore skippa il suo turno (può far avanzare il gioco)
         controller.onPlayerDisconnected("Alice");
@@ -653,17 +658,15 @@ class GameControllerTest {
     @Test
     void onPlayerDisconnected_notifiesRemainingPlayers() {
         StubView bobView = new StubView("Bob");
+        controller.setNumPlayers(2);
         controller.addPlayer("Alice", Color.BLUE, mockView);
         controller.addPlayer("Bob",   Color.RED,  bobView);
-        controller.setNumPlayers(2);
 
         controller.onPlayerDisconnected("Alice");
         assertTrue(bobView.messages.stream().anyMatch(m -> m.contains("Alice")));
     }
 
-    // =====================================================================
     // Turn timer
-    // =====================================================================
 
     @Test
     void startAndCancelTurnTimer_doesNotThrow() {
@@ -689,9 +692,7 @@ class GameControllerTest {
         });
     }
 
-    // =====================================================================
     // Getters / utility
-    // =====================================================================
 
     @Test
     void getGameId_returnsConstructorValue() {
@@ -781,16 +782,14 @@ class GameControllerTest {
         assertFalse(found);
     }
 
-    // =====================================================================
     // Flusso di gioco completo (round 1 → round 2)
-    // =====================================================================
 
     @Test
     void fullFirstRound_endingInPlacingTotemsForRound2() {
+        controller.setNumPlayers(3);
         controller.addPlayer("Alice", Color.BLUE,   mockView);
         controller.addPlayer("Bob",   Color.RED,    mockView);
         controller.addPlayer("Carlo", Color.PURPLE, mockView);
-        controller.setNumPlayers(3);
 
         assertEquals(GameState.PLACING_TOTEMS,
                 controller.getGame().getCurrentState().getStateId());

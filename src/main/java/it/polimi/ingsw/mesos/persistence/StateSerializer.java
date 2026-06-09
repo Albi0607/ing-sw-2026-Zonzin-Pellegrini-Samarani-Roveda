@@ -143,20 +143,6 @@ public class StateSerializer {
     }
 
     /**
-     * Deletes the persistence files for this game.
-     */
-    public void delete() {
-        try {
-            Files.deleteIfExists(Paths.get(tribeFile));
-            Files.deleteIfExists(Paths.get(buildingFile));
-            Files.deleteIfExists(Paths.get(orderFile));
-            System.out.println("[StateSerializer] Persistence files deleted.");
-        } catch (IOException e) {
-            System.err.println("[StateSerializer] Error deleting files: " + e.getMessage());
-        }
-    }
-
-    /**
      * Checks if a saved state exists.
      *
      * @return true if all required persistence files exist

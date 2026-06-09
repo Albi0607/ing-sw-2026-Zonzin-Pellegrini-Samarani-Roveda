@@ -233,6 +233,9 @@ public class ServerState {
      *
      * This method is executed once at server startup before initializing RMI and Socket services.
      */
+    /** Minutes after which an unrecovered crashed session is considered abandoned. */
+    private static final long STALE_SESSION_THRESHOLD_MINUTES = 5;
+
     public synchronized void initializeFromDisk() {
         File dir = new File(".");
         File[] logFiles = dir.listFiles(
@@ -254,6 +257,15 @@ public class ServerState {
             MoveLogger logger = new MoveLogger(logFile.getName());
 
             if (!logger.hasSavedGame()) continue;
+
+            if (logger.isStale(STALE_SESSION_THRESHOLD_MINUTES)) {
+                System.out.println("[ServerState] Sessione " + gameId
+                        + " abbandonata (log più vecchio di "
+                        + STALE_SESSION_THRESHOLD_MINUTES
+                        + " minuti). File eliminati.");
+                logger.deleteAll(gameId);
+                continue;
+            }
 
             // Ricava i nickname che partecipavano alla partita dal log
             // (sono le mosse ADD_PLAYER)

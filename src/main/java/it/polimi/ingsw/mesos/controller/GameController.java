@@ -48,11 +48,11 @@ public class GameController {
 
     private int expectedNumPlayers = 0;
 
-    private LeaderboardService leaderboardService;
+    private final LeaderboardService leaderboardService;
 
-    private MoveLogger moveLogger;
+    private final MoveLogger moveLogger;
 
-    private StateSerializer stateSerializer;
+    private final StateSerializer stateSerializer;
 
     private boolean replayMode = false;
 
@@ -111,22 +111,9 @@ public class GameController {
             moveLogger.append(GameMove.setNumPlayers(expectedNumPlayers));
         }
 
-        if (pendingNicknames.size() == this.expectedNumPlayers) {
-            createGame();
-            game.startGame();
-
-            new Thread(() -> {
-                for (VirtualView v : players.values()) {
-                    v.sendClientState(ClientState.IN_GAME);
-                }
-                broadcastUpdate();
-            }).start();
-
-        } else {
-            for (VirtualView view : players.values()) {
-                view.sendClientState(ClientState.WAITING_PLAYERS);
-                view.showMessage("Game set to " + expectedNumPlayers + " players. Waiting for opponents...");
-            }
+        for (VirtualView view : players.values()) {
+            view.sendClientState(ClientState.WAITING_PLAYERS);
+            view.showMessage("Game set to " + expectedNumPlayers + " players. Waiting for opponents...");
         }
     }
 
@@ -182,8 +169,10 @@ public class GameController {
             boolean allReconnected = players.values().stream()
                     .noneMatch(v -> v instanceof DummyVirtualView);
             if (allReconnected) {
-                broadcastUpdate();
-                sendClientStateToAll(ClientState.IN_GAME);
+                new Thread (() -> {
+                    broadcastUpdate();
+                    sendClientStateToAll(ClientState.IN_GAME);
+                }).start();
             }
             return;
         }
@@ -215,7 +204,11 @@ public class GameController {
 
         if (expectedNumPlayers != 0 && pendingNicknames.size() == expectedNumPlayers) {
             createGame();
-            new Thread(() -> startGame()).start();
+            startGame();
+            new Thread (() -> {
+                broadcastUpdate();
+                sendClientStateToAll(ClientState.IN_GAME);
+            }).start();
         }
         else {
             view.sendClientState(ClientState.WAITING_PLAYERS);
@@ -325,8 +318,7 @@ public class GameController {
 
         sendClientStateToAll(ClientState.END_GAME);
 
-        if (moveLogger != null) moveLogger.delete();
-        stateSerializer.delete();
+        if (moveLogger != null) moveLogger.deleteAll(gameId);
 
         if (onGameFinished != null) {
             onGameFinished.run();
