@@ -29,7 +29,7 @@ public class ClientChoseSetup {
     public static Network createNetwork(String choice, String serverIp, int port,String clientIp) {
         try {
             return switch (choice) {
-                case "RMI" -> new client_RMI(serverIp, port,clientIp);
+                case "RMI" -> new client_RMI(serverIp, port, clientIp);
                 case "SOCKET" -> new clientSocket(serverIp, port);
                 default -> throw new IllegalArgumentException();
             };
