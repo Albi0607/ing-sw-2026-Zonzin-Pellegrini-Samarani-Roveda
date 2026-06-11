@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.view.GUI.Controllers;
+package it.polimi.ingsw.mesos.view.GUI.Controllers.EndGame;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
@@ -13,31 +13,40 @@ import javafx.scene.layout.VBox;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Controller for the end game screen.
+ * Displays the final results of the current game session sorted by score,
+ * and optionally shows the all-time leaderboard fetched from the database.
+ */
 public class EndGameController {
+    /** The observable game model used to retrieve the final player standings. */
     private ObservableGameModel gameModel;
 
+    // FXML components
     @FXML private VBox resultContainer;
     @FXML private Label databaseLabel;
     @FXML private ScrollPane databaseContainer;
     @FXML private VBox databaseVBox;
 
-
-    public void set(ObservableGameModel gameModel) {
+    /**
+     * Injects the game model and immediately renders the end game results.
+     *
+     * @param gameModel the observable game model containing the final player states
+     */
+    public void setController(ObservableGameModel gameModel) {
         this.gameModel = gameModel;
         printResult();
     }
 
+    /**
+     * Renders the end game result cards sorted by prestige points descending,
+     * with food as a tiebreaker. Players with equal score share the same position.
+     * The database leaderboard section is hidden when this method is called.
+     */
     private void printResult() {
-        databaseLabel.setManaged(false);
-        databaseContainer.setManaged(false);
-        databaseVBox.setManaged(false);
-        databaseLabel.setDisable(true);
-        databaseContainer.setDisable(true);
-        databaseVBox.setDisable(true);
-
+        setDatabaseVisible(false);
 
         resultContainer.getChildren().clear();
-
 
         //si potrebbe usare winners facendo solo il controllo delle posizioni
         List<ObservablePlayerModel> sorted = gameModel.getPlayers().stream()
@@ -85,14 +94,17 @@ public class EndGameController {
 
     }
 
+    /**
+     * Renders the all-time leaderboard fetched from the database.
+     * Makes the database section visible and populates it with one card per entry.
+     * The local player's entry is highlighted if their position matches.
+     *
+     * @param leaderboard the list of all-time game results from the database
+     * @param myPosition the position of the local player in the leaderboard
+     */
     public void showLeaderboard(List<GameResult> leaderboard, int myPosition){
 
-        databaseLabel.setManaged(true);
-        databaseContainer.setManaged(true);
-        databaseVBox.setManaged(true);
-        databaseLabel.setDisable(false);
-        databaseContainer.setDisable(false);
-        databaseVBox.setDisable(false);
+        setDatabaseVisible(true);
 
         databaseVBox.getChildren().clear();
 
@@ -114,6 +126,21 @@ public class EndGameController {
             }
 
         }
+    }
+
+    /**
+     * Shows or hides the database leaderboard section.
+     * Manages both the layout presence and the disabled state of all three components.
+     *
+     * @param visible true to show the section, false to hide it
+     */
+    private void setDatabaseVisible(boolean visible) {
+        databaseLabel.setManaged(visible);
+        databaseContainer.setManaged(visible);
+        databaseVBox.setManaged(visible);
+        databaseLabel.setDisable(!visible);
+        databaseContainer.setDisable(!visible);
+        databaseVBox.setDisable(!visible);
     }
 
 }
