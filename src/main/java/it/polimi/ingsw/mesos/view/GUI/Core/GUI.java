@@ -19,38 +19,60 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
+/**
+ * Main JavaFX application class and entry point for the GUI client.
+ * Implements the View interface to receive updates from the server via the ClientController.
+ * Manages the ObservableGameModel and delegates all scene transitions to the SceneManager.
+ */
 public class GUI extends Application implements View {
+    /** The primary JavaFX stage used to display all scenes. */
     private Stage primaryStage;
+    /** The scene manager responsible for all scene transitions and UI routing. */
     private SceneManager sceneManager;
+    /** The client controller used to send player actions to the server. */
     private ClientController clientController;
+    /** The current state of the client, used to route messages to the correct scene. */
     private ClientState clientState;
+    /** The observable game model shared between the GUI and all game controllers. */
     private ObservableGameModel gameModel;
+    /** The main game controller, created when the first game update is received. */
     private GameControllerGUI gameControllerGUI;
+    /** The local player's nickname, set after login. */
     private String localNickname;
-    private boolean gameStarted;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Initializes the primary stage, creates the observable game model and scene manager,
+     * and loads the login scene.
+     *
+     * @param primaryStage the primary JavaFX stage provided by the framework
+     */
     @Override public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         gameModel = new ObservableGameModel();
-        sceneManager = new SceneManager(primaryStage, this,clientState, gameModel);
-        gameStarted=false;
+        sceneManager = new SceneManager(primaryStage, this, gameModel);
         sceneManager.loadLoginScene();
         this.primaryStage.setTitle("Mesos");
         this.primaryStage.getIcons().add(new Image("/images/tool/icon.png"));
         this.primaryStage.show();
     }
 
+    /**
+     * Receives the latest game state from the server and updates the observable model.
+     * On the first update, creates the game controller and loads the game scene.
+     * On subsequent updates, only refreshes the model.
+     *
+     * @param game the latest GameDTO received from the server
+     */
     @Override
     public void showLastUpdate(GameDTO game) {
        Platform.runLater(() -> {
 
             //partita appena iniziata aggiorno il modello e cambio la scene con il modello appena aggiornato
-            if(!gameStarted&&gameControllerGUI==null) {
-                gameStarted = true;
+            if(gameControllerGUI==null) {
                 gameModel.updateFromDTO(game);
                 gameControllerGUI = sceneManager.loadGameScene();
                 return;
@@ -61,6 +83,11 @@ public class GUI extends Application implements View {
         });
     }
 
+    /**
+     * Displays a message to the player by routing it to the currently active scene.
+     *
+     * @param message the message to display
+     */
     @Override
     public void showMessage(String message) {
         Platform.runLater(() -> {
@@ -68,28 +95,45 @@ public class GUI extends Application implements View {
         });
     }
 
+    /**
+     * Receives the current lobby state from the server.
+     * Navigates to the lobby scene on the first call, then updates the lobby list.
+     *
+     * @param lobby the current list of available games
+     */
     @Override
     public void showLobby(List<LobbyInfoDTO> lobby) {
-        // DA IMPLEMENTARE: Platform.runLater() -> aggiorna scena lobby
         Platform.runLater(()->{
-
             if (this.clientState == null || this.clientState != ClientState.LOBBY) {
                 this.clientState = ClientState.LOBBY;
                 sceneManager.loadLobbyScene(clientController);
             }
-
             sceneManager.updateLobby(lobby);
         });
     }
 
+    /**
+     * Receives a client state update from the server and notifies the scene manager
+     * if the state has changed.
+     *
+     * @param currentState the new client state
+     */
     @Override
     public void showClientStateUpdate(ClientState currentState){
-        if(this.clientState!=currentState) {
-            this.clientState=currentState;
-            sceneManager.updateClientState(currentState);
-        }
+        Platform.runLater(() -> {
+            if(this.clientState != currentState) {
+                this.clientState = currentState;
+                sceneManager.updateClientState(currentState);
+            }
+        });
     }
 
+    /**
+     * Receives a rejected action notification from the server and forwards
+     * the reason to the game controller.
+     *
+     * @param reason the reason the action was rejected
+     */
     @Override
     public void showActionRejected(String reason) {
        Platform.runLater(() -> {
@@ -99,6 +143,12 @@ public class GUI extends Application implements View {
         });
     }
 
+    /**
+     * Receives an accepted action notification from the server and forwards
+     * the message to the game controller.
+     *
+     * @param message the message describing the accepted action
+     */
     @Override
     public void showActionAccepted(String message) {
        Platform.runLater(() -> {
@@ -108,6 +158,11 @@ public class GUI extends Application implements View {
         });
     }
 
+    /**
+     * Receives a login error from the server and forwards it to the login controller.
+     *
+     * @param message the error message to display on the login screen
+     */
     @Override
     public void  showLoginError(String message) {
        Platform.runLater(() -> {
@@ -120,7 +175,17 @@ public class GUI extends Application implements View {
         });
     }
 
-    //capire se gestire qua questa cosa o se fare diversamente, rendere le scelte di IP e PORT veramente utili e usabili
+    /**
+     * Handles the login action triggered by the login screen.
+     * Creates the network connection and the clientController,
+     * then requests to enter the lobby with the given nickname.
+     *
+     * @param nickname the player's chosen nickname
+     * @param ip the server IP address
+     * @param port the server port
+     * @param networkChoice the network protocol chosen by the player (SOCKET or RMI)
+     * @param clientIp the client's own IP address, used for RMI
+     */
     public void handleLogin(String nickname,String ip,int port,String networkChoice,String clientIp){
         try {
             if (ip == null || ip.trim().isEmpty()) {
@@ -134,16 +199,32 @@ public class GUI extends Application implements View {
         }
     }
 
+    /**
+     * Sets the local player's nickname after a successful login.
+     *
+     * @param nickname the nickname to store
+     */
     public void setNickname(String nickname){
         this.localNickname = nickname;
     }
 
+    /**
+     * Returns the local player's nickname.
+     *
+     * @return the local player's nickname
+     */
     public String getNickname(){
         return this.localNickname;
     }
 
+    /**
+     * Receives the all-time leaderboard from the server and forwards it to the scene manager.
+     *
+     * @param leaderboard the list of all-time game results
+     * @param myPosition the position of the local player in the leaderboard
+     */
     @Override
     public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
-        Platform.runLater(()-> sceneManager.showLeaderboard(leaderboard,myPosition));
+        sceneManager.showLeaderboard(leaderboard,myPosition);
     }
 }

@@ -54,7 +54,7 @@ public class clientSocket implements Network {
         new Thread(this::listenFromServer).start();
     }
 
-    /**
+    /**-+
      * Sends a request to place a totem in the game.
      *
      * @param nickname the nickname of the player

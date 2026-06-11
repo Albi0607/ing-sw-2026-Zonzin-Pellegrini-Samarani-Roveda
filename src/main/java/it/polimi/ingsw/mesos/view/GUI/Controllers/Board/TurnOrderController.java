@@ -11,35 +11,52 @@ import javafx.scene.layout.StackPane;
 
 import java.util.Objects;
 
+/**
+ * Controller for the turn order track on the game board.
+ * Displays the turn order track image based on the number of players,
+ * and renders each player's totem at the correct position in the track.
+ * Totems are stacked vertically.
+ */
 public class TurnOrderController {
 
+    // FXML components
     @FXML StackPane turnOrderTrack;
     @FXML ImageView turnOrderTrackImage;
     @FXML Pane totemContainer;
-    private String path;
-    private ObservableGameModel gameModel;
 
-    //disegnare il turnOrderTrack una sola volta in set e in questo metodo cambiare solo la posizione dei totem
+    /**
+     * Loads and displays the turn order track image based on the number of players.
+     * Should be called once at the start of the game.
+     *
+     * @param turnOrderTrack the list of turn order slots, used to determine the player count
+     */
     public void setTurnOrder(ObservableList<TurnOrderSlotDTO> turnOrderTrack){
-        path="/images/TurnOrderTrack/"+turnOrderTrack.size()+".png";
+        String path="/images/TurnOrderTrack/"+turnOrderTrack.size()+".png";
         try{
             Image image = new Image(Objects.requireNonNull(TurnOrderController.class.getResourceAsStream(path)));
             turnOrderTrackImage.setImage(image);
         }catch(Exception e){
-            System.err.println("ERRORE NEL CARICAMENTO DEL TURNORDERTRACK: " + e.getMessage());
+            System.out.println("ERRORE NEL CARICAMENTO DEL TURNORDERTRACK: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    /**
+     * Updates the totem positions on the turn order track.
+     * Clears all existing totem images and redraws them based on the current slot occupants.
+     * Empty slots are skipped. Totems are stacked vertically.
+     *
+     * @param turnOrderTrack the updated list of turn order slots with occupant colors
+     */
     public void update(ObservableList<TurnOrderSlotDTO> turnOrderTrack){
 
         //tolgo i vecchi totem
         totemContainer.getChildren().clear();
 
-        double startX = 30;
+        double startX = 27;
         double startY = 5;
         if(turnOrderTrack.size()>=4){
-            startY = -5;
+            startY = -15;
         }
         double spacingY = 25;
 
@@ -59,7 +76,7 @@ public class TurnOrderController {
                 ImageView totem = new ImageView(new Image(Objects.requireNonNull(
                         TurnOrderController.class.getResourceAsStream(totemPath))));
 
-                totem.setFitWidth(25);
+                totem.setFitWidth(30);
                 totem.setFitHeight(45);
                 totem.setPreserveRatio(true);
 
