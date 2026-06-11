@@ -1,44 +1,46 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
-import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/**
+ * Controller for a single game card displayed in the lobby list.
+ * Shows the game id, current status and player count for one available game,
+ * and allows the player to navigate to the totem choice screen to join it.
+ */
 public class GameCardController {
+    /** The lobby data currently displayed by this card. */
     private LobbyInfoDTO data;
-    private GUI gui;
-    private ClientController clientController;
+    /** The scene manager used to navigate to the totem choice screen on join. */
     private SceneManager sceneManager;
 
-
+    //FXML components
     @FXML private Label roomIdLabel;
     @FXML private Label statusLabel;
     @FXML private Label playersLabel;
     @FXML private Button joinButton;
 
-
-    @FXML public void initialize(){
+    /**
+     * Applies the click effect to the join button.
+     */
+    @FXML public void initialize() {
         // effetto click
-        joinButton.setOnMousePressed(e -> {
-            joinButton.setScaleX(0.95);
-            joinButton.setScaleY(0.95);
-        });
-
-        joinButton.setOnMouseReleased(e -> {
-            joinButton.setScaleX(1.0);
-            joinButton.setScaleY(1.0);
-        });
-
+        UIEffects.applyClickEffect(joinButton);
     }
 
-    public void setData(LobbyInfoDTO dto, GUI gui, ClientController controller, SceneManager sceneManager) {
+    /**
+     * Populates this card with the provided lobby data and updates all labels.
+     * Can be called multiple times to refresh the card when the lobby state changes.
+     *
+     * @param dto the lobby data to display
+     * @param sceneManager the scene manager used to navigate on join
+     */
+    public void setData(LobbyInfoDTO dto, SceneManager sceneManager) {
         this.data = dto;
-        this.gui = gui;
-        this.clientController = controller;
         this.sceneManager = sceneManager;
 
         roomIdLabel.setText(String.valueOf(dto.id));
@@ -51,6 +53,10 @@ public class GameCardController {
         playersLabel.setText(dto.numPlayers + "/" + dto.maxNumPlayers);
     }
 
+    /**
+     * Handles the join button action.
+     * Navigates to the totem choice screen in join mode for this specific game.
+     */
     @FXML
     public void handleJoinGame() {
         sceneManager.loadTotemScene(data.id,0,data);

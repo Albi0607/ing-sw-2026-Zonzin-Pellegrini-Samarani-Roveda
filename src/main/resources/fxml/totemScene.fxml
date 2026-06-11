@@ -56,9 +56,9 @@
                   <Insets top="-10.0" />
                </VBox.margin>
             </Label>
-            <Button fx:id="create_joinGameButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleCreate_JoinGame" style="-fx-background-radius: 10; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #4a90e2;" text="CREA/ACCEDI ALLA PARTITA" textAlignment="CENTER">
+            <Button fx:id="create_joinGameButton" alignment="CENTER" contentDisplay="CENTER" disable="true" mnemonicParsing="false" onAction="#handleCreate_JoinGame" style="-fx-background-radius: 10; -fx-font-weight: bold; -fx-text-fill: white; -fx-background-color: #4a90e2;" text="CREA/ACCEDI ALLA PARTITA" textAlignment="CENTER" prefWidth="200" prefHeight="40" minWidth="200" minHeight="40" maxWidth="200" maxHeight="40">
                <font>
-                  <Font size="14.0" />
+                  <Font size="18.0" />
                </font>
             </Button>
          </children>

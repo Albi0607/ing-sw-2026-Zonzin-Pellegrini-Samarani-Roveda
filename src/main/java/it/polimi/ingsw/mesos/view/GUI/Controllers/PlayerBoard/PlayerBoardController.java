@@ -3,6 +3,7 @@ package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -17,26 +18,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ * Controller for a single player's board panel.
+ * Displays the player's name, food, prestige points and card collections,
+ * grouped by character type and buildings.
+ * Binds directly to an ObservablePlayerModel so all scalar values update automatically.
+ * Also manages the skip button visibility for the main player during extra draw phases.
+ */
 public class PlayerBoardController {
+    /** The observable player model this board is bound to. */
     private ObservablePlayerModel playerModel;
+    /** The client controller used to send game actions such as skip. */
     private ClientController clientController;
+    /** Whether this board belongs to the main local player. Used to show the skip button. */
     private boolean isMainPlayer = false;
+    /** The CSS color string derived from the player color, used to style labels. */
     private String colorPaint;
 
-    //tengo riferimento alle carte per tipologia
+    /** Card ids for artist characters owned by this player. */
     private final List<String> artists = new ArrayList<>();
+    /** Card ids for builder characters owned by this player. */
     private final List<String> builders = new ArrayList<>();
+    /** Card ids for gatherer characters owned by this player. */
     private final List<String> gatherers = new ArrayList<>();
+    /** Card ids for hunter characters owned by this player. */
     private final List<String> hunters = new ArrayList<>();
+    /** Card ids for inventor characters owned by this player. */
     private final List<String> inventors = new ArrayList<>();
+    /** Card ids for shaman characters owned by this player. */
     private final List<String> shamans = new ArrayList<>();
 
-
+    /** Ordered list of all character type card id lists. */
     List<List<String>> characters;
+    /** Ordered list of card slot StackPanes for the six character types. */
     List<StackPane> stackPanes;
+    /** Ordered list of card ImageViews for the six character types. */
     List<ImageView> imagesView;
+    /** Ordered list of card count labels for the six character types. */
     List<Label> cardsCount;
+
+    // FXML components
 
     @FXML private HBox headerBox;
     @FXML Label playerNameLabel;
@@ -67,7 +88,10 @@ public class PlayerBoardController {
 
     @FXML Button skipButton;
 
-
+    /**
+     * Initializes all card slots as hidden and builds the parallel lists
+     * for character type slots, images and count labels.
+     */
     @FXML
     public void initialize() {
 
@@ -81,20 +105,29 @@ public class PlayerBoardController {
         disableSlot(cardSlot7);
 
         characters = List.of(artists, builders, gatherers, hunters, inventors, shamans);
-
         stackPanes = List.of(cardSlot1, cardSlot2, cardSlot3, cardSlot4, cardSlot5, cardSlot6);
-
         imagesView = List.of(cardImage1, cardImage2, cardImage3, cardImage4, cardImage5, cardImage6);
-
         cardsCount = List.of(cardCount1, cardCount2, cardCount3, cardCount4, cardCount5, cardCount6);
     }
 
+    /**
+     * Hides a card slot and removes it from the layout flow so it takes no space
+     * when no cards of that type have been acquired yet.
+     *
+     * @param slot the StackPane slot to hide
+     */
     private void disableSlot(StackPane slot) {
         slot.setVisible(false);
         slot.setManaged(false);
     }
 
-
+    /**
+     * Binds this board to the given player model and sets up all listeners.
+     *
+     * @param playerModel the observable player model to bind to
+     * @param clientController the client controller used to send game actions
+     * @param isMainPlayer true if this board belongs to the local player
+     */
     public void setPlayer(ObservablePlayerModel playerModel,ClientController clientController, boolean isMainPlayer) {
         this.playerModel = playerModel;
         this.clientController = clientController;
@@ -103,6 +136,11 @@ public class PlayerBoardController {
         bind();
     }
 
+    /**
+     * Binds all labels to the player model properties and registers listeners
+     * for new character and building cards.
+     * Label colors are derived from the player's assigned color.
+     */
     private void bind() {
         //trova il colore del player e scrive le label con quel colore
         colorPaint = switch (playerModel.getColor()) {
@@ -114,7 +152,7 @@ public class PlayerBoardController {
             default -> "black";
         };
 
-        //aggiorna automaticamente il nome (non serve)
+        //aggiorna automaticamente il nome
         playerNameLabel.textProperty().bind(playerModel.nicknameProperty());
         playerNameLabel.setStyle("-fx-text-fill: " + colorPaint + ";" + "-fx-font-size: 22px;" + "-fx-font-weight: bold;");
 
@@ -140,6 +178,11 @@ public class PlayerBoardController {
 
     }
 
+    /**
+     * Adds a new building card to the dedicated building slot.
+     *
+     * @param card the building card DTO to add
+     */
     private void addBuildingCard(CardDTO card) {
 
         Platform.runLater(() -> PlayerCardView.addNewCard(card.id, cardSlot7, cardImage7, cardCount7,  playerModel.getTribe().getBuildings().stream()
@@ -148,6 +191,12 @@ public class PlayerBoardController {
         ));
     }
 
+    /**
+     * Adds a new character card to the slot corresponding to its character type.
+     * Uses the character type to select the correct slot from the parallel lists.
+     *
+     * @param card the character card DTO to add
+     */
     private void addCharacterCard(CardDTO card) {
         if(card.characterType==null){
             return;
@@ -169,12 +218,23 @@ public class PlayerBoardController {
 
     }
 
-    //per ruotare il nome e i punti quando la playerBoard è quella di un giocatore che si trova in alto
+    /**
+     * Rotates the header box by 180 degrees.
+     * Used when this player board is displayed at the top of the screen
+     * so the name and points are readable from the correct orientation.
+     */
     public void setHeaderFlipped() {
         headerBox.setRotate(180);
     }
 
-    // chiamato dall'esterno ogni volta che il GameDTO aggiorna il model
+    /**
+     * Updates the visibility and enabled state of the skip button.
+     * The button is shown only for the main player during the RESOLVING_ACTIONS
+     * state when an extra draw phase is active.
+     *
+     * @param currentState    the current game state
+     * @param isExtraDrawPhase whether the game is currently in an extra draw phase
+     */
     public void updateSkipButton(GameState currentState, boolean isExtraDrawPhase) {
         if (!isMainPlayer) return; // solo per il player principale
 
@@ -185,6 +245,10 @@ public class PlayerBoardController {
         skipButton.setDisable(!shouldShow);
     }
 
+    /**
+     * Handles the skip button click.
+     * Hides the button and sends the skip action to the server.
+     */
     @FXML private void onSkipClicked() {
         skipButton.setVisible(false);
         skipButton.setManaged(false);
@@ -193,33 +257,21 @@ public class PlayerBoardController {
         clientController.skipOnExtraDraw(); // chiama l'azione sul server
     }
 
+    /**
+     * Applies the hover effect to the skip button when the mouse enters it.
+     * Ignored if the button is currently disabled.
+     */
     @FXML private void onSkipHover() {
         if (!skipButton.isDisable()) {
-            skipButton.setStyle(
-                    "-fx-background-color: #ff4400;" +
-                            "-fx-text-fill: white;" +
-                            "-fx-font-weight: bold;" +
-                            "-fx-font-size: 14px;" +
-                            "-fx-background-radius: 8;" +
-                            "-fx-border-radius: 8;" +
-                            "-fx-padding: 6 18 6 18;" +
-                            "-fx-cursor: hand;" +
-                            "-fx-effect: dropshadow(gaussian, rgba(255,80,0,0.5), 10, 0.3, 0, 2);"
-            );
+            UIEffects.applySkipHoverEffect(skipButton);
         }
     }
 
+    /**
+     * Restores the default style of the skip button when the mouse exits it.
+     */
     @FXML private void onSkipHoverExit() {
-        skipButton.setStyle(
-                "-fx-background-color: #cc3300;" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-border-radius: 8;" +
-                        "-fx-padding: 6 18 6 18;" +
-                        "-fx-cursor: hand;"
-        );
+        UIEffects.applySkipDefaultEffect(skipButton);
     }
 }
 

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
-import it.polimi.ingsw.mesos.rete.ClientController;
+
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,25 +11,28 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-
+/**
+ * Controller for the lobby screen.
+ * Displays the list of available games as interactive cards and allows
+ * the player to create a new game by selecting the number of players.
+ * Updates the game list incrementally without recreating existing cards.
+ */
 public class LobbyController {
-    private GUI gui;
-    private ClientController clientController;
+    /** The scene manager used for navigation between screens. */
     private SceneManager sceneManager;
+    /** Maps each game id to its corresponding GameCardController for updates. */
+    private final Map<Integer, GameCardController> cardControllers = new HashMap<>();
 
-    public void setController(GUI gui,ClientController clientCtrl,SceneManager sceneManager) {
-        this.gui = gui;
-        this.clientController = clientCtrl;
-        this.sceneManager = sceneManager;
-    }
-
+    // FXML components
     @FXML AnchorPane rootPane;
     @FXML private ScrollPane gamesContainer;
     @FXML private VBox gamesVBox;
@@ -37,7 +40,12 @@ public class LobbyController {
     @FXML private Label errorLabel;
     @FXML private Button createGameButton;
 
-
+    /**
+     * Initializes the lobby screen.
+     * Populates the players combo box with the allowed player counts,
+     * disables the create button until a player count is selected,
+     * and applies the click effect and background image.
+     */
     @FXML public void initialize() {
 
         //riempo il comboBox con i possibili giocatori di una partita
@@ -50,77 +58,86 @@ public class LobbyController {
         });
 
         // effetto click
-            createGameButton.setOnMousePressed(e -> {
-            createGameButton.setScaleX(0.95);
-            createGameButton.setScaleY(0.95);
-        });
-
-        createGameButton.setOnMouseReleased(e -> {
-            createGameButton.setScaleX(1.0);
-            createGameButton.setScaleY(1.0);
-        });
-
-
+        UIEffects.applyClickEffect(createGameButton);
 
         //metto come sfondo l'immagine di background mesos
-        try {
-            Image image = new Image(getClass().getResource("/images/tool/backgroundMesos.png").toExternalForm());
-
-            ImageView background = new ImageView(image);
-
-            // dimensione base (quella che vuoi tu)
-            background.setFitWidth(1450);
-            background.setFitHeight(750);
-
-            // scala proporzionalmente
-            background.setPreserveRatio(false); // oppure true se vuoi mantenere proporzioni
-
-            // IMPORTANTISSIMO: si adatta al resize del pane
-            background.fitWidthProperty().bind(rootPane.widthProperty());
-            background.fitHeightProperty().bind(rootPane.heightProperty());
-
-            // manda sul fondo
-            rootPane.getChildren().add(0, background);
-        } catch (Exception e) {
-            System.out.println("ERRORE NEL CARICAMENTO DELL'IMMAGINE DI BACKGROUND: " + e.getMessage());
-            e.printStackTrace();
-        }
+        UIEffects.applyBackground(rootPane);
     }
 
-    //TODO da modificare per rendere l'aggiornamento piu intelligente senza eliminare ogni volta le gameCard
-    public void updateLobby(List<LobbyInfoDTO> lobby){
-        //pulisco l'interfaccia vecchia
-        gamesVBox.getChildren().clear();
+    /**
+     * Injects the scene manager into this controller.
+     *
+     * @param sceneManager the scene manager used for navigation
+     */
+    public void setController(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
+    }
 
-        //rifaccio e visualizzo l'interfaccia nuova
+    /**
+     * Updates the lobby game list incrementally.
+     * Adds new game cards for newly appeared games, updates data on existing ones,
+     * and removes cards for games that are no longer present in the list.
+     *
+     * @param lobby the current list of available games received from the server
+     */
+    public void updateLobby(List<LobbyInfoDTO> lobby) {
+
+        // rimuovo le card per lobby che non esistono piu
+        Set<Integer> currentIds = lobby.stream()
+                .map(dto -> dto.id)
+                .collect(Collectors.toSet());
+
+        cardControllers.entrySet().removeIf(entry -> {
+            if (!currentIds.contains(entry.getKey())) {
+                gamesVBox.getChildren().removeIf(node ->
+                        node.getUserData() != null && node.getUserData().equals(entry.getKey())
+                );
+                return true;
+            }
+            return false;
+        });
+
+        // aggiorno o creo le card
         for (LobbyInfoDTO dto : lobby) {
-            System.out.println("CREO CARD: " + dto);
+            if (cardControllers.containsKey(dto.id)) {
+                // card esiste gia, aggiorno solo i dati
+                cardControllers.get(dto.id).setData(dto,sceneManager);
+            } else {
+                // card nuova, la creo
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/gameCard.fxml"));
+                    Parent card = loader.load();
+                    card.setUserData(dto.id);
 
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/gameCard.fxml"));
+                    GameCardController controller = loader.getController();
+                    controller.setData(dto, sceneManager);
+                    cardControllers.put(dto.id, controller);
+                    gamesVBox.getChildren().add(card);
 
-                Parent card = loader.load();
-
-                GameCardController controller = loader.getController();
-                controller.setData(dto,gui,clientController,sceneManager);
-
-                gamesVBox.getChildren().add(card);
-
-            } catch (Exception e) {
-                System.out.println("ERRORE NEL CREARE LE GAMECARD: " + e.getMessage());
-                e.printStackTrace();
+                } catch (Exception e) {
+                    System.out.println("ERRORE NEL CREARE LE GAMECARD: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
-
     }
 
+    /**
+     * Displays a message in the error label with orange text.
+     *
+     * @param message the message to display
+     */
     public void showMessage(String message){
         errorLabel.setText(message);
         errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
         errorLabel.setVisible(true);
     }
 
-
+    /**
+     * Handles the create game button action.
+     * Navigates to the totem choice screen in create mode,
+     * passing -1 as the game id to signal that a new game should be created.
+     */
     @FXML
     public void handleCreateGame() {
         sceneManager.loadTotemScene(-1,playersComboBox.getValue(),null);

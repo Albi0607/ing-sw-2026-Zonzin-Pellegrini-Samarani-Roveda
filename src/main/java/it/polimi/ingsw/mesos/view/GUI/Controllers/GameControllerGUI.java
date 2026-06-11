@@ -28,35 +28,60 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main controller for the game scene.
+ * Orchestrates all sub-controllers for the board, rows, offer tiles, turn order,
+ * deck and player boards. Binds the ObservableGameModel to the UI so all components
+ * update automatically when the server sends new data.
+ * Also manages the action label and player turn feedback.
+ */
 public class GameControllerGUI {
 
+    /** The client controller used to send game actions to the server. */
     private ClientController clientController;
+    /** The scene manager used to trigger scene transitions. */
     private SceneManager sceneManager;
+    /** The observable game model this controller is bound to. */
     private ObservableGameModel gameModel;
+    /** The local player's nickname, used to determine turn ownership. */
     private String localNickname;
+    /**
+     * Flag used to unit multiple rapid model changes into a single UI refresh.
+     * When true, a refresh is already scheduled and further requests are ignored.
+     */
     private boolean refreshFlag = false;
-
-    private TopRowController topRowController;
-    private BottomRowController bottomRowController;
-    private OfferTileController offerTileController;
-    private TurnOrderController turnOrderController;
-    private DeckController deckController;
-
-    private PlayerBoardController mainPlayerBoardController;
-
+    /**
+     * When true, the action label is locked and will not be overwritten by state updates.
+     * Used to keep action accepted or rejected messages visible for a few seconds.
+     */
     private boolean labelLocked = false;
 
+
+    /** Controller for the upper card row. */
+    private TopRowController topRowController;
+    /** Controller for the lower card row. */
+    private BottomRowController bottomRowController;
+    /** Controller for the offer tile area. */
+    private OfferTileController offerTileController;
+    /** Controller for the turn order track. */
+    private TurnOrderController turnOrderController;
+    /** Controller for the deck slot. */
+    private DeckController deckController;
+    /** Controller for the local player's board panel. */
+    private PlayerBoardController mainPlayerBoardController;
+    /** List of all player board controllers, including the local player. */
     private List<PlayerBoardController> playersController;
 
-    @FXML private VBox centerBoard;
-    //label creata per spiegare al client tramite visualizzazione di messaggi cosa deve fare
+    /** Label displaying the current action instruction or feedback to the local player. */
     private Label actionLabel;
-    //labels per stampare di fianco al deck le informazioni sul round e sull'era
+    /** Label displaying the current round number. */
     private Label roundLabel;
+    /** Label displaying the current era. */
     private Label eraLabel;
 
+    // FXML components
+    @FXML private VBox centerBoard;
     @FXML private AnchorPane rootPane;
-
     @FXML private StackPane bottomPlayerContainer;
     @FXML private StackPane topLeftPlayerContainer;
     @FXML private StackPane topRightPlayerContainer;
@@ -71,8 +96,16 @@ public class GameControllerGUI {
     @FXML private Pane leftPlayerArea;
     @FXML private Pane rightPlayerArea;
 
-
-
+    /**
+     * Injects all dependencies and initializes the board, player panels and model bindings.
+     * Schedules an initial UI refresh to ensure all nodes are rendered
+     * before interactivity is enabled.
+     *
+     * @param clientController the client controller used to send game actions
+     * @param sceneManager the scene manager used for scene transitions
+     * @param model the observable game model to bind to
+     * @param nickname the local player's nickname
+     */
     public void setController(ClientController clientController,SceneManager sceneManager,ObservableGameModel model,String nickname) {
         this.clientController = clientController;
         this.sceneManager = sceneManager;
@@ -85,7 +118,11 @@ public class GameControllerGUI {
         Platform.runLater(this::refreshUI);
     }
 
-    //inizializzo la board centrale (senza mani dei giocatori)
+    /**
+     * Loads and assembles all subcomponents of the central game board.
+     * Creates the top row, deck, turn order track, offer tiles, bottom row,
+     * info labels and action label, and arranges them in the center VBox.
+     */
     private void initBoard() {
         try {
 
@@ -113,8 +150,7 @@ public class GameControllerGUI {
             FXMLLoader offerLoader = new FXMLLoader(getClass().getResource("/fxml/offerTileArea.fxml"));
             Parent offer = offerLoader.load();
             offerTileController = offerLoader.getController();
-            offerTileController.set(clientController,this);
-            offerTileController.setModel(gameModel);
+            offerTileController.setController(clientController,this);
 
             //creo la fila inferiore delle carte che possono essere pescate dai giocatori
             FXMLLoader bottomLoader = new FXMLLoader(getClass().getResource("/fxml/bottomRowCards.fxml"));
@@ -128,8 +164,6 @@ public class GameControllerGUI {
             VBox infoBox = new VBox(roundLabel,eraLabel);
             infoBox.setSpacing(20);
             infoBox.setAlignment(Pos.CENTER);
-
-
 
             //creo un HBox(allineamento orizzontale) per tenere sullo stesso piano deck, turnOrderTrack e offerTiles
             HBox middleRow = new HBox(infoBox,deck, turn, offer);
@@ -153,7 +187,12 @@ public class GameControllerGUI {
         }
     }
 
-    //creo le postazioni dei player in base al loro numero
+    /**
+     * Creates and places a player board panel for each player.
+     * The local player is placed at the bottom without rotation.
+     * Other players are assigned to slots based on total player count,
+     * and rotated or scaled to fit their position around the board.
+     */
     private void initPlayerBoard(){
         topRightPlayerArea.setManaged(false);
         topCenterPlayerArea.setManaged(false);
@@ -174,13 +213,9 @@ public class GameControllerGUI {
 
         List<Pane> usedSlots = switch(players.size()){
             case 2 -> List.of(topCenterPlayerContainer);
-
             case 3 -> List.of(topLeftPlayerContainer, topRightPlayerContainer);
-
             case 4 -> List.of(leftPlayerContainer, topCenterPlayerContainer, rightPlayerContainer);
-
             case 5 -> List.of(leftPlayerContainer, topLeftPlayerContainer, topRightPlayerContainer, rightPlayerContainer);
-
             default -> {
                 System.out.println("ERRORE NELL'ASSEGNAZIONE DEGLI SLOT PLAYER DA USARE");
                 yield List.of();}
@@ -264,7 +299,12 @@ public class GameControllerGUI {
         }
     }
 
-    //associo al gameModel degli osservatori che chiamano i metodi di update quando ricevono un cambiamento
+    /**
+     * Registers listeners on all observable properties and lists of the game model.
+     * Each listener triggers either a direct update on the relevant sub-controller
+     * or a scheduled UI refresh via scheduledRefresh.
+     * Also performs the initial population of all board components.
+     */
     private void bindModel() {
 
         gameModel.getUpperRow().addListener((ListChangeListener<CardDTO>) change -> {
@@ -323,14 +363,11 @@ public class GameControllerGUI {
 
     }
 
-    public boolean isMyTurn(GameState state){
-        return(localNickname!=null &&
-                gameModel.getCurrentPlayerNickname()!=null &&
-                gameModel.getCurrentPlayerNickname().equals(localNickname) &&
-                gameModel.getGameState()==state);
-    }
 
-    //utilizzo questo metodo e il flag cosi che faccio un solo refresh anche se cambiano più parametri
+    /**
+     * Schedules a single UI refresh via Platform.runLater.
+     * Uses a flag to ensure that multiple rapid model changes result in only one refresh call.
+     */
     public void scheduledRefresh(){
         if(refreshFlag){
             return;
@@ -345,7 +382,11 @@ public class GameControllerGUI {
         });
     }
 
-
+    /**
+     * Refreshes all interactive and informational UI components.
+     * Checks if the game has ended, updates row and offer tile interactivity,
+     * updates the era and round labels, the action label and the skip button.
+     */
     private void refreshUI() {
         checkIfEnd();
         topRowController.refreshInteraction();
@@ -362,7 +403,13 @@ public class GameControllerGUI {
     }
 
 
-    //scrive nella label le azioni da fare in base allo stato del gioco
+    /**
+     * Updates the action label text and color based on the current game state.
+     * If the label is locked by a temporary message, does nothing.
+     * Shows whose turn it is and what action is expected.
+     *
+     * @param state the current game state
+     */
     public void updateActionLabel(GameState state) {
         if(labelLocked){
             return;
@@ -403,48 +450,76 @@ public class GameControllerGUI {
         actionLabel.setVisible(true);
     }
 
-
+    /**
+     * Updates the round label text and applies the standard round label style.
+     *
+     * @param round the current round number to display
+     */
     public void updateRoundLabel(int round) {
         roundLabel.setText("ROUND: " + round);
-        roundLabel.setStyle(
-                "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #f5e6c8;" +
-                        "-fx-background-color: rgba(0,0,0,0.35);" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-padding: 4 12 4 12;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
-        );
+        UIEffects.applyRoundLabelStyle(roundLabel);
     }
 
+    /**
+     * Updates the era label text and applies the standard era label style.
+     *
+     * @param era the current era string to display
+     */
     public void updateEraLabel(String era) {
         eraLabel.setText("ERA: " + era);
-        eraLabel.setStyle(
-                "-fx-font-size: 18px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #d4a017;" +
-                        "-fx-background-color: rgba(0,0,0,0.35);" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-padding: 4 12 4 12;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
-        );
+        UIEffects.applyEraLabelStyle(eraLabel);
     }
 
+    /**
+     * Returns whether it is currently the local player's turn in the given game state.
+     *
+     * @param state the game state to check against
+     * @return true if the local player is the current player and the state matches
+     */
+    public boolean isMyTurn(GameState state){
+        return(localNickname!=null &&
+                gameModel.getCurrentPlayerNickname()!=null &&
+                gameModel.getCurrentPlayerNickname().equals(localNickname) &&
+                gameModel.getGameState()==state);
+    }
+
+    /**
+     * Returns whether the upper row is currently the active board row.
+     *
+     * @return true if the upper row is active
+     */
     public boolean getIsUpper(){
         return gameModel.getIsUpper();
     }
 
+    /**
+     * Returns the current round number from the game model.
+     *
+     * @return the current round
+     */
     public int getCurrentRound(){
         return gameModel.getCurrentRound();
     }
 
+
+    /**
+     * Checks if the game has reached the FINISHED state and triggers the end game scene.
+     */
     public void checkIfEnd(){
         if(gameModel.getGameState()==GameState.FINISHED){
             sceneManager.loadEndScene();
         }
     }
 
-    //scrive nella label del game se le azioni sono corrette e se sono state risolte o meno
+    /**
+     * Displays a temporary action result message on the action label.
+     * Locks the label for a short duration so the message remains visible.
+     * Accepted actions are shown for 1 second, rejected actions for 3 seconds.
+     * After the timer expires, the label returns to showing the current game state.
+     *
+     * @param message the message to display
+     * @param accept true if the action was accepted, false if rejected
+     */
     public void setActionMessage(String message, boolean accept){
 
         actionLabel.setText(message);
@@ -465,6 +540,12 @@ public class GameControllerGUI {
         pause.play();
     }
 
+    /**
+     * Displays a generic message on the action label in orange.
+     * Used for non-critical notifications that do not lock the label.
+     *
+     * @param message the message to display
+     */
     public void showMessage(String message){
         actionLabel.setText(message);
         actionLabel.setTextFill(Color.ORANGE);

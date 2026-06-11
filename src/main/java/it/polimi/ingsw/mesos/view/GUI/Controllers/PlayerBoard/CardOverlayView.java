@@ -1,72 +1,65 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 
+import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.CardView;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * Class that displays a overlay showing all cards of a given type.
+ * The overlay can be dismissed by clicking outside the card panel.
+ * Only one overlay can be shown at a time.
+ */
 public class CardOverlayView {
 
-    private static StackPane overlay = null;
+    /** Whether an overlay is currently being displayed. Prevents multiple overlays at once. */
+    private static boolean isShowing = false;
 
+    /**
+     * Shows the card overlay with the given list of card ids.
+     * Loads and displays up to 24 card images arranged in rows of 8.
+     * Blurs the existing scene content and adds a transparent click layer to dismiss the overlay.
+     * Does nothing if an overlay is already showing or if no scene is available.
+     *
+     * @param cardIds the list of card ids to display in the overlay
+     */
     public static void show(List<String> cardIds) {
         Scene scene = getCurrentScene();
         if (scene == null) return;
 
         AnchorPane rootPane = (AnchorPane) scene.getRoot();
 
-        if (overlay != null) {
-            rootPane.getChildren().remove(overlay);
-            overlay = null;
-        }
+        if (isShowing) return;
+        isShowing = true;
 
         // carica immagini (max 24)
         List<ImageView> imageViews = new ArrayList<>();
         List<String> limited = cardIds.subList(0, Math.min(cardIds.size(), 24));
 
         for (String id : limited) {
-            String path;
-            if (id.startsWith("CH")) {
-                path = "/images/characters/" + id + ".png";
-            } else if (id.startsWith("BD")) {
-                path = "/images/buildings/" + id + ".png";
-            } else continue;
+            ImageView iv = new ImageView();
+            CardDTO dto = new CardDTO();
+            dto.id=id;
+            CardView.render(iv,dto);
+            if (iv.getImage() == null) continue;
+            iv.setFitWidth(85);
+            iv.setFitHeight(145);
+            iv.setPreserveRatio(true);
+            iv.setOnMouseEntered(e -> UIEffects.applyOverlayCardHoverEffect(iv));
+            iv.setOnMouseExited(e -> UIEffects.resetOverlayCardEffect(iv));
 
-            try {
-                Image img = new Image(Objects.requireNonNull(
-                        CardOverlayView.class.getResourceAsStream(path)));
-                ImageView iv = new ImageView(img);
-                iv.setFitWidth(85);
-                iv.setFitHeight(145);
-                iv.setPreserveRatio(true);
-
-                iv.setOnMouseEntered(e -> {
-                    iv.setScaleX(1.08);
-                    iv.setScaleY(1.08);
-                    iv.setEffect(new DropShadow(15, Color.web("#FFD700")));
-                });
-                iv.setOnMouseExited(e -> {
-                    iv.setScaleX(1.0);
-                    iv.setScaleY(1.0);
-                    iv.setEffect(null);
-                });
-
-                imageViews.add(iv);
-            } catch (Exception e) {
-                System.out.println("ERRORE CARICAMENTO CARTA OVERLAY: " + e.getMessage());
-            }
+            imageViews.add(iv);
         }
 
         // righe da 8
@@ -124,15 +117,14 @@ public class CardOverlayView {
             ft.setOnFinished(ev -> {
                 rootPane.getChildren().clear();
                 rootPane.getChildren().addAll(existingChildren);
+                isShowing = false;
             });
             ft.play();
-            overlay = null;
         });
 
         // aggiungi clickLayer e content senza blur
         rootPane.getChildren().addAll(clickLayer, content);
 
-        overlay = new StackPane();
 
         // fade-in
         content.setOpacity(0);
@@ -141,6 +133,13 @@ public class CardOverlayView {
         ft.setToValue(1);
         ft.play();
     }
+
+    /**
+     * Retrieves the scene of the currently showing JavaFX stage.
+     * Returns null if no stage is currently visible.
+     *
+     * @return the current Scene, or null if none is available
+     */
     private static Scene getCurrentScene() {
         for (javafx.stage.Window w : javafx.stage.Window.getWindows()) {
             if (w instanceof javafx.stage.Stage stage && stage.isShowing()) {
