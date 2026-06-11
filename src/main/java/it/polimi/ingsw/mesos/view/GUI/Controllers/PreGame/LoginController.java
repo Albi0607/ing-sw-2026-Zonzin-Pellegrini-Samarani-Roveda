@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,30 +11,32 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 
-
+/**
+ * Controller for the login screen.
+ * Handles user input for nickname, server IP, port, client IP and network type,
+ * validates the input and delegates the connection to the GUI layer.
+ */
 public class LoginController {
+
+    /** The main GUI instance used to trigger the login and set the nickname. */
     private GUI gui;
 
-    public void setController(GUI gui) {
-        this.gui = gui;
-    }
-
+    // FXML components
     @FXML private AnchorPane rootPane;
-
     @FXML private TextField nicknameTextField;
-
     @FXML private TextField ipTextField;
-
     @FXML private TextField portTextField;
-
     @FXML private ComboBox<String> networkComboBox;
-
     @FXML private Label errorLabel;
-
     @FXML private Button connectToLobbyButton;
-
     @FXML private TextField clientIpTextField;
 
+    /**
+     * Initializes the login screen.
+     * Sets default values for all input fields, configures the network combo box
+     * to auto-update the port when the protocol changes, disables the connect
+     * button until a nickname is entered, and applies the click effect and background.
+     */
     @FXML public void initialize() {
 
         //Riempio il ComboBox con le opzioni di rete e metto di default SOCKET
@@ -59,69 +62,62 @@ public class LoginController {
             connectToLobbyButton.setDisable(newVal==null|| newVal.isEmpty());
         });
 
-
         // effetto click
-        connectToLobbyButton.setOnMousePressed(e -> {
-            connectToLobbyButton.setScaleX(0.95);
-            connectToLobbyButton.setScaleY(0.95);
-        });
+        UIEffects.applyClickEffect(connectToLobbyButton);
 
-        connectToLobbyButton.setOnMouseReleased(e -> {
-            connectToLobbyButton.setScaleX(1.0);
-            connectToLobbyButton.setScaleY(1.0);
-        });
-
-        //metto come sfondo l'immagine di background mesos
-        try {
-            Image image = new Image(getClass().getResource("/images/tool/backgroundMesos.png").toExternalForm());
-
-            ImageView background = new ImageView(image);
-
-            // dimensione base (quella che vuoi tu)
-            background.setFitWidth(1450);
-            background.setFitHeight(750);
-
-            // scala proporzionalmente
-            background.setPreserveRatio(false); // oppure true se vuoi mantenere proporzioni
-
-            // IMPORTANTISSIMO: si adatta al resize del pane
-            background.fitWidthProperty().bind(rootPane.widthProperty());
-            background.fitHeightProperty().bind(rootPane.heightProperty());
-
-            // manda sul fondo
-            rootPane.getChildren().add(0, background);
-        } catch (Exception e) {
-            System.out.println("ERRORE NEL CARICAMENTO DELL'IMMAGINE DI BACKGROUND: " + e.getMessage());
-            e.printStackTrace();
-        }
-
+        //immagine di sfondo
+        UIEffects.applyBackground(rootPane);
     }
 
-    //valutare le scelte di indirizzo ip e porta e attenzione a errori e usare label per segnalarli
+    /**
+     * Injects the main GUI instance into this controller.
+     *
+     * @param gui the GUI instance
+     */
+    public void setController(GUI gui) {
+        this.gui = gui;
+    }
+
+    /**
+     * Handles the connect button action.
+     * Reads all input fields and delegates the login to the GUI layer.
+     * Shows an error message if the port field does not contain a valid number.
+     */
     @FXML public void handleConnect() {
         String nickname = nicknameTextField.getText();
         String ip = ipTextField.getText();
-        int port = Integer.parseInt(portTextField.getText());
         String clientIp = clientIpTextField.getText();
         String networkChoice = networkComboBox.getValue();
+        int port;
+        try {
+            port = Integer.parseInt(portTextField.getText());
+        } catch (NumberFormatException e) {
+            showLoginError("❌ Invalid port. Please enter a number.");
+            return;
+        }
 
         gui.handleLogin(nickname,ip,port,networkChoice,clientIp);
         gui.setNickname(nickname);
     }
 
+    /**
+     * Displays an error message on the login screen.
+     * Highlights the nickname field in red, clears its content and requests focus
+     * so the user can immediately type a new nickname.
+     *
+     * @param errorMessage the error message to display in the error label
+     */
     public void showLoginError(String errorMessage) {
         if (errorLabel != null) {
             errorLabel.setVisible(true);
             errorLabel.setManaged(true);
-            errorLabel.setText("❌ Nickname già in uso. Scegline un altro!");
+            errorLabel.setText(errorMessage);
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-
         } else {
-            System.err.println("[ERRORE CRITICO] errorLabel è NULL! Controlla se nel file FXML c'è fx:id=\"errorLabel\"");
+            System.out.println("[ERRORE CRITICO] errorLabel è NULL! Controlla se nel file FXML c'è fx:id=\"errorLabel\"");
         }
         nicknameTextField.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 3px;");
         nicknameTextField.clear();
         nicknameTextField.requestFocus();
-
     }
 }

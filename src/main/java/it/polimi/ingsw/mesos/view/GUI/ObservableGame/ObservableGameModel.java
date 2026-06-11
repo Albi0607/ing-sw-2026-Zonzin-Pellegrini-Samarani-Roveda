@@ -8,29 +8,36 @@ import javafx.collections.ObservableList;
 
 import java.util.List;
 
-public class ObservableGameModel {
+/**
+ * Observable model representing the full game state for the JavaFX GUI layer.
+ *
+ * Wraps a GameDTO into JavaFX observable properties and lists,
+ * allowing UI components to bind directly to this model and react
+ * automatically to any state change received from the server.
+ *
+ * Implements DTOUpdatable to support incremental updates from server-side DTOs.
+ */
+public class ObservableGameModel implements DTOUpdatable<GameDTO> {
 
-    //Attributi della board che si aggiornano automaticamente a ogni cambiamento
+    // Board lists: represent the current state of the game board
     private final ObservableList<CardDTO> upperRow = FXCollections.observableArrayList();
     private final ObservableList<CardDTO> lowerRow = FXCollections.observableArrayList();
     private final ObservableList<OfferTileDTO> offerTiles = FXCollections.observableArrayList();
     private final ObservableList<TurnOrderSlotDTO> turnOrderTrack = FXCollections.observableArrayList();
 
-    //Attributo che serve per gestire tutti i player in gioco
+    // Player list
     private final ObservableList<ObservablePlayerModel> players = FXCollections.observableArrayList();
 
-    //Attributi generali di gioco che si aggiornano automaticamente
+    // Observable property accessors: each method returns the JavaFX property
+    // for UI binding
     private final ObservableList<String> lastResolvedEvents = FXCollections.observableArrayList();
     private final IntegerProperty currentRound = new SimpleIntegerProperty();
     private final StringProperty era = new SimpleStringProperty();
     private final StringProperty currentPlayerNickname = new SimpleStringProperty();
     private final ObjectProperty<GameState> gameState = new SimpleObjectProperty<>();
     private final BooleanProperty isUpper = new SimpleBooleanProperty();
-    private BooleanProperty extraDrawPhase = new SimpleBooleanProperty();
+    private final BooleanProperty extraDrawPhase = new SimpleBooleanProperty();
 
-
-
-    //metodi get per ottenere gli attributi
     public ObservableList<CardDTO> getUpperRow() {
         return upperRow;
     }
@@ -67,7 +74,7 @@ public class ObservableGameModel {
     public BooleanProperty extraDrawPhaseProperty() { return extraDrawPhase; }
 
 
-    //metodi get per ottenere direttamente il valore
+    // Get methods to get the value
     public int getCurrentRound() {
         return currentRound.get();
     }
@@ -85,7 +92,16 @@ public class ObservableGameModel {
     }
     public boolean isExtraDrawPhase() { return extraDrawPhase.get(); }
 
-    //Metodo update che aggiorna il modello osservabile a ogni cambiamento e a ogni chiamata di update da parte del server
+    /**
+     * Updates this model from the provided GameDTO.
+     *
+     * Updates all observable properties and lists to reflect the latest
+     * game state received from the server. If the DTO or its board is
+     * null, the method returns without making any changes.
+     *
+     * @param game the DTO containing the updated game state
+     */
+    @Override
     public void updateFromDTO(GameDTO game) {
 
         if (game == null||game.board==null){
@@ -115,8 +131,14 @@ public class ObservableGameModel {
         updatePlayers(game.players);
     }
 
-    //Metodo update di tutti i parametri di tutti i player in gioco
-    //prima invocazione creo players, dalla seconda aggiorno i parametri
+    /**
+     * Updates the observable players list from a list of PlayerDTO.
+     *
+     * On the first call, creates a new ObservablePlayerModel for each player.
+     * On subsequent calls, matches players by nickname and updates their data in place.
+     *
+     * @param playerDTOs the list of player DTOs to update from
+     */
     private void updatePlayers(List<PlayerDTO> playerDTOs) {
 
         if (playerDTOs == null){
@@ -126,21 +148,32 @@ public class ObservableGameModel {
         //al primo aggiornamento creo gli observable per tutti i player
         if(players.isEmpty()) {
             for (PlayerDTO dto : playerDTOs) {
-
                 ObservablePlayerModel player = new ObservablePlayerModel();
                 player.updateFromDTO(dto);
-
                 players.add(player);
             }
             return;
         }
-        for(int i = 0; i<players.size(); i++){
-            players.get(i).updateFromDTO(playerDTOs.get(i));
+        //faccio update dei player per nome (anche se il gameController li restituisce in ordine)
+        for (PlayerDTO dto : playerDTOs) {
+            players.stream()
+                    .filter(p -> p.getNickname().equals(dto.nickname))
+                    .findFirst()
+                    .ifPresent(p -> p.updateFromDTO(dto));
         }
     }
 
-
-    public <T> void updateListIfChanged(ObservableList<T> oldList, List<T> newList){
+    /**
+     * Updates an ObservableList only if its content differs from the new list,
+     * avoiding unnecessary change events on the UI.
+     * If newList is null or identical in size and content to
+     * oldList, no update is performed.
+     *
+     * @param <T> the type of elements in the lists
+     * @param oldList the observable list to update
+     * @param newList the new list to compare against and copy from
+     */
+    public static <T> void updateListIfChanged(ObservableList<T> oldList, List<T> newList){
         if(newList==null){
             return;
         }
