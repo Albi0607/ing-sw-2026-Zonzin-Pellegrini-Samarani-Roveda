@@ -29,11 +29,11 @@ public class GameMove implements Serializable {
     }
 
     public final MoveType type;
-    public final String   nickname;
-    public final int      intPayload;
-    public final char     charPayload;
-    public final boolean  boolPayload;
-    public final Color    colorPayload;
+    public final String nickname;
+    public final int intPayload;
+    public final char charPayload;
+    public final boolean boolPayload;
+    public final Color colorPayload;
 
     private GameMove(MoveType type, String nickname, int intPayload, char charPayload, boolean boolPayload, Color colorPayload) {
         this.type = type;
