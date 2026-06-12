@@ -145,6 +145,17 @@ public class GameController {
 
         // Scenario: Reconnecting to a game that needs restoration (game not yet created)
         if (restorer != null && game == null) {
+
+            boolean isOriginal = restorer.getMoveLogger().readAll().stream()
+                    .filter(m -> m.type == GameMove.MoveType.ADD_PLAYER)
+                    .anyMatch(m -> m.nickname.equals(nickname));
+
+            if (!isOriginal) {
+                throw new IllegalArgumentException(
+                        "Il nickname '" + nickname + "' non apparteneva a questa partita."
+                );
+            }
+
             players.put(nickname, view);
 
             List<GameMove> moves = restorer.getMoveLogger().readAll();

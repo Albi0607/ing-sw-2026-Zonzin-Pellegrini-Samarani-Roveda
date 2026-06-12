@@ -56,6 +56,8 @@ public class ServerState {
      * used to support reconnection to ongoing games.
      */
     private final Map<String, Integer> pendingReconnect;
+    /** Minutes after which an unrecovered crashed session is considered abandoned. */
+    private static final long STALE_SESSION_THRESHOLD_MINUTES = 5;
 
     /**
      * Constructs a new ServerState instance and initializes all internal data structures.
@@ -92,14 +94,14 @@ public class ServerState {
      * @param view the VirtualView instance representing the client connection
      */
     public synchronized void getLobby(String nickname,VirtualView view){
-        GameController controllerR = getController(nickname);
-        if (controllerR != null) {
+        GameController gc = getController(nickname);
+        if (gc != null) {
             // Il giocatore era in una partita → riconnessione
-            if (controllerR.isPlayerDisconnected(nickname)) {
+            if (gc.isPlayerDisconnected(nickname)) {
                 // Sì, era crashato. Lo facciamo rientrare.
                 String virtualViewId = view.getId();
                 connections.put(virtualViewId, view);
-                controllerR.reconnectPlayer(nickname, view);
+                gc.reconnectPlayer(nickname, view);
             } else {
                 // non è crashato, qualcun altro sta provando a usare il suo nickname mentre gioca.
                 view.showLoginError("Il giocatore '" + nickname + "' è già online e sta giocando!");
@@ -233,9 +235,6 @@ public class ServerState {
      *
      * This method is executed once at server startup before initializing RMI and Socket services.
      */
-    /** Minutes after which an unrecovered crashed session is considered abandoned. */
-    private static final long STALE_SESSION_THRESHOLD_MINUTES = 5;
-
     public synchronized void initializeFromDisk() {
         File dir = new File(".");
         File[] logFiles = dir.listFiles(

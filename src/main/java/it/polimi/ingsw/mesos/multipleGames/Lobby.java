@@ -110,7 +110,7 @@ public class Lobby {
     public synchronized GameController createNewGame(String nickname, int expectedNumPlayers, Color color, String virtualViewId) throws Exception{
         //controlli per gestione di eventuali errori e cambiare client.State al client
 
-        //try {
+        try {
             VirtualView view = serverState.getConnection(virtualViewId);
             if (view == null) {
                 return null;
@@ -125,11 +125,11 @@ public class Lobby {
             removeViewer(virtualViewId);
             broadcast();
             return controller;
-        /*} catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Creazione del gioco non riuscita");
             return null;
         }
-         */
+
     }
 
     /**
@@ -166,17 +166,15 @@ public class Lobby {
             throw new IllegalStateException("La partita è già piena o iniziata");
         }
         // Partita non ancora iniziata OPPURE in attesa di ripristino
-        //try {
+        try {
             controller.addPlayer(nickname, color, view);
             removeViewer(virtualViewId);
             broadcast();
             return controller;
-        /*} catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Errore generico che non permette di entrare nella partita con id: " + id + ": " + e.getMessage());
             return null;
         }
-
-         */
     }
 
     /**
