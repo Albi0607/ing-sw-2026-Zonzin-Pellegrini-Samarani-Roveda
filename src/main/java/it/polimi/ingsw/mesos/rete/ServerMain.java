@@ -40,13 +40,20 @@ public class ServerMain {
      */
     public static void main(String[] args) throws SQLException {
         String myIp = "127.0.0.1";
-        try {
-            // FORZA RMI ad usare questo IP per evitare che i client si connettano a se stessi!
-            myIp = InetAddress.getLocalHost().getHostAddress();
-            System.setProperty("java.rmi.server.hostname", myIp);
-        } catch (Exception e) {
-            System.err.println("Impossibile recuperare l'IP di rete locale, userò localhost.");
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== CONFIGURAZIONE SERVER ===");
+        System.out.print("Inserisci l'IP di questo Server (o premi invio per 127.0.0.1): ");
+        // FORZA RMI ad usare questo IP per evitare che i client si connettano a se stessi!
+        String inputIp = scanner.nextLine().trim();
+
+        // Controllo di sicurezza: se premi solo invio, usa il localhost
+        if (!inputIp.isEmpty()) {
+            myIp = inputIp;
         }
+
+        System.setProperty("java.rmi.server.hostname", myIp);
 
         //aggiungo serverState e lobby per la gestione delle partite
         ServerState serverState = new ServerState();
@@ -56,8 +63,6 @@ public class ServerMain {
         int port = 1099;
 
         boolean dbEnabled = false;
-
-        Scanner scanner = new Scanner(System.in);
 
         System.out.print("MySQL username (invio per skip): ");
         String user = scanner.nextLine();
