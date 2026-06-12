@@ -71,7 +71,7 @@ public class SceneManager {
      */
     public void loadLoginScene() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/loginScene.fxml"));
             Parent root = loader.load();
             this.loginController = loader.getController();
             this.loginController.setController(gui);
@@ -79,6 +79,7 @@ public class SceneManager {
             stage.setScene(scene);
         } catch (Exception e) {
             System.out.println("ERRORE NELL'APERTURA DELL' INTERFACCIA DI LOGIN");
+            e.printStackTrace();
         }
     }
 

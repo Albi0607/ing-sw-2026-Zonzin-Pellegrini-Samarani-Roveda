@@ -81,6 +81,25 @@
       <version>21.0.4</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>21.0.4</version>
+      <classifier>win</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>21.0.4</version>
+      <classifier>mac-aarch64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>21.0.4</version>
+      <classifier>linux</classifier>
+    </dependency>
+
   </dependencies>
 
   <repositories>
@@ -152,6 +171,20 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>it.polimi.ingsw.mesos.view.CLI.CLIClient</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>build-client-gui</id>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <outputFile>${project.build.directory}/Mesos-Client-GUI.jar</outputFile>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>it.polimi.ingsw.mesos.view.GUI.Core.GUILauncher</mainClass>
                 </transformer>
               </transformers>
             </configuration>
