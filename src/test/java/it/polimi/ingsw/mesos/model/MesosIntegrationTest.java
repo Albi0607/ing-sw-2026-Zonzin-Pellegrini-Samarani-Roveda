@@ -1077,4 +1077,14 @@ class MesosIntegrationTest {
             new Game(List.of());
         }, "Il costruttore di Game deve bloccare la creazione di partite con 0 giocatori");
     }
+
+    @Test
+    void defaultTest(){
+        EventState event = new EventState();
+        assertFalse(event.isNextUpper(game));
+
+        event.getActivePlayer(game);
+
+        event.forceSkipCurrentPlayer(game);
+    }
 }

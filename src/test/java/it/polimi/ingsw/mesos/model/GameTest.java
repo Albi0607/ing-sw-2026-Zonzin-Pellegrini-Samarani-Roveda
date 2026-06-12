@@ -65,13 +65,12 @@ class GameTest {
     }
 
 
-
     @Test
     void testConstructorInitialization() {
         assertEquals(4, game.getPlayers().size());
         assertEquals(1, game.getCurrentRound());
         // Verifica che lo stato iniziale sia Setup
-        assertEquals(GameState.SETUP, game.getCurrentState().getStateId());
+        assertEquals(GameState.PLACING_TOTEMS, game.getCurrentState().getStateId());
     }
 
 
@@ -81,6 +80,10 @@ class GameTest {
         GameStateLogic fakeState = new GameStateLogic() {
             @Override public void execute(Game g) { }
             @Override public void placeTotemOnOffer(Game g, Player p, it.polimi.ingsw.mesos.model.board.OfferTile t) {}
+            @Override public void takeCard(Game g, Player p, int index, boolean upper) {}
+            @Override public void skipExtraDraw(Game g) {}
+
+
             @Override public GameState getStateId() { return GameState.PLACING_TOTEMS; }
         };
 
