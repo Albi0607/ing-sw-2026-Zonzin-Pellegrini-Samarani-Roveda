@@ -230,15 +230,15 @@ public class PlayerBoardController {
     /**
      * Updates the visibility and enabled state of the skip button.
      * The button is shown only for the main player during the RESOLVING_ACTIONS
-     * state when an extra draw phase is active.
+     * state when an extra draw phase is active and when isMyTurn is true.
      *
      * @param currentState    the current game state
      * @param isExtraDrawPhase whether the game is currently in an extra draw phase
      */
-    public void updateSkipButton(GameState currentState, boolean isExtraDrawPhase) {
+    public void updateSkipButton(GameState currentState, boolean isExtraDrawPhase, boolean isMyTurn) {
         if (!isMainPlayer) return; // solo per il player principale
 
-        boolean shouldShow = currentState == GameState.RESOLVING_ACTIONS && isExtraDrawPhase;
+        boolean shouldShow = currentState == GameState.RESOLVING_ACTIONS && isExtraDrawPhase && isMyTurn;
 
         skipButton.setVisible(shouldShow);
         skipButton.setManaged(shouldShow);
