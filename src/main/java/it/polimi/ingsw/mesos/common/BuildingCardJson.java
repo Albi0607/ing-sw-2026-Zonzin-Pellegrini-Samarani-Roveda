@@ -2,10 +2,10 @@ package it.polimi.ingsw.mesos.common;
 
 import it.polimi.ingsw.mesos.common.enums.*;
 
-/**Java DTO class that maps the attributes of the buildings.json file to determine which type of effect to construct and,
+/**
+ * Java DTO class that maps the attributes of the buildings.json file to determine which type of effect to construct and,
  *  consequently, the entire building that depends on that effect, assigning the corresponding parameters for each effect type
- *  @author Alberto Roveda
- *  */
+ */
 
 public class BuildingCardJson implements CardJson{
     public String id;
