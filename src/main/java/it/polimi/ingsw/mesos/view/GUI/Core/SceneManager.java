@@ -209,14 +209,23 @@ public class SceneManager {
     }
 
     /**
-     * Updates the current client state and triggers the end game scene if the state is END_GAME.
+     * Updates the current client state and triggers a scene transition when needed.
+     * Loads the end game scene when the state is END_GAME.
+     * Loads the waiting room when the state is WAITING_PLAYERS, which covers both
+     * the normal post-join flow and the reconnection case where the player was in
+     * an abandoned game and needs to wait for it to resume.
      *
      * @param currentState the new client state
      */
     public void updateClientState(ClientState currentState){
-        this.clientState=currentState;
-        if(clientState== END_GAME) {
-            Platform.runLater(this::loadEndScene);
+        this.clientState = currentState;
+
+        switch (currentState) {
+            case END_GAME -> this.loadEndScene();
+
+            case WAITING_PLAYERS -> this.loadWaitingRoom();
+
+            default -> { /* nessuna transizione di scena automatica */ }
         }
     }
 
@@ -270,4 +279,6 @@ public class SceneManager {
     public LoginController getLoginController() {
         return this.loginController;
     }
+
+    public LobbyController getLobbyController(){return this.lobbyController;}
 }

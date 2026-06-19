@@ -97,17 +97,25 @@ public class GUI extends Application implements View {
 
     /**
      * Receives the current lobby state from the server.
-     * Navigates to the lobby scene on the first call, then updates the lobby list.
+     * If the client is reconnecting to an abandoned game, the call is ignored.
+     * Loads the lobby scene only on the first call (when no lobby controller is active yet),
+     * then only updates the lobby list on subsequent calls, so players currently in
+     * the totem choice screen are not redirected back to the lobby.
      *
      * @param lobby the current list of available games
      */
     @Override
     public void showLobby(List<LobbyInfoDTO> lobby) {
-        Platform.runLater(()->{
-            if (this.clientState == null || this.clientState != ClientState.LOBBY) {
-                this.clientState = ClientState.LOBBY;
+        Platform.runLater(() -> {
+
+            if (this.clientState == ClientState.IN_GAME) {
+                return;
+            }
+
+            if (sceneManager.getLobbyController() == null) {
                 sceneManager.loadLobbyScene(clientController);
             }
+
             sceneManager.updateLobby(lobby);
         });
     }

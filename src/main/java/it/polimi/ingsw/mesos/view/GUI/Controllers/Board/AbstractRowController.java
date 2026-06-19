@@ -12,6 +12,8 @@ import javafx.scene.layout.HBox;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base controller for a row of cards on the game board.
@@ -60,7 +62,9 @@ public abstract class AbstractRowController {
     /**
      * Updates this row from the given observable list of card DTOs.
      * If the round has not changed and the card count is the same, only refreshes interactivity.
-     * If the round has not changed but a card is missing, removes only that card and updates positions.
+     * If the round has not changed but one or more cards are missing, removes them by ID,
+     * so that any card (including the last one) is correctly detected and removed.
+     * The list is iterated in reverse to avoid index shifts during removal.
      * If the round has changed, rebuilds the entire row from scratch.
      *
      * @param row the updated list of card DTOs for this row
@@ -72,18 +76,29 @@ public abstract class AbstractRowController {
                 refreshInteraction();
                 return;
             }
-            for (int i = 0; i < cards.size(); i++) {
-                if (!cards.get(i).getDTO().id.equals(row.get(i).id)) {
+
+            // costruisco il set degli ID
+            Set<String> serverIds = row.stream()
+                    .map(dto -> dto.id)
+                    .collect(Collectors.toSet());
+
+            // scorro per vedere se manca una carta
+            for (int i = cards.size() - 1; i >= 0; i--) {
+                if (!serverIds.contains(cards.get(i).getDTO().id)) {
                     getRowBox().getChildren().remove(i);
                     cards.remove(i);
-                    for (int j = i; j < cards.size(); j++) {
-                        cards.get(j).setPosition(j);
-                    }
-                    refreshInteraction();
-                    return;
                 }
             }
+
+            // ricalcolo le posizioni di tutte le carte rimaste
+            for (int j = 0; j < cards.size(); j++) {
+                cards.get(j).setPosition(j);
+            }
+
+            refreshInteraction();
+            return;
         }
+
         this.currentRound = gameController.getCurrentRound();
 
         getRowBox().getChildren().clear();
