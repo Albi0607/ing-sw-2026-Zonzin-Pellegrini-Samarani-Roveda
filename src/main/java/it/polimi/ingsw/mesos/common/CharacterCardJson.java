@@ -4,9 +4,10 @@ import it.polimi.ingsw.mesos.common.enums.CharacterType;
 import it.polimi.ingsw.mesos.common.enums.Era;
 import it.polimi.ingsw.mesos.common.enums.InventionIcon;
 
-/** Java class of type DTO that maps the attributes of the character.json file in order to determine which type of
+/**
+ * Java class of type DTO that maps the attributes of the character.json file in order to determine which type of
  * character to construct, with the corresponding parameters that differ from one character to another
- * @author Alberto Roveda*/
+ */
 public class CharacterCardJson implements CardJson{
     public String id;
     public CharacterType type;

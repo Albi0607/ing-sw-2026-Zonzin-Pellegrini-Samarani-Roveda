@@ -280,5 +280,10 @@ public class SceneManager {
         return this.loginController;
     }
 
+    /**
+     * Returns the lobby controller
+     *
+     * @return the LobbyController
+     */
     public LobbyController getLobbyController(){return this.lobbyController;}
 }
