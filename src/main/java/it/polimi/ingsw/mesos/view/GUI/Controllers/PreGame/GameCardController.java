@@ -35,6 +35,8 @@ public class GameCardController {
     /**
      * Populates this card with the provided lobby data and updates all labels.
      * Can be called multiple times to refresh the card when the lobby state changes.
+     * Disables the join button if the game is already full or has already started,
+     * since in both cases only the original players can rejoin.
      *
      * @param dto the lobby data to display
      * @param sceneManager the scene manager used to navigate on join
@@ -51,6 +53,11 @@ public class GameCardController {
             statusLabel.setText("IN ATTESA DI GIOCATORI");
         }
         playersLabel.setText(dto.numPlayers + "/" + dto.maxNumPlayers);
+
+        //disabilito bottone di join
+        boolean isFull = dto.numPlayers >= dto.maxNumPlayers;
+        boolean isSuspended = dto.started;
+        joinButton.setDisable(isFull || isSuspended);
     }
 
     /**
