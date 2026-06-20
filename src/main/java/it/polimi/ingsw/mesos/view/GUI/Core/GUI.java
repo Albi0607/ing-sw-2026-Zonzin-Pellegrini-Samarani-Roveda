@@ -70,7 +70,6 @@ public class GUI extends Application implements View {
     @Override
     public void showLastUpdate(GameDTO game) {
        Platform.runLater(() -> {
-
             //partita appena iniziata aggiorno il modello e cambio la scene con il modello appena aggiornato
             if(gameControllerGUI==null) {
                 gameModel.updateFromDTO(game);
@@ -129,6 +128,11 @@ public class GUI extends Application implements View {
     @Override
     public void showClientStateUpdate(ClientState currentState){
         Platform.runLater(() -> {
+            if (currentState == ClientState.IN_GAME) {
+                sceneManager.setClientController(clientController); // ← aggiunto
+                this.gameControllerGUI = null;
+            }
+
             if(this.clientState != currentState) {
                 this.clientState = currentState;
                 sceneManager.updateClientState(currentState);

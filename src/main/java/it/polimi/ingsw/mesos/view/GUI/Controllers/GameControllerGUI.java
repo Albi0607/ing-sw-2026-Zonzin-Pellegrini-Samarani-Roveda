@@ -115,7 +115,11 @@ public class GameControllerGUI {
         initPlayerBoard();
         bindModel();
         //faccio runLater cosi aspetto che finisca di creare la visualizzazione e poi aggiorno e rendo able i valori
-        Platform.runLater(this::refreshUI);
+        Platform.runLater(() -> {
+            turnOrderController.update(gameModel.getTurnOrderTrack());
+            offerTileController.update(gameModel.getOfferTiles());
+            refreshUI();
+        });
     }
 
     /**
@@ -350,12 +354,11 @@ public class GameControllerGUI {
         });
 
         //fatto alla prima volta in cui setto i parametri ma li creo anche nella UI
-            topRowController.updateUpper(gameModel.getUpperRow());
-            bottomRowController.updateLower(gameModel.getLowerRow());
-            offerTileController.init(gameModel.getOfferTiles());
-            turnOrderController.update(gameModel.getTurnOrderTrack());
-            //chiamata del metodo la prima volta cosi che aggiorni i valori fino al prossimo aggiornamento
-            deckController.updateDeckView(gameModel.getEra());
+        topRowController.updateUpper(gameModel.getUpperRow());
+        bottomRowController.updateLower(gameModel.getLowerRow());
+        offerTileController.init(gameModel.getOfferTiles());
+        turnOrderController.update(gameModel.getTurnOrderTrack());
+        deckController.updateDeckView(gameModel.getEra());
 
     }
 

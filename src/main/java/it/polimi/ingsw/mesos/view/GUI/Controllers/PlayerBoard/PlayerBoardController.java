@@ -176,6 +176,14 @@ public class PlayerBoardController {
             addBuildingCard(newCard);
         });
 
+
+        for (CardDTO card : playerModel.getTribe().getCharacters()) {
+            addCharacterCard(card);
+        }
+        for (CardDTO card : playerModel.getTribe().getBuildings()) {
+            addBuildingCard(card);
+        }
+
     }
 
     /**
