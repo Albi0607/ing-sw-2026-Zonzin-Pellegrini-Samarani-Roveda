@@ -58,6 +58,8 @@ public class GameController {
 
     private GameRestorer restorer = null;
 
+    private boolean paused = false;
+
     /** Callback executed when the game has finished. */
     private Runnable onGameFinished;
 
@@ -351,6 +353,12 @@ public class GameController {
         if(view == null){
             return false;
         }
+
+        if (paused) {
+            view.showActionRejected(("Game currently paused, wait for other players to continue"));
+            return false;
+        }
+
         try {
             requireState(GameState.PLACING_TOTEMS);
             cancelTurnTimer();
@@ -391,6 +399,11 @@ public class GameController {
     public boolean onTakeCard(String nickname, int cardIndex, boolean isUpper) {
         VirtualView view = players.get(nickname);
         if (view == null) {
+            return false;
+        }
+
+        if (paused) {
+            view.showActionRejected(("Game currently paused, wait for other players to continue"));
             return false;
         }
 
@@ -436,6 +449,12 @@ public class GameController {
         if(view == null){
             return false;
         }
+
+        if (paused) {
+            view.showActionRejected(("Game currently paused, wait for other players to continue"));
+            return false;
+        }
+
         try {
             requireState(GameState.RESOLVING_ACTIONS);
             cancelTurnTimer();
@@ -740,6 +759,100 @@ public class GameController {
     }
 
     /**
+     * Handles the event of a player disconnecting.
+     * Marks the player as disconnected, notifies others, and skips their turn
+     * if they were the active player.
+     *
+     * @param nickname the nickname of the disconnected player
+     */
+    public synchronized void onPlayerDisconnected(String nickname) {
+        if (disconnectedPlayers.contains(nickname)) return;
+        disconnectedPlayers.add(nickname);
+
+        for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
+            if (!entry.getKey().equals(nickname)) {
+                try {
+                    entry.getValue().showMessage(nickname + " has disconnected. Their turn will be skipped.");
+                } catch (Exception ignored) {}
+            }
+        }
+
+        int connectedCount = players.size() - disconnectedPlayers.size();
+
+        if (connectedCount == 1) {
+            pauseGame();
+            return;
+        }
+
+        if (game != null && nickname.equals(game.getCurrentPlayerNickname())) {
+            skipDisconnectedTurn(nickname);
+        }
+    }
+
+    /**
+     * Advances the turn by skipping the current player if they are disconnected.
+     * If all players are disconnected, the game ends.
+     *
+     * @param nickname the nickname of the disconnected player
+     */
+    private void skipDisconnectedTurn(String nickname) {
+        try {
+            long connectedCount = players.keySet().stream()
+                    .filter(n -> !disconnectedPlayers.contains(n))
+                    .count();
+
+            if (connectedCount == 0) {
+                System.out.println("[GameController] All players disconnected, ending game.");
+                try { endGame(); } catch (Exception ignored) {}
+                return;
+            }
+
+            game.skipCurrentPlayerTurn();
+            broadcastUpdate();
+
+        } catch (Exception e) {
+            System.err.println("[GameController] Error skipping turn: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Automatically skips the current player's turn if they are marked as disconnected.
+     */
+    private void skipIfCurrentPlayerDisconnected() {
+        if (game == null) return;
+        String current = game.getCurrentPlayerNickname();
+        if (current != null && disconnectedPlayers.contains(current)) {
+            System.out.println("[GameController] It is " + current + "'s turn but they are disconnected. Skipping automatically.");
+            skipDisconnectedTurn(current);
+        }
+    }
+
+    private void pauseGame() {
+        paused = true;
+        cancelTurnTimer();
+
+        currentTurnTimeout = turnTimer.schedule(() -> {
+            synchronized (this) {
+                if (paused) {
+                    System.out.println("[GameController] Game ended, none reconnected in time.");
+                    try {
+                        endGame();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }, TURN_TIMEOUT_SEC, TimeUnit.SECONDS);
+
+        for (VirtualView view : players.values()) {
+            try {
+                view.showMessage("Game paused: waiting players reconnection...");
+            } catch (Exception ignored) {}
+        }
+        System.out.println("[GameController] Game paused: only one player connected.");
+    }
+
+    /**
      * Handles the reconnection of a player.
      * Updates their VirtualView, removes them from the disconnected set,
      * and notifies other players of their return.
@@ -766,7 +879,25 @@ public class GameController {
         }
 
         newView.sendClientState(ClientState.IN_GAME);
+        int connectedCount = players.size() - disconnectedPlayers.size();
+        if (paused && connectedCount >= 2) {
+            resumeGame();
+        }
+    }
+
+    private void resumeGame() {
+        paused = false;
+        cancelTurnTimer();
+
+        for  (VirtualView view : players.values()) {
+            try {
+                view.showMessage("Game resumed.");
+            } catch (Exception ignored) {}
+        }
         broadcastUpdate();
+
+        String current = game.getCurrentPlayerNickname();
+        if (current != null) startTurnTimer(current);
     }
 
     /**
@@ -851,70 +982,6 @@ public class GameController {
      */
     public List<Color> getTakenColors() {
         return new ArrayList<>(chosenColors.values());
-    }
-
-    /**
-     * Handles the event of a player disconnecting.
-     * Marks the player as disconnected, notifies others, and skips their turn
-     * if they were the active player.
-     *
-     * @param nickname the nickname of the disconnected player
-     */
-    public synchronized void onPlayerDisconnected(String nickname) {
-        if (disconnectedPlayers.contains(nickname)) return;
-        disconnectedPlayers.add(nickname);
-
-        System.out.println("[GameController] Player disconnected: " + nickname);
-
-        for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
-            if (!entry.getKey().equals(nickname)) {
-                try {
-                    entry.getValue().showMessage(nickname + " has disconnected. Their turn will be skipped.");
-                } catch (Exception ignored) {}
-            }
-        }
-
-        if (game != null && nickname.equals(game.getCurrentPlayerNickname())) {
-            skipDisconnectedTurn(nickname);
-        }
-    }
-
-    /**
-     * Advances the turn by skipping the current player if they are disconnected.
-     * If all players are disconnected, the game ends.
-     *
-     * @param nickname the nickname of the disconnected player
-     */
-    private void skipDisconnectedTurn(String nickname) {
-        try {
-            long connectedCount = players.keySet().stream()
-                    .filter(n -> !disconnectedPlayers.contains(n))
-                    .count();
-
-            if (connectedCount == 0) {
-                System.out.println("[GameController] All players disconnected, ending game.");
-                try { endGame(); } catch (Exception ignored) {}
-                return;
-            }
-
-            game.skipCurrentPlayerTurn();
-            broadcastUpdate();
-
-        } catch (Exception e) {
-            System.err.println("[GameController] Error skipping turn: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Automatically skips the current player's turn if they are marked as disconnected.
-     */
-    private void skipIfCurrentPlayerDisconnected() {
-        if (game == null) return;
-        String current = game.getCurrentPlayerNickname();
-        if (current != null && disconnectedPlayers.contains(current)) {
-            System.out.println("[GameController] It is " + current + "'s turn but they are disconnected. Skipping automatically.");
-            skipDisconnectedTurn(current);
-        }
     }
 
     /**

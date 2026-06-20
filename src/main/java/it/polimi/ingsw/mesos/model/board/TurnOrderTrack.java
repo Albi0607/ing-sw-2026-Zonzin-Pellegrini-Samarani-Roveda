@@ -121,6 +121,16 @@ public class TurnOrderTrack {
         }
     }
 
+    public void placeWithoutEffects(int index, Player p) {
+        if (index < 0 || index >= positions.size()) {
+            throw new IndexOutOfBoundsException("Index not valid: " + index);
+        }
+        if (positions.get(index) != null) {
+            throw new IllegalStateException("Index not free: " + index);
+        }
+        positions.set(index, p);
+    }
+
     // --- Getters ---
     public Player getPlayerAt(int index) {
         if (index < 0 || index >= positions.size()) {
