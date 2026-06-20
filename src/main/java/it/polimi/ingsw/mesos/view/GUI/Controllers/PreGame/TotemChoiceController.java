@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.rete.ClientController;
 import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -133,6 +135,8 @@ public class TotemChoiceController {
      * Updates the lobby data for this screen when another player picks a color.
      * Searches the updated lobby list for the game matching the current dto id.
      * If the data has not changed, no refresh is performed.
+     * If the game is now full, shows an error message and redirects to the lobby after 2 seconds.
+     * Otherwise, refreshes the totem slots to reflect the updated color availability.
      *
      * @param lobby the updated list of all lobbies received from the server
      */
@@ -150,7 +154,18 @@ public class TotemChoiceController {
                 break;
             }
         }
-        refresh();
+
+        if (this.dto.numPlayers >= this.dto.maxNumPlayers) {
+            errorLabel.setText("Partita piena, ritorno alla lobby...");
+            errorLabel.setTextFill(javafx.scene.paint.Color.RED);
+            errorLabel.setVisible(true);
+
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(e -> sceneManager.loadLobbyScene(clientController));
+            delay.play();
+        } else {
+            refresh();
+        }
     }
 
     /**
@@ -281,13 +296,18 @@ public class TotemChoiceController {
         errorLabel.setText(message);
         errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
         errorLabel.setVisible(true);
+        create_joinGameButton.setDisable(colorChoice == null);
     }
 
     /**
      * Handles the create or join game button action.
      * If no color has been selected, shows an error message and returns.
-     * Otherwise, calls the appropriate client controller method based on
-     * whether the player is creating or joining, then navigates to the waiting room.
+     * Disables the button immediately to prevent double clicks while waiting
+     * for the server response. The scene transition to the waiting room is
+     * triggered automatically by updateClientState when the server confirms
+     * the join. If the server rejects the request (e.g. game full or color taken),
+     * the button is re-enabled and an error message is shown.
+     *
      */
     @FXML public void handleCreate_JoinGame() {
 
@@ -296,6 +316,8 @@ public class TotemChoiceController {
             errorLabel.setDisable(false);
             return;
         }
+        create_joinGameButton.setDisable(true);
+
         try {
             if(id == -1) {
                 clientController.createNewGame(numPlayers, colorChoice);
@@ -303,9 +325,9 @@ public class TotemChoiceController {
             else {
                 clientController.joinGame(id, colorChoice);
             }
-            sceneManager.loadWaitingRoom();
 
         } catch (Exception e) {
+            create_joinGameButton.setDisable(false);
             errorLabel.setText("ERRORE NEL CREARE/ACCEDERE ALLA PARTITA");
             System.out.println("ERRORE ALL'ATTIVAZIONE DEI METODI PER ACCEDERE/CREARE LA PARTITA IN TOTEMCHOICE :" + e.getMessage());
             e.printStackTrace();

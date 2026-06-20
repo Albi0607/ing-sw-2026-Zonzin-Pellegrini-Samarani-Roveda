@@ -382,6 +382,8 @@ public class GameControllerGUI {
      * Refreshes all interactive and informational UI components.
      * Checks if the game has ended, updates row and offer tile interactivity,
      * updates the era and round labels, the action label and the skip button.
+     * The skip button is updated only for the main player and only if it is
+     * currently their turn during an extra draw phase.
      */
     private void refreshUI() {
         checkIfEnd();
@@ -394,7 +396,10 @@ public class GameControllerGUI {
 
         //aggiorna il bottone skip solo sul player principale
         if (mainPlayerBoardController!=null) {
-            mainPlayerBoardController.updateSkipButton(gameModel.getGameState(), gameModel.isExtraDrawPhase());
+            mainPlayerBoardController.updateSkipButton(gameModel.getGameState(),
+                    gameModel.isExtraDrawPhase(),
+                    isMyTurn(GameState.RESOLVING_ACTIONS)
+            );
         }
     }
 
