@@ -286,4 +286,8 @@ public class SceneManager {
      * @return the LobbyController
      */
     public LobbyController getLobbyController(){return this.lobbyController;}
+
+    public void setClientController(ClientController clientController) {
+        this.clientController = clientController;
+    }
 }
