@@ -177,6 +177,7 @@ public class SceneManager {
      * If a leaderboard was received before this scene was loaded, applies it immediately.
      */
     public void loadEndScene(){
+        if (endGameController != null) return;
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/endGameScene.fxml"));
             Parent root = loader.load();

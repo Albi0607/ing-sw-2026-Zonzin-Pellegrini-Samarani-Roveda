@@ -28,6 +28,10 @@ public class EndGameController {
     @FXML private ScrollPane databaseContainer;
     @FXML private VBox databaseVBox;
 
+    public void initialize() {
+        setDatabaseVisible(false);
+    }
+
     /**
      * Injects the game model and immediately renders the end game results.
      *
@@ -44,7 +48,6 @@ public class EndGameController {
      * The database leaderboard section is hidden when this method is called.
      */
     private void printResult() {
-        setDatabaseVisible(false);
 
         resultContainer.getChildren().clear();
 
