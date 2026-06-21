@@ -55,6 +55,6 @@ public interface UIEvent {
 
     /** * Carries the global database leaderboard statistics and the local player's specific ranking index.
      */
-    record LeaderboardReadyEvent(List<GameResult> leaderboard, int myPosition) implements UIEvent {}
+    record LeaderboardReadyEvent(List<GameResult> leaderboard) implements UIEvent {}
 
 }

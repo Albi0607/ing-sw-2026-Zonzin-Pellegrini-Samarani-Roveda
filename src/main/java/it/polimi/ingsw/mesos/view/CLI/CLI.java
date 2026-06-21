@@ -89,9 +89,6 @@ public class CLI implements View, UIContext {
     /** Cached global leaderboard fetched from the database at the end of the game. */
     private List<GameResult> cachedLeaderboard = null;
 
-    /** The player's specific rank within the cached leaderboard. */
-    private int cachedMyPosition = -1;
-
     /**
      * Initializes the CLI, setting up the scanner, mapping event handlers,
      * and defaulting the starting state to Login.
@@ -468,7 +465,7 @@ public class CLI implements View, UIContext {
      */
     private void handleResolutionTimeout() {
         CLIPrinter.clearScreen();
-        printDBLeaderboard(cachedLeaderboard, cachedMyPosition);
+        printDBLeaderboard(cachedLeaderboard);
         if (currentGameState != null) {
             CLIPrinter.printGameOver(currentGameState);
         }
@@ -499,7 +496,6 @@ public class CLI implements View, UIContext {
      */
     private void handleLeaderboardReady(UIEvent.LeaderboardReadyEvent e) {
         this.cachedLeaderboard = e.leaderboard();
-        this.cachedMyPosition = e.myPosition();
     }
 
     /**
@@ -568,9 +564,8 @@ public class CLI implements View, UIContext {
     /**
      * Formats and prints the global database leaderboard.
      * @param leaderboard The list of historic game results.
-     * @param myPosition The player's ranking index.
      */
-    private void printDBLeaderboard(List<GameResult> leaderboard, int myPosition) {
+    private void printDBLeaderboard(List<GameResult> leaderboard) {
         if (leaderboard == null || leaderboard.isEmpty()) {
             System.out.println("Classifica non disponibile.");
             return;
@@ -582,7 +577,6 @@ public class CLI implements View, UIContext {
             System.out.printf("%d) %s - %d punti | %d giocatori | (%s)\n",
                     pos++, r.getNickname(), r.getPoints(), r.getNumPlayers(), r.getDate());
         }
-        System.out.println("\nLa tua posizione nella classifica globale: " + myPosition);
         System.out.println(CLIPrinter.ANSI_YELLOW + "===========================================\n" + CLIPrinter.ANSI_RESET);
     }
 
@@ -604,6 +598,6 @@ public class CLI implements View, UIContext {
 
     @Override
     public void showLeaderboard(List<GameResult> leaderboard, int myPosition) {
-        eventQueue.offer(new UIEvent.LeaderboardReadyEvent(leaderboard, myPosition));
+        eventQueue.offer(new UIEvent.LeaderboardReadyEvent(leaderboard));
     }
 }

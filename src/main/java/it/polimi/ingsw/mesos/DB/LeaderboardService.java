@@ -50,5 +50,5 @@ public class LeaderboardService {
         return dao.getLeaderboard(numPlayers);
     }
 
-    record LeaderboardReadyEvent(List<GameResult> leaderboard, int myPosition) implements UIEvent {}
+    record LeaderboardReadyEvent(List<GameResult> leaderboard) implements UIEvent {}
 }
