@@ -14,8 +14,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <javafx.version>21.0.4</javafx.version>
   </properties>
 
   <dependencies>
@@ -27,58 +28,47 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Jackson core -->
+    <!-- Jackson -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>2.15.2</version>
     </dependency>
-
-    <!-- Jackson databind -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.15.2</version>
     </dependency>
-
-    <!-- Jackson annotations -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
       <version>2.15.2</version>
     </dependency>
 
-    <!-- jGson-->
+    <!-- Gson -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.13.2</version>
     </dependency>
 
+    <!-- MySQL -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.33</version>
     </dependency>
 
-
-
-    <!-- ===================== -->
-    <!--       JAVA FX         -->
-    <!-- ===================== -->
-
-    <!-- JavaFX Controls -->
+    <!-- JavaFX – moduli Java puri (funzionano su tutte le piattaforme) -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>21.0.4</version>
+      <version>${javafx.version}</version>
     </dependency>
-
-    <!-- JavaFX FXML -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <version>21.0.4</version>
+      <version>${javafx.version}</version>
     </dependency>
   </dependencies>
 
@@ -88,6 +78,71 @@
       <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
   </repositories>
+
+  <!-- ============================================================ -->
+  <!--  PROFILO cross-platform: attivato SOLO con -P cross-platform -->
+  <!--  Usalo solo per: mvn package -P cross-platform               -->
+  <!-- ============================================================ -->
+  <profiles>
+    <profile>
+      <id>cross-platform</id>
+      <dependencies>
+
+        <!-- Windows x64 -->
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-base</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-graphics</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-fxml</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>win</classifier>
+        </dependency>
+
+        <!-- macOS Apple Silicon (ARM) ONLY – no mac Intel -->
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-base</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-graphics</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>mac-aarch64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-fxml</artifactId>
+          <version>${javafx.version}</version>
+          <classifier>mac-aarch64</classifier>
+        </dependency>
+
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -111,23 +166,26 @@
       </plugin>
 
       <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-shade-plugin</artifactId>
-      <version>3.5.1</version>
-      <configuration>
-        <filters>
-          <filter>
-            <artifact>*:*</artifact>
-            <excludes>
-              <exclude>META-INF/*.SF</exclude>
-              <exclude>META-INF/*.DSA</exclude>
-              <exclude>META-INF/*.RSA</exclude>
-            </excludes>
-          </filter>
-        </filters>
-      </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+                <exclude>META-INF/versions/*/module-info.class</exclude>
+                <exclude>module-info.class</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
         <executions>
 
+          <!-- Server JAR -->
           <execution>
             <id>build-server</id>
             <phase>package</phase>
@@ -142,6 +200,7 @@
             </configuration>
           </execution>
 
+          <!-- CLI JAR -->
           <execution>
             <id>build-client-cli</id>
             <phase>package</phase>
@@ -156,6 +215,7 @@
             </configuration>
           </execution>
 
+          <!-- GUI JAR – cross-platform -->
           <execution>
             <id>build-client-gui</id>
             <phase>package</phase>
@@ -166,12 +226,14 @@
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>it.polimi.ingsw.mesos.view.GUI.Core.GUILauncher</mainClass>
                 </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
             </configuration>
           </execution>
+
         </executions>
       </plugin>
-  </plugins>
+    </plugins>
   </build>
 
 </project>
