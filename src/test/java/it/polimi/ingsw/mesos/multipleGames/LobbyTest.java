@@ -401,7 +401,6 @@ class LobbyTest {
     // removeEmptyGames
     // =========================================================================
 
-    //TODO da sistemare removeEmptyGames soprattutto nel gameController cosi da
     //rimuovere veramente le partite senza player
     @Test
     void removeEmptyGames() {
@@ -411,9 +410,14 @@ class LobbyTest {
         serverState.getLobby("Alberto", makeView("v1", "Alberto"));
         serverState.createNewGame("Alberto", 2, Color.RED, "v1");
 
+        GameController albertoGame = serverState.getController("Alberto");
+
         // Alberto si disconnette — 0 giocatori connessi, game non avviato
         serverState.removeConnection("v1");
         serverState.removePlayer("Alberto");
+        if (albertoGame != null) albertoGame.onPlayerDisconnected("Alberto");
+
+
 
         // Forziamo un broadcast reale tramite createNewGame
         serverState.getLobby("Mattia", makeView("v2", "Mattia"));

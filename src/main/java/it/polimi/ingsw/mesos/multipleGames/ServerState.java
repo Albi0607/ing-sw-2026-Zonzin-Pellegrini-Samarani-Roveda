@@ -176,6 +176,13 @@ public class ServerState {
                 view.showActionRejected("GameController non creato correttamente");
                 return;
             }
+            controller.setOnWaitingRoomChangeCallback(nick -> {
+                connections.remove(nick);
+                nicknames.remove(nick);
+                playerToGame.remove(nick);
+                lobby.removeEmptyGames();
+                lobby.broadcast();
+            });
 
             playerToGame.put(nickname, controller);
 
