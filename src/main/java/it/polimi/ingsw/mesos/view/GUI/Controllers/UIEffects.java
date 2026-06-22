@@ -229,6 +229,7 @@ public class UIEffects {
 
     // End game card effects
 
+    //non usato per problema di duplicazione dei nickname nel database
     /**
      * Highlights the leaderboard entry belonging to the local player.
      * Applies a yellow background with rounded corners and a subtle drop shadow
@@ -236,7 +237,6 @@ public class UIEffects {
      *
      * @param container the HBox of the leaderboard entry to highlight
      */
-
     public static void applyMyResultHighlight(HBox container) {
         container.setStyle(
                 "-fx-background-color: yellow;" +

@@ -57,6 +57,10 @@ public class GUI extends Application implements View {
         sceneManager.loadLoginScene();
         this.primaryStage.setTitle("Mesos");
         this.primaryStage.getIcons().add(new Image("/images/tool/icon.png"));
+        this.primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
         this.primaryStage.show();
     }
 

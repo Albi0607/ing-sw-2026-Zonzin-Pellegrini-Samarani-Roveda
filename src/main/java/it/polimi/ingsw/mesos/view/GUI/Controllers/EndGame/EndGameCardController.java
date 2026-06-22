@@ -55,9 +55,7 @@ public class EndGameCardController {
         ppLabel.setText("PP: " + result.getPoints());
         foodLabel_time.setText("DATE: " + result.getDate());
         numPlayersLabel.setText("PLAYERS: " + result.getNumPlayers());
-        if(myResult){
-            UIEffects.applyMyResultHighlight(HBoxContainer);
-        }
+
     }
 
 }
