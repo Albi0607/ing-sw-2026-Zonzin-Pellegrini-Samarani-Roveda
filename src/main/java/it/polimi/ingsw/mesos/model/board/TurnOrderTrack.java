@@ -121,6 +121,23 @@ public class TurnOrderTrack {
         }
     }
 
+    /**
+     * Places the given player in the specified slot WITHOUT applying the slot's
+     * food effect.
+     *
+     * <p>Used for administrative re-insertions into the track that are not the
+     * result of a real game action — for example, when a disconnected player's
+     * turn is force-skipped during {@code PLACING_TOTEMS} (see
+     * {@code PlacingState.forceSkipCurrentPlayer}). In that situation the player
+     * never occupied an offer tile, so there is no "return from the tile" event
+     * to justify granting or charging food; using {@link #setPlayerAt} there
+     * would fabricate a food effect the rules do not prescribe.</p>
+     *
+     * @param index the index of the slot where the player will be placed
+     * @param p the player to occupy the slot
+     * @throws IndexOutOfBoundsException if the index is invalid
+     * @throws IllegalStateException if the slot is already occupied
+     */
     public void placeWithoutEffects(int index, Player p) {
         if (index < 0 || index >= positions.size()) {
             throw new IndexOutOfBoundsException("Index not valid: " + index);

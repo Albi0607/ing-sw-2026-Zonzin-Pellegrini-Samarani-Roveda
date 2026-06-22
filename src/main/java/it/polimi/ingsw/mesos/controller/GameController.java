@@ -1,4 +1,3 @@
-
 package it.polimi.ingsw.mesos.controller;
 
 import it.polimi.ingsw.mesos.DB.DBManager;
@@ -37,7 +36,7 @@ import java.util.function.Consumer;
 public class GameController {
 
     private Game game;
-    
+
     /** Map associating each player's nickname with their corresponding VirtualView. */
     private final Map<String, VirtualView> players = new ConcurrentHashMap<>();
 
@@ -340,7 +339,7 @@ public class GameController {
         }
         turnTimer.shutdownNow();
     }
-    
+
     /**
      * Handles the player's action of placing a totem on an offer tile.
      * Validates the game state, ensures the player is connected, and checks if the tile is available.
@@ -800,6 +799,17 @@ public class GameController {
         }
     }
 
+    /**
+     * Sets the callback to be invoked when the waiting room composition changes
+     * because a pending player (one who joined before the game was created)
+     * disconnects.
+     *
+     * <p>This callback is used by the lobby layer to keep the list of available
+     * games in sync, since a player leaving the waiting room may free up a slot
+     * or, if it was the last pending player, leave the room empty.</p>
+     *
+     * @param callback a consumer receiving the nickname of the player who left
+     */
     public void setOnWaitingRoomChangeCallback(Consumer <String> callback) {
         this.onWaitingRoomChangeCallback = callback;
     }
@@ -842,6 +852,16 @@ public class GameController {
         }
     }
 
+    /**
+     * Pauses the game because only one connected player remains.
+     *
+     * <p>While paused, no game action is accepted (see {@link #onPlaceTotem},
+     * {@link #onTakeCard}, {@link #onSkipExtraDraw}). The turn timer is repurposed:
+     * instead of timing out the active player's move, it is rescheduled to end
+     * the game automatically via {@link #endGame()} if no second player
+     * reconnects within {@link #TURN_TIMEOUT_SEC} seconds. The pause is lifted by
+     * {@link #resumeGame()} once at least two players are connected again.</p>
+     */
     private void pauseGame() {
         paused = true;
         cancelTurnTimer();
@@ -900,6 +920,14 @@ public class GameController {
         }
     }
 
+    /**
+     * Resumes a previously paused game.
+     *
+     * <p>Called by {@link #reconnectPlayer(String, VirtualView)} once at least
+     * two players are connected again. Cancels the pending end-of-pause timeout,
+     * notifies all clients, broadcasts the current state, and restarts the
+     * normal per-turn timer for the player who is currently active.</p>
+     */
     private void resumeGame() {
         paused = false;
         cancelTurnTimer();
@@ -1044,8 +1072,3 @@ public class GameController {
         return gameId;
     }
 }
-
-
-
-
-
