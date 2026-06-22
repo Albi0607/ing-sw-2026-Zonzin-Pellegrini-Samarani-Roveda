@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * The GameController class manages the logic for a single game instance.
@@ -62,6 +63,8 @@ public class GameController {
 
     /** Callback executed when the game has finished. */
     private Runnable onGameFinished;
+
+    private Consumer<String> onWaitingRoomChangeCallback;
 
     /** Nicknames of players who have disconnected and are eligible for reconnection. */
     private final java.util.Set<String> disconnectedPlayers = ConcurrentHashMap.newKeySet();
@@ -767,6 +770,15 @@ public class GameController {
      */
     public synchronized void onPlayerDisconnected(String nickname) {
         if (disconnectedPlayers.contains(nickname)) return;
+        if (game == null) {
+            pendingNicknames.remove(nickname);
+            chosenColors.remove(nickname);
+            players.remove(nickname);
+            if (onWaitingRoomChangeCallback != null) {
+                onWaitingRoomChangeCallback.accept(nickname);
+            }
+            return;
+        }
         disconnectedPlayers.add(nickname);
 
         for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
@@ -787,6 +799,10 @@ public class GameController {
         if (game != null && nickname.equals(game.getCurrentPlayerNickname())) {
             skipDisconnectedTurn(nickname);
         }
+    }
+
+    public void setOnWaitingRoomChangeCallback(Consumer <String> callback) {
+        this.onWaitingRoomChangeCallback = callback;
     }
 
     /**
