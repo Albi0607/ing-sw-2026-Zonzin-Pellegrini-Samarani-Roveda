@@ -65,6 +65,21 @@ class GameControllerTest {
     }
 
     /**
+     * Aggiunge 3 giocatori e avvia la partita.
+     * Usato per i test su disconnessione/pausa: con 3 giocatori connessi,
+     * la disconnessione di UNO solo lascia connectedCount=2 (skip normale),
+     * mentre con 2 giocatori la disconnessione di uno lascia connectedCount=1,
+     * che attiva pauseGame() invece dello skip — i due scenari vanno quindi
+     * testati con un numero di giocatori diverso.
+     */
+    private void initGameWith3Players(StubView viewAlice, StubView viewBob, StubView viewCharlie) {
+        controller.setNumPlayers(3);
+        controller.addPlayer("Alice",   Color.BLUE,  viewAlice);
+        controller.addPlayer("Bob",     Color.RED,   viewBob);
+        controller.addPlayer("Charlie", Color.WHITE, viewCharlie);
+    }
+
+    /**
      * Porta il controller nello stato RESOLVING_ACTIONS facendo piazzare tutti
      * i totem ai giocatori nel loro ordine corretto.
      */
@@ -271,7 +286,7 @@ class GameControllerTest {
         // Bob si riconnette mentre il gioco è già in corso
         controller.addPlayer("Bob", Color.RED, mockView);
         assertNotNull(controller.getGame());
-        
+
         tempLogger.deleteAll(controller.getGameId());
     }
 
@@ -635,11 +650,126 @@ class GameControllerTest {
 
     @Test
     void onPlayerDisconnected_currentPlayerDisconnects_turnIsSkipped() {
-        initGameWith2Players();
+        // Con 3 giocatori, disconnetterne 1 lascia connectedCount=2 (≥2),
+        // quindi il ramo eseguito è lo skip del turno, non pauseGame().
+        // Con 2 soli giocatori connectedCount scenderebbe a 1 e attiverebbe
+        // la pausa invece — il test originale era quindi strutturalmente
+        // incompatibile con la funzionalità di pausa introdotta successivamente.
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
         String current = controller.getGame().getCurrentPlayerNickname();
         controller.onPlayerDisconnected(current);
+
         // Il turno deve essere passato ad un altro giocatore
         assertNotEquals(current, controller.getGame().getCurrentPlayerNickname());
+    }
+
+    @Test
+    void onPlayerDisconnected_twoOfThreeDisconnect_gamePauses() {
+        // Disconnettendo 2 giocatori su 3 resta connectedCount=1 → pauseGame().
+        // L'unico giocatore rimasto non deve più poter compiere azioni.
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
+        controller.onPlayerDisconnected("Bob");
+        controller.onPlayerDisconnected("Charlie");
+
+        // L'azione del giocatore rimasto (Alice, sia o meno il suo turno)
+        // deve essere rifiutata perché la partita è in pausa.
+        boolean result = controller.onPlaceTotem("Alice", 'A');
+        assertFalse(result);
+    }
+
+    @Test
+    void reconnectPlayer_secondPlayerReconnectsWhilePaused_resumesGame() {
+        // Riportando connectedCount da 1 a 2 mentre paused=true,
+        // reconnectPlayer deve invocare resumeGame() e disattivare il flag
+        // di pausa.
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
+        controller.onPlayerDisconnected("Bob");
+        controller.onPlayerDisconnected("Charlie"); // ora in pausa
+
+        List<String> rejections = new ArrayList<>();
+        StubView newBobView = new StubView("Bob") {
+            @Override public void showActionRejected(String reason) { rejections.add(reason); }
+        };
+        controller.reconnectPlayer("Bob", newBobView);
+        assertFalse(controller.isPlayerDisconnected("Bob"));
+
+        // 'Z' non è una tessera valida: l'azione verrà comunque rifiutata,
+        // isolare il comportamento per vedere che sia esattamente
+        // il flag che resumeGame() ad essere disattivato.
+        controller.onPlaceTotem("Bob", 'Z');
+        boolean rejectedForPause = rejections.stream()
+                .anyMatch(r -> r.toLowerCase().contains("pausa"));
+        assertFalse(rejectedForPause);
+    }
+
+    @Test
+    void onPlayerDisconnected_beforeGameCreated_removesFromPendingListAndInvokesCallback() {
+        // Se un giocatore in attesa (waiting room) si disconnette prima che
+        // la partita venga creata, va rimosso da pendingNicknames/chosenColors/players
+        // e va invocata la callback registrata con setOnWaitingRoomChangeCallback.
+        List<String> notified = new ArrayList<>();
+        controller.setOnWaitingRoomChangeCallback(notified::add);
+
+        controller.setNumPlayers(3);
+        controller.addPlayer("Alice", Color.BLUE, mockView);
+
+        controller.onPlayerDisconnected("Alice");
+
+        assertEquals(List.of("Alice"), notified);
+        // Alice è stata rimossa: un nuovo giocatore con lo stesso nickname
+        // deve poter rientrare senza errori di duplicato.
+        assertDoesNotThrow(() -> controller.addPlayer("Alice", Color.WHITE, mockView));
+    }
+
+    @Test
+    void onPlaceTotem_whenPaused_returnsFalseAndRejectsAction() {
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
+        controller.onPlayerDisconnected("Bob");
+        controller.onPlayerDisconnected("Charlie"); // in pausa
+
+        assertFalse(controller.onPlaceTotem("Alice", 'A'));
+    }
+
+    @Test
+    void onTakeCard_whenPaused_returnsFalseAndRejectsAction() {
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
+        controller.onPlayerDisconnected("Bob");
+        controller.onPlayerDisconnected("Charlie"); // in pausa
+
+        assertFalse(controller.onTakeCard("Alice", 0, true));
+    }
+
+    @Test
+    void onSkipExtraDraw_whenPaused_returnsFalseAndRejectsAction() {
+        StubView viewAlice   = new StubView("Alice");
+        StubView viewBob     = new StubView("Bob");
+        StubView viewCharlie = new StubView("Charlie");
+        initGameWith3Players(viewAlice, viewBob, viewCharlie);
+
+        controller.onPlayerDisconnected("Bob");
+        controller.onPlayerDisconnected("Charlie"); // in pausa
+
+        assertFalse(controller.onSkipExtraDraw("Alice"));
     }
 
     @Test

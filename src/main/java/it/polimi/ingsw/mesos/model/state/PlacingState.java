@@ -120,6 +120,24 @@ public class PlacingState implements GameStateLogic {
     }
 
 
+    /**
+     * Force-skips the turn of the currently active player, used when that
+     * player has disconnected.
+     *
+     * <p>The skipped player never placed a totem on an offer tile during this
+     * round, so unlike the normal return-from-tile flow in {@code ResolvingState},
+     * no food bonus or penalty applies here — the player is re-inserted into
+     * the track via {@link TurnOrderTrack#placeWithoutEffects} rather than
+     * {@link TurnOrderTrack#setPlayerAt}. This keeps them eligible to act again
+     * starting from the next round's {@code PlacingState}, instead of vanishing
+     * from the turn rotation entirely.</p>
+     *
+     * <p>If this was the last player still expected to place a totem, the state
+     * transitions to {@link ResolvingState} exactly as it would after a normal
+     * placement.</p>
+     *
+     * @param game the current game context
+     */
     @Override
     public void forceSkipCurrentPlayer(Game game) {
         Player skipped = getActivePlayer(game);
