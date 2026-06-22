@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.CardDTO;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 

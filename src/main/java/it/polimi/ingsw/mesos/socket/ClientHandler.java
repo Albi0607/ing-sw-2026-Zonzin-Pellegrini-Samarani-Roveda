@@ -2,7 +2,7 @@ package it.polimi.ingsw.mesos.socket;
 
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
-import it.polimi.ingsw.mesos.rete.PlayerStatus;
+import it.polimi.ingsw.mesos.network.PlayerStatus;
 import it.polimi.ingsw.mesos.socket.Message.Message;
 import it.polimi.ingsw.mesos.socket.Message.messageClient.*;
 import it.polimi.ingsw.mesos.socket.Message.messageServer.ErrorMessage;

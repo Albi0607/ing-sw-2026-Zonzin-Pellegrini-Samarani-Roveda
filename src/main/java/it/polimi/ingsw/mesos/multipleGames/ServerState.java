@@ -5,7 +5,7 @@ import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.persistence.GameMove;
 import it.polimi.ingsw.mesos.persistence.GameRestorer;
 import it.polimi.ingsw.mesos.persistence.MoveLogger;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.io.File;
 import java.util.List;

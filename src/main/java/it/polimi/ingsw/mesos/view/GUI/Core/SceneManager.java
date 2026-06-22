@@ -1,9 +1,9 @@
 package it.polimi.ingsw.mesos.view.GUI.Core;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.ClientController;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.EndGame.EndGameController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
@@ -17,8 +17,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.List;
-
-import static it.polimi.ingsw.mesos.rete.ClientModel.ClientState.END_GAME;
 
 /**
  * Manages all scene transitions for the GUI client.

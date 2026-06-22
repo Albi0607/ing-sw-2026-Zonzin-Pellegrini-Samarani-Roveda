@@ -3,7 +3,7 @@ package it.polimi.ingsw.mesos.RMI;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.rmi.*;
 import java.rmi.server.*;

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame;
 
 
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.Core.SceneManager;
 import javafx.fxml.FXML;

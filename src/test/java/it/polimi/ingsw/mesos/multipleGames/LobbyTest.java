@@ -3,10 +3,10 @@ package it.polimi.ingsw.mesos.multipleGames;
 import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

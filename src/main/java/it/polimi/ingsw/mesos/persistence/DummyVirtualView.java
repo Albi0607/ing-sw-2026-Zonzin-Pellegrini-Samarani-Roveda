@@ -1,11 +1,10 @@
 package it.polimi.ingsw.mesos.persistence;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.VirtualView;
-import it.polimi.ingsw.mesos.view.CLI.UIEvent;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
 
 import java.util.ArrayList;

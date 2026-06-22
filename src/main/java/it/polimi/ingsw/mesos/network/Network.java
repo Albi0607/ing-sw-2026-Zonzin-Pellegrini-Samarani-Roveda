@@ -1,9 +1,6 @@
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.network;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-
-import java.util.List;
 
 /**
  * Generic interface for network management; both the RMI client and the socket client must implement this interface so

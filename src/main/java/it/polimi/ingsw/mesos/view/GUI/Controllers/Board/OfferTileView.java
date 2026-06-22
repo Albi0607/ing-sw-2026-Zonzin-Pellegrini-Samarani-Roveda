@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.Board;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.OfferTileDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.OfferTileDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;

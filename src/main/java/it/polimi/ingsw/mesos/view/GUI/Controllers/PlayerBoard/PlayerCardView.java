@@ -1,6 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.CardView;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import javafx.scene.control.Label;

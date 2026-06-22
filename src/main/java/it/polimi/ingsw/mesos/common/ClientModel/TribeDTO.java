@@ -1,4 +1,4 @@
-package it.polimi.ingsw.mesos.rete.ClientModel;
+package it.polimi.ingsw.mesos.common.ClientModel;
 
 
 import java.io.Serializable;

@@ -1,9 +1,7 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
-import it.polimi.ingsw.mesos.view.CLI.CLIPrinter;
 
 /**
  * Represents a passive UI state where the local client is waiting.
@@ -37,7 +35,7 @@ public class WaitingState implements UIState {
     @Override
     public void render(UIContext context) {
 
-        if (context.getClientState() == it.polimi.ingsw.mesos.rete.ClientModel.ClientState.IN_GAME) {
+        if (context.getClientState() == ClientState.IN_GAME) {
             context.drawUI();
         }
     }

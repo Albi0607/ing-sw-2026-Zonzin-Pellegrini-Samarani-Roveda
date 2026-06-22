@@ -1,10 +1,10 @@
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.network;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
 import it.polimi.ingsw.mesos.common.enums.Color;
 
 import java.util.List;

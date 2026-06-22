@@ -5,6 +5,7 @@ import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResult;
 import it.polimi.ingsw.mesos.DB.GameResultDAO;
 import it.polimi.ingsw.mesos.DB.LeaderboardService;
+import it.polimi.ingsw.mesos.common.ClientModel.*;
 import it.polimi.ingsw.mesos.model.Game;
 import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.Tribe;
@@ -18,14 +19,12 @@ import it.polimi.ingsw.mesos.common.enums.GameState;
 import it.polimi.ingsw.mesos.model.state.FinishedState;
 import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.persistence.*;
-import it.polimi.ingsw.mesos.rete.ClientModel.*;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 

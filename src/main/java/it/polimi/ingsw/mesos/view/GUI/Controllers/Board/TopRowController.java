@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.Board;
 
 
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.CardDTO;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;

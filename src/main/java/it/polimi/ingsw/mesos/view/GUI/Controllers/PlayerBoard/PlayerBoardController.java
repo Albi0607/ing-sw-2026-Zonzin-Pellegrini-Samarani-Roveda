@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard;
 
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.network.ClientController;
+import it.polimi.ingsw.mesos.common.ClientModel.CardDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservablePlayerModel;
 import javafx.application.Platform;

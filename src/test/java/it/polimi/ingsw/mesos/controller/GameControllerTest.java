@@ -11,10 +11,10 @@ import it.polimi.ingsw.mesos.model.state.ResolvingState;
 import it.polimi.ingsw.mesos.persistence.GameMove;
 import it.polimi.ingsw.mesos.persistence.GameRestorer;
 import it.polimi.ingsw.mesos.persistence.MoveLogger;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

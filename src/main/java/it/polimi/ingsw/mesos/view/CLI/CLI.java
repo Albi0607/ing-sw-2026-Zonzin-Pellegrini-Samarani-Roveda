@@ -1,13 +1,12 @@
 package it.polimi.ingsw.mesos.view.CLI;
 
-import it.polimi.ingsw.mesos.DB.DBManager;
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.DB.GameResultDAO;
-import it.polimi.ingsw.mesos.DB.LeaderboardService;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.*;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.ClientController;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.View;
+import it.polimi.ingsw.mesos.network.View;
 import it.polimi.ingsw.mesos.view.CLI.state.*;
 
 import java.util.List;
