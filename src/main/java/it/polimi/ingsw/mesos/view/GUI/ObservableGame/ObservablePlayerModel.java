@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.ObservableGame;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
-import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.PlayerDTO;
 import javafx.beans.property.*;
 
 /**

@@ -1,22 +1,12 @@
 package it.polimi.ingsw.mesos.multipleGames;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.RMI.CallBackImplementation;
-import it.polimi.ingsw.mesos.RMI.RMIVirtualView;
-import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.Network;
-import it.polimi.ingsw.mesos.rete.View;
-import it.polimi.ingsw.mesos.rete.VirtualView;
-import it.polimi.ingsw.mesos.socket.SocketVirtualView;
-import it.polimi.ingsw.mesos.socket.clientSocket;
-import it.polimi.ingsw.mesos.view.CLI.CLI;
-import it.polimi.ingsw.mesos.view.GUI.Core.GUI;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.VirtualView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.List;
 
-import static java.lang.System.out;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ServerStateTest {

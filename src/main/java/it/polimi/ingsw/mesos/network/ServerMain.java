@@ -1,18 +1,12 @@
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.network;
 
 import it.polimi.ingsw.mesos.DB.DBManager;
-import it.polimi.ingsw.mesos.DB.GameResultDAO;
-import it.polimi.ingsw.mesos.DB.LeaderboardService;
 import it.polimi.ingsw.mesos.RMI.server_RMI;
 import it.polimi.ingsw.mesos.multipleGames.ServerState;
 import it.polimi.ingsw.mesos.socket.serverSocket;
-import java.net.InetAddress;
 
 import java.sql.SQLException;
 import java.util.Scanner;
-import java.net.Inet4Address;
-import java.net.NetworkInterface;
-import java.util.Collections;
 
 /**
  * Class used to start the game server, which accepts clients and manages game creation.

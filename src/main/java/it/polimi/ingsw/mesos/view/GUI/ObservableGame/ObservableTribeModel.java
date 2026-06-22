@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.ObservableGame;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.CardDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.TribeDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.CardDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.TribeDTO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

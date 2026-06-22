@@ -1,11 +1,8 @@
 package it.polimi.ingsw.mesos.RMI;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.VirtualView;
 
 import java.rmi.*;
-import java.util.List;
 
 /**
  * Remote interface that defines the actions that can be invoked remotely by the client

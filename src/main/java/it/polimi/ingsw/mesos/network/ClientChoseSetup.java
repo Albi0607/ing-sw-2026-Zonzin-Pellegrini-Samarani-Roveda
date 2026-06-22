@@ -1,5 +1,5 @@
 
-package it.polimi.ingsw.mesos.rete;
+package it.polimi.ingsw.mesos.network;
 
 import it.polimi.ingsw.mesos.RMI.client_RMI;
 import it.polimi.ingsw.mesos.socket.clientSocket;

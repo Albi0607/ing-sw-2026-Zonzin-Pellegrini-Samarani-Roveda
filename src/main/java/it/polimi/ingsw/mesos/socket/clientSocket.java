@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.socket;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
-import it.polimi.ingsw.mesos.rete.Network;
-import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.network.Network;
+import it.polimi.ingsw.mesos.network.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.*;
 import it.polimi.ingsw.mesos.socket.Message.messageClient.*;
 

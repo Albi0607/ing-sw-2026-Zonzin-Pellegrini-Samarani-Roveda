@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.socket.Message.messageServer;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.network.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.Message;
 
 /**

@@ -2,8 +2,8 @@ package it.polimi.ingsw.mesos.multipleGames;
 
 import it.polimi.ingsw.mesos.common.enums.Color;
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

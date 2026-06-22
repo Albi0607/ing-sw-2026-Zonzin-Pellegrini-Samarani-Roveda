@@ -1,9 +1,9 @@
 package it.polimi.ingsw.mesos.view.CLI.state;
 
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.ClientModel.GameDTO;
-import it.polimi.ingsw.mesos.rete.ClientModel.LobbyInfoDTO;
+import it.polimi.ingsw.mesos.network.ClientController;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.common.ClientModel.GameDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.LobbyInfoDTO;
 
 import java.util.List;
 

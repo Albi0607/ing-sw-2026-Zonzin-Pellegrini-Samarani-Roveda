@@ -1,8 +1,8 @@
 package it.polimi.ingsw.mesos.persistence;
 
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ClientModel.ClientState;
-import it.polimi.ingsw.mesos.rete.VirtualView;
+import it.polimi.ingsw.mesos.common.ClientModel.ClientState;
+import it.polimi.ingsw.mesos.network.VirtualView;
 
 import java.util.List;
 import java.util.Map;

@@ -5,7 +5,7 @@ import it.polimi.ingsw.mesos.view.CLI.formatter.BuildingFormatter;
 import it.polimi.ingsw.mesos.view.CardRegistry;
 import it.polimi.ingsw.mesos.common.CharacterCardJson;
 import it.polimi.ingsw.mesos.common.enums.CharacterType;
-import it.polimi.ingsw.mesos.rete.ClientModel.PlayerDTO;
+import it.polimi.ingsw.mesos.common.ClientModel.PlayerDTO;
 
 import java.util.ArrayList;
 import java.util.List;

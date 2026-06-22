@@ -1,14 +1,10 @@
 package it.polimi.ingsw.mesos.RMI;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.Network;
+import it.polimi.ingsw.mesos.network.ClientController;
+import it.polimi.ingsw.mesos.network.Network;
 import it.polimi.ingsw.mesos.common.enums.Color;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.rmi.*;
 import java.rmi.registry.*;
-import java.util.Collections;
 
 /**
  * Class responsible for establishing an RMI connection with the RMI server and handling all client-side remote method

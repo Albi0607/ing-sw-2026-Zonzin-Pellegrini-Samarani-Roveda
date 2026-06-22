@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.view.GUI.ObservableGame;
 
+import it.polimi.ingsw.mesos.common.ClientModel.*;
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientModel.*;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,10 +1,9 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.Board;
 
 import it.polimi.ingsw.mesos.common.enums.GameState;
-import it.polimi.ingsw.mesos.rete.ClientController;
-import it.polimi.ingsw.mesos.rete.ClientModel.OfferTileDTO;
+import it.polimi.ingsw.mesos.network.ClientController;
+import it.polimi.ingsw.mesos.common.ClientModel.OfferTileDTO;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
-import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

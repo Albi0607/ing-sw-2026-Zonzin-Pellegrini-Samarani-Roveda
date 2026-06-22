@@ -2,7 +2,6 @@ package it.polimi.ingsw.mesos.socket.Message.messageClient;
 
 import it.polimi.ingsw.mesos.socket.Message.Message;
 import it.polimi.ingsw.mesos.controller.GameController;
-import it.polimi.ingsw.mesos.rete.ClientController;
 
 /**
  * Message sent from the client to the server indicating that the player

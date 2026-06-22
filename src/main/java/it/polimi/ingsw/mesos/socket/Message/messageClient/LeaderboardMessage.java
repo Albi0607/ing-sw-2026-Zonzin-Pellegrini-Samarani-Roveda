@@ -1,7 +1,7 @@
 package it.polimi.ingsw.mesos.socket.Message.messageClient;
 
 import it.polimi.ingsw.mesos.DB.GameResult;
-import it.polimi.ingsw.mesos.rete.ClientController;
+import it.polimi.ingsw.mesos.network.ClientController;
 import it.polimi.ingsw.mesos.socket.Message.Message;
 
 import java.util.List;

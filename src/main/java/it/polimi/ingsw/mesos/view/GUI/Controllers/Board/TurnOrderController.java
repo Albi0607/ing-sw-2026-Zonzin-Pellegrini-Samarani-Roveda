@@ -1,7 +1,6 @@
 package it.polimi.ingsw.mesos.view.GUI.Controllers.Board;
 
-import it.polimi.ingsw.mesos.rete.ClientModel.TurnOrderSlotDTO;
-import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
+import it.polimi.ingsw.mesos.common.ClientModel.TurnOrderSlotDTO;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
