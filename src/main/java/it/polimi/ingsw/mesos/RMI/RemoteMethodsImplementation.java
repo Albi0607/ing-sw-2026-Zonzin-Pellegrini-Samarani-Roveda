@@ -164,14 +164,43 @@ public class RemoteMethodsImplementation extends UnicastRemoteObject implements 
         });
     }
 
-
-
+    /**
+     * Records the current timestamp for the given player as proof of an active connection.
+     *
+     * <p>This method is called periodically by the client-side {@link KeepAliveRMI}
+     * at a fixed interval. Each invocation updates the player's entry in
+     * {@code lastHeartbeat} with the current system time, resetting the inactivity
+     * countdown monitored by the watchdog thread started in {@link #startWatchdog()}.</p>
+     *
+     * @param nickname name of the player sending the heartbeat,
+     *                 used as the key to update the timestamp map
+     * @throws RemoteException if a network error occurs during the remote call
+     */
 
     @Override
     public void heartbeat(String nickname) throws RemoteException {
         lastHeartbeat.put(nickname, System.currentTimeMillis());
     }
 
+    /**
+     * Starts a background watchdog thread that periodically checks all connected
+     * players for heartbeat timeouts and handles disconnections accordingly.
+     *
+     * <p>The watchdog runs on a single-threaded scheduled executor and fires every
+     * 5 seconds. On each tick it iterates over the {@code lastHeartbeat} map and
+     * compares the current system time against each player's last recorded heartbeat.
+     * If the elapsed time exceeds 50 seconds, the player is considered disconnected
+     * and the following cleanup sequence is triggered:</p>
+     * <ol>
+     *   <li>The player's entry is removed from {@code lastHeartbeat}.</li>
+     *   <li>A timeout message is printed to {@code stdout} for diagnostics.</li>
+     *   <li>{@link GameController#onPlayerDisconnected(String)} is called on the
+     *       player's active game controller (if present), so the game logic can
+     *       react to the disconnection (e.g. pausing the game or reassigning the turn).</li>
+     *   <li>{@link ServerState#removePlayer(String)} is called to clean up all
+     *       remaining server-side references to the player.</li>
+     * </ol>
+     */
     private void startWatchdog() {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             long now = System.currentTimeMillis();

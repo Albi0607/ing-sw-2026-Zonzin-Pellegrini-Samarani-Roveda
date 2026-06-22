@@ -78,7 +78,20 @@ public interface RemoteMethods extends Remote {
      */
     void joinGame(String nickname, int id, Color color, String viewId) throws  RemoteException;
 
-    //TODO da fare javadoc
+    /**
+     * Sends a heartbeat signal to the server to indicate that the client is
+     * still active and connected.
+     *
+     * <p>This method is called periodically by {@link KeepAliveRMI} at a fixed
+     * interval. The server uses incoming heartbeats to detect disconnected or
+     * unresponsive clients: if no heartbeat is received within the expected
+     * window, the server may treat the client as disconnected and take
+     * appropriate action (e.g. removing the player from the session).</p>
+     *
+     * @param nickname name of the player sending the heartbeat,
+     *                 used to identify the client on the server side
+     * @throws RemoteException if a network error occurs during the remote call
+     */
     void heartbeat(String nickname) throws RemoteException;
 
 }

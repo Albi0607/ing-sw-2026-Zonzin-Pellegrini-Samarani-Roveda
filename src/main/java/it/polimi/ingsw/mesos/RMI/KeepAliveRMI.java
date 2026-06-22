@@ -2,7 +2,15 @@ package it.polimi.ingsw.mesos.RMI;
 
 import java.rmi.RemoteException;
 
-// gestisce il messaggi di KeepALive
+/**
+ * Manages the keep-alive mechanism for RMI connections by periodically
+ * sending heartbeat signals to the remote server.
+ *
+ * <p>This class implements {@link Runnable} and is intended to be executed
+ * in a dedicated background thread. It sends a heartbeat to the server
+ * at fixed intervals to signal that the client is still alive and connected.
+ * If the server becomes unreachable, the loop is terminated automatically.</p>
+ */
 public class KeepAliveRMI implements Runnable {
 
     private static final long INTERVAL_MS = 5_000;
@@ -15,6 +23,21 @@ public class KeepAliveRMI implements Runnable {
         this.nickname = nickname;
     }
 
+    /**
+     * Starts the keep-alive loop, sending a heartbeat to the server every
+     * {@value #INTERVAL_MS} milliseconds.
+     *
+     * <p>The loop continues until one of the following occurs:</p>
+     * <ul>
+     *   <li>{@link #stop()} is called, setting {@code running} to {@code false}</li>
+     *   <li>A {@link RemoteException} is thrown, indicating the server is unreachable</li>
+     *   <li>The thread is interrupted externally</li>
+     * </ul>
+     *
+     * <p>If a {@link RemoteException} is caught, an error message is printed to
+     * {@code stderr} and the loop exits gracefully. If an {@link InterruptedException}
+     * is caught, the thread's interrupt status is restored before exiting.</p>
+     */
     @Override
     public void run() {
         while (running) {
