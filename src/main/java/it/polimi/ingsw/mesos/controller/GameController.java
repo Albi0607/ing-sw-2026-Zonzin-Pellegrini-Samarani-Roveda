@@ -115,7 +115,7 @@ public class GameController {
 
         for (VirtualView view : players.values()) {
             view.sendClientState(ClientState.WAITING_PLAYERS);
-            view.showMessage("Game set to " + expectedNumPlayers + " players. Waiting for opponents...");
+            view.showMessage("Partita creata per " + expectedNumPlayers + " giocatori. Aspetto altri giocatori...");
         }
     }
 
@@ -170,7 +170,7 @@ public class GameController {
                 restorer = null;
             } else {
                 view.sendClientState(ClientState.WAITING_PLAYERS);
-                view.showMessage("Reconnecting... waiting for other players.");
+                view.showMessage("Riconnessione... aspetto altri giocatori");
             }
             return;
         }
@@ -374,13 +374,13 @@ public class GameController {
 
             if (moveLogger != null) moveLogger.append(GameMove.placeTotem(nickname, tileId));
 
-            if (!replayMode) view.showActionAccepted("Totem placed successfully!");
+            if (!replayMode) view.showActionAccepted("Totem piazzato correttamente!");
 
             broadcastUpdate();
             return true;
 
         } catch (Exception e) {
-            if (!replayMode) view.showActionRejected("Failed to place totem: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Totem non piazzato correttamente: " + e.getMessage());
             System.err.println("⚠️ Action rejected for " + nickname + ": " + e.getMessage());
             return false;
         }
@@ -403,7 +403,7 @@ public class GameController {
         }
 
         if (paused) {
-            view.showActionRejected(("Game currently paused, wait for other players to continue"));
+            view.showActionRejected(("Partita attualmente in pausa; aspetta altri giocatori per continuare"));
             return false;
         }
 
@@ -417,7 +417,7 @@ public class GameController {
             }
 
             game.takeCard(player, cardIndex, isUpper);
-            if (!replayMode) view.showActionAccepted("Card chosen successfully!");
+            if (!replayMode) view.showActionAccepted("Carta scelta correttamente!");
 
             if (moveLogger != null) moveLogger.append(GameMove.takeCard(nickname, cardIndex, isUpper));
 
@@ -431,7 +431,7 @@ public class GameController {
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {
-            if (!replayMode) view.showActionRejected("Failed to choose card: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Carta non scelta correttamente: " + e.getMessage());
             return false;
         }
     }
@@ -451,7 +451,7 @@ public class GameController {
         }
 
         if (paused) {
-            view.showActionRejected(("Game currently paused, wait for other players to continue"));
+            view.showActionRejected(("Partita attualmente in pausa; aspetta altri giocatori per continuare"));
             return false;
         }
 
@@ -465,7 +465,7 @@ public class GameController {
             }
 
             game.skipExtraDraw(player);
-            if (!replayMode) view.showActionAccepted("Action skipped successfully!");
+            if (!replayMode) view.showActionAccepted("Azione saltata correttamente!");
             if (moveLogger != null) moveLogger.append(GameMove.skipExtraDraw(nickname));
             broadcastUpdate();
 
@@ -476,7 +476,7 @@ public class GameController {
             }
             return true;
         } catch (IllegalArgumentException | IllegalStateException e) {
-            if (!replayMode) view.showActionRejected("Failed to skip action: " + e.getMessage());
+            if (!replayMode) view.showActionRejected("Azione non saltata: " + e.getMessage());
             return false;
         }
     }
@@ -772,7 +772,7 @@ public class GameController {
         for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
             if (!entry.getKey().equals(nickname)) {
                 try {
-                    entry.getValue().showMessage(nickname + " has disconnected. Their turn will be skipped.");
+                    entry.getValue().showMessage(nickname + " si è disconnesso. Il suo turno verrà saltato");
                 } catch (Exception ignored) {}
             }
         }
@@ -846,7 +846,7 @@ public class GameController {
 
         for (VirtualView view : players.values()) {
             try {
-                view.showMessage("Game paused: waiting players reconnection...");
+                view.showMessage("Gioco in pausa: sei l'unico giocatore rimasto ");
             } catch (Exception ignored) {}
         }
         System.out.println("[GameController] Game paused: only one player connected.");
@@ -873,7 +873,7 @@ public class GameController {
         for (Map.Entry<String, VirtualView> entry : players.entrySet()) {
             if (!entry.getKey().equals(nickname)) {
                 try {
-                    entry.getValue().showMessage(nickname + " has reconnected!");
+                    entry.getValue().showMessage(nickname + " si è riconnesso!");
                 } catch (Exception ignored) {}
             }
         }
@@ -891,7 +891,7 @@ public class GameController {
 
         for  (VirtualView view : players.values()) {
             try {
-                view.showMessage("Game resumed.");
+                view.showMessage("Gioco ripreso.");
             } catch (Exception ignored) {}
         }
         broadcastUpdate();

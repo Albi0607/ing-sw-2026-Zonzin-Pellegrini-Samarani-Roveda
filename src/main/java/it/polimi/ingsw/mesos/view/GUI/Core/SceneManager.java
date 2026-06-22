@@ -226,7 +226,7 @@ public class SceneManager {
 
             case WAITING_PLAYERS -> this.loadWaitingRoom();
 
-            default -> { /* nessuna transizione di scena automatica */ }
+            default -> { }
         }
     }
 

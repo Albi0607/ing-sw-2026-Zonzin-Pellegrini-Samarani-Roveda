@@ -56,6 +56,7 @@ public class ServerState {
      * used to support reconnection to ongoing games.
      */
     private final Map<String, Integer> pendingReconnect;
+
     /** Minutes after which an unrecovered crashed session is considered abandoned. */
     private static final long STALE_SESSION_THRESHOLD_MINUTES = 5;
 
