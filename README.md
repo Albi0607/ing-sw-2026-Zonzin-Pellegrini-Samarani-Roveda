@@ -113,3 +113,18 @@ At startup:
 6. Press the connection button.
 
 After completing these steps, the player enters the lobby.
+
+---
+
+# Platform Compatibility
+
+The provided JAR files for the **Server** and the **CLI Client** are fully platform-independent and can be executed on any operating system supported by Java 21 or later.
+
+The **GUI Client** JAR includes JavaFX dependencies only for:
+
+- Windows
+- macOS (ARM architecture)
+
+As a consequence, the GUI client can be executed directly only on these platforms using the provided JAR file.
+
+Users running other operating systems may need to manually provide the appropriate JavaFX runtime libraries for their platform in order to launch the GUI client.
