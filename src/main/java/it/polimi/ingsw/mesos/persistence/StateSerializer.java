@@ -1,5 +1,6 @@
 package it.polimi.ingsw.mesos.persistence;
 
+import it.polimi.ingsw.mesos.model.Player;
 import it.polimi.ingsw.mesos.model.card.Card;
 import it.polimi.ingsw.mesos.model.card.building.BuildingCard;
 import it.polimi.ingsw.mesos.model.card.character.TribeCard;
@@ -40,9 +41,9 @@ public class StateSerializer {
      *
      * @param players the list of players in their starting order
      */
-    public void savePlayerOrder(List<it.polimi.ingsw.mesos.model.Player> players) {
+    public void savePlayerOrder(List<Player> players) {
         List<String> nicknames = new ArrayList<>();
-        for (it.polimi.ingsw.mesos.model.Player p : players) {
+        for (Player p : players) {
             nicknames.add(p.getNickname());
         }
         writeIdsToFile(nicknames, orderFile);
@@ -76,7 +77,7 @@ public class StateSerializer {
             ids.add(card.getId());
         }
         writeIdsToFile(ids, path);
-        for (int i = cards.size() - 1; i >= 0; i--) {
+        for (int i = cards.size() - 1; i >= 0; i--) { // inverted order
             deck.put(cards.get(i));
         }
     }
