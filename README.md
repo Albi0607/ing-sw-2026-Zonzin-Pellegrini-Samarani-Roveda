@@ -1,6 +1,7 @@
 # MESOS
 
 Software Engineering Project 2026
+
 Grade: 30/30
 
 ## Authors
@@ -24,8 +25,8 @@ Grade: 30/30
 
 ### Additional Features
 
-| Feature | Description | Status |
-| :--- | :--- | :---: |
+| Feature | Status |
+| :--- | :---: |
 | **Match Ranking Database (MySQL)** | :white_check_mark: |
 | **Multiple Concurrent Matches** | :white_check_mark: |
 | **Persistence** | :white_check_mark: |
