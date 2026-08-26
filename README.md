@@ -1,13 +1,14 @@
 # MESOS
 
 Software Engineering Project 2026
+Grade: 30/30
 
 ## Authors
 
-- Mattia Zonzin
-- Luca Pellegrini
-- Anna Samarani
-- Alberto Roveda
+- [Mattia Zonzin](https://github.com/mattiazonzin)
+- [Luca Pellegrini](https://github.com/LucaPelle01)
+- [Anna Samarani](https://github.com/annasamarani)
+- [Alberto Roveda](https://github.com/Albi0607)
 
 ---
 
@@ -22,6 +23,13 @@ Software Engineering Project 2026
 - Socket communication
 
 ### Additional Features
+
+| Feature | Description | Status |
+| :--- | :--- | :---: |
+| **Match Ranking Database (MySQL)** | :white_check_mark: |
+| **Multiple Concurrent Matches** | :white_check_mark: |
+| **Persistence** | :white_check_mark: |
+| **Disconnection Resilience** | :white_check_mark: |
 
 - **Match Ranking Database (MySQL)**  
   The server stores completed matches in a MySQL database, saving player nickname, final score, match date, and number of players. At the end of each match, players can view their ranking position and the complete leaderboard for matches with the same number of participants.
