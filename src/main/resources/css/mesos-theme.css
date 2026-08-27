@@ -1,0 +1,618 @@
+/*
+ * Mesos — Parchment / tribal ledger theme
+ * ---------------------------------------------------------------
+ * Professional board-game UI (Codex-like craft) with Mesos identity:
+ * cream parchment, ink serif, bronze borders, clay accents, totems.
+ *
+ * Apply with: stylesheets="@../css/mesos-theme.css"
+ * ---------------------------------------------------------------
+ */
+
+.root {
+    -mesos-parchment:     #F3E6C8;
+    -mesos-paper:         #EAD7B0;
+    -mesos-paper-deep:    #DCC49A;
+    -mesos-ink:           #2A1C12;
+    -mesos-ink-muted:     #6B5340;
+    -mesos-bronze:        #8B6914;
+    -mesos-bronze-light:  #B8952E;
+    -mesos-clay:          #A84B1C;
+    -mesos-clay-bright:   #C45A22;
+    -mesos-bone:          #F7F0DE;
+    -mesos-danger:        #8B1E1E;
+    -mesos-sand:          #C4A574;
+    -mesos-earth:         #5C3D2E;
+    -mesos-earth-deep:    #3A261C;
+
+    /* legacy aliases used by older class names */
+    -mesos-void:          -mesos-parchment;
+    -mesos-panel:         -mesos-paper;
+    -mesos-panel-raised:  -mesos-paper-deep;
+    -mesos-panel-hover:   derive(-mesos-paper-deep, -4%);
+    -mesos-ember:         -mesos-clay;
+    -mesos-ember-bright:  -mesos-clay-bright;
+    -mesos-ochre:         -mesos-bronze-light;
+    -mesos-stone:         -mesos-ink-muted;
+    -mesos-stone-dark:    -mesos-bronze;
+    -mesos-moss:          -mesos-earth;
+    -mesos-moss-deep:     -mesos-earth-deep;
+
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-background-color: -mesos-parchment;
+}
+
+/* ==================== Page wash (Codex-like soft blobs) ==================== */
+
+.mesos-page {
+    -fx-background-color:
+        radial-gradient(center 12% 18%, radius 55%, rgba(168,75,28,0.14), transparent),
+        radial-gradient(center 88% 22%, radius 50%, rgba(107,140,90,0.16), transparent),
+        radial-gradient(center 18% 88%, radius 48%, rgba(90,70,130,0.12), transparent),
+        radial-gradient(center 82% 85%, radius 52%, rgba(168,75,28,0.13), transparent),
+        radial-gradient(center 50% 100%, radius 70%, rgba(184,149,46,0.10), transparent),
+        -mesos-parchment;
+}
+
+.mesos-scrim {
+    -fx-background-color: transparent;
+}
+
+.mesos-art-veil {
+    -fx-opacity: 0.18;
+}
+
+/* ==================== Corner / tribal ornaments ==================== */
+
+.mesos-corner {
+    -fx-border-color: -mesos-bronze;
+    -fx-border-width: 0;
+    -fx-pref-width: 48;
+    -fx-pref-height: 48;
+    -fx-min-width: 48;
+    -fx-min-height: 48;
+}
+.mesos-corner-tl {
+    -fx-border-width: 3 0 0 3;
+    -fx-border-color: -mesos-bronze;
+}
+.mesos-corner-tr {
+    -fx-border-width: 3 3 0 0;
+    -fx-border-color: -mesos-bronze;
+}
+.mesos-corner-bl {
+    -fx-border-width: 0 0 3 3;
+    -fx-border-color: -mesos-bronze;
+}
+.mesos-corner-br {
+    -fx-border-width: 0 3 3 0;
+    -fx-border-color: -mesos-bronze;
+}
+
+.mesos-tribal-rule {
+    -fx-pref-height: 10;
+    -fx-max-height: 10;
+    -fx-min-height: 10;
+    -fx-background-color:
+        linear-gradient(to bottom,
+            transparent 0%, transparent 35%,
+            -mesos-bronze 35%, -mesos-bronze 42%,
+            transparent 42%, transparent 58%,
+            -mesos-clay 58%, -mesos-clay 65%,
+            transparent 65%, transparent 100%);
+}
+
+.mesos-panel-rule {
+    -fx-background-color: linear-gradient(to right,
+        -mesos-clay 0%, -mesos-bronze 25%, -mesos-clay 50%, -mesos-bronze 75%, -mesos-clay 100%);
+    -fx-pref-height: 5;
+    -fx-max-height: 5;
+    -fx-min-height: 5;
+}
+
+.mesos-panel-divider {
+    -fx-background-color:
+        linear-gradient(to right, transparent, -mesos-bronze, transparent);
+    -fx-pref-height: 2;
+    -fx-max-height: 2;
+    -fx-min-height: 2;
+    -fx-opacity: 0.85;
+}
+
+/* ==================== Ledger panels ==================== */
+
+.mesos-panel {
+    -fx-background-color: rgba(234,215,176,0.94);
+    -fx-background-radius: 4;
+    -fx-border-color: -mesos-ink, -mesos-bronze;
+    -fx-border-width: 1.5, 1;
+    -fx-border-insets: 0, 4;
+    -fx-border-radius: 4, 2;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.28), 24, 0.22, 0, 8);
+    -fx-padding: 0;
+}
+
+.mesos-header-box {
+    -fx-background-color: rgba(234,215,176,0.92);
+    -fx-background-radius: 3;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 3;
+    -fx-padding: 10 28 10 28;
+}
+
+.mesos-emblem {
+    -fx-background-color: rgba(220,196,154,0.95);
+    -fx-background-radius: 8;
+    -fx-border-color: -mesos-bronze, -mesos-ink;
+    -fx-border-width: 3, 1;
+    -fx-border-insets: 0, 5;
+    -fx-border-radius: 8, 4;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.28), 16, 0.2, 0, 4);
+}
+
+.mesos-emblem-title {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 42px;
+    -fx-text-fill: -mesos-ink;
+    -fx-effect: dropshadow(gaussian, rgba(184,149,46,0.35), 4, 0.2, 0, 1);
+}
+
+.mesos-emblem-ring {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 50%;
+    -fx-border-color: -mesos-bronze;
+    -fx-border-width: 2;
+    -fx-border-radius: 50%;
+    -fx-pref-width: 44;
+    -fx-pref-height: 44;
+    -fx-min-width: 44;
+    -fx-min-height: 44;
+    -fx-max-width: 44;
+    -fx-max-height: 44;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.2), 6, 0.2, 0, 1);
+}
+
+/* ==================== Typography ==================== */
+
+.mesos-title {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-size: 34px;
+}
+
+.mesos-title-hero {
+    -fx-font-size: 44px;
+    -fx-letter-spacing: 3px;
+}
+
+.mesos-subtitle {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-text-fill: -mesos-ink-muted;
+    -fx-font-size: 13px;
+}
+
+.mesos-field-label {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-text-fill: -mesos-ink-muted;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.8px;
+}
+
+.mesos-error-label {
+    -fx-text-fill: -mesos-danger;
+    -fx-font-weight: bold;
+    -fx-font-size: 12.5px;
+}
+
+.mesos-info-label {
+    -fx-text-fill: -mesos-clay;
+    -fx-font-weight: bold;
+    -fx-font-size: 12.5px;
+}
+
+/* ==================== Inputs ==================== */
+
+.mesos-text-field {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-text-fill: -mesos-ink;
+    -fx-prompt-text-fill: derive(-mesos-ink-muted, 25%);
+    -fx-padding: 9 12 9 12;
+    -fx-font-size: 13.5px;
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+}
+.mesos-text-field:focused {
+    -fx-border-color: -mesos-clay;
+    -fx-border-width: 1.6;
+    -fx-background-color: -mesos-bone;
+    -fx-effect: dropshadow(gaussian, rgba(168,75,28,0.25), 8, 0.25, 0, 0);
+}
+.mesos-text-field.mesos-field-error {
+    -fx-border-color: -mesos-danger;
+    -fx-border-width: 1.8;
+}
+
+/* ---- Combo: ink on parchment (high contrast) ---- */
+
+.mesos-combo {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-padding: 2 6 2 6;
+    -fx-mark-color: -mesos-clay;
+}
+.mesos-combo:focused {
+    -fx-border-color: -mesos-clay;
+    -fx-border-width: 1.6;
+}
+.mesos-combo .arrow-button {
+    -fx-background-color: -mesos-paper-deep;
+}
+.mesos-combo .arrow {
+    -fx-background-color: -mesos-ink;
+}
+
+.mesos-combo .list-cell,
+.mesos-combo > .list-cell {
+    -fx-background-color: -mesos-parchment;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-size: 13.5px;
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-padding: 6 10 6 10;
+}
+
+.mesos-combo-popup .list-view,
+.combo-box-popup .list-view {
+    -fx-background-color: -mesos-parchment;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.3), 14, 0.2, 0, 4);
+    -fx-control-inner-background: -mesos-parchment;
+}
+
+.mesos-combo-popup .list-cell,
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: -mesos-parchment;
+    -fx-text-fill: -mesos-ink;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 13.5px;
+}
+
+.mesos-combo-popup .list-cell:filled:hover,
+.mesos-combo-popup .list-cell:filled:selected,
+.combo-box-popup .list-view .list-cell:filled:hover,
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: -mesos-clay;
+    -fx-text-fill: -mesos-bone;
+}
+
+/* ==================== Buttons ==================== */
+
+.mesos-button-primary {
+    -fx-background-color: -mesos-clay;
+    -fx-text-fill: -mesos-bone;
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 2;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 2;
+    -fx-padding: 11 28 11 28;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.2), 8, 0.2, 0, 3);
+}
+.mesos-button-primary:hover {
+    -fx-background-color: -mesos-clay-bright;
+}
+.mesos-button-primary:armed {
+    -fx-background-color: derive(-mesos-clay, -12%);
+}
+.mesos-button-primary:disabled {
+    -fx-opacity: 0.4;
+    -fx-effect: none;
+}
+
+.mesos-button-compact {
+    -fx-padding: 7 16 7 16;
+    -fx-font-size: 12px;
+}
+
+.mesos-button-wide {
+    -fx-max-width: Infinity;
+    -fx-pref-width: 320;
+}
+
+.mesos-button-secondary {
+    -fx-background-color: -mesos-parchment;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10 22 10 22;
+    -fx-cursor: hand;
+}
+.mesos-button-secondary:hover {
+    -fx-border-color: -mesos-clay;
+    -fx-text-fill: -mesos-clay;
+}
+
+.mesos-button-ledger {
+    -fx-background-color: -mesos-paper;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-background-radius: 0 0 3 3;
+    -fx-border-color: -mesos-ink transparent transparent transparent;
+    -fx-border-width: 1.2 0 0 0;
+    -fx-padding: 14 28 14 28;
+    -fx-cursor: hand;
+}
+.mesos-button-ledger:hover {
+    -fx-background-color: -mesos-paper-deep;
+    -fx-text-fill: -mesos-clay;
+}
+.mesos-button-ledger:disabled {
+    -fx-opacity: 0.4;
+}
+
+/* ==================== Scroll ==================== */
+
+.mesos-scroll,
+.mesos-scroll .viewport {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-width: 0;
+}
+.mesos-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+.mesos-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: -mesos-bronze;
+    -fx-background-radius: 4;
+}
+.mesos-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -mesos-clay;
+}
+.mesos-scroll .scroll-bar:vertical .track,
+.mesos-scroll .scroll-bar:vertical .increment-button,
+.mesos-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-pref-height: 0;
+    -fx-min-height: 0;
+}
+
+/* ==================== Game card ==================== */
+
+.mesos-card {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-padding: 12 16 12 16;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.12), 8, 0.15, 0, 2);
+}
+.mesos-card:hover {
+    -fx-border-color: -mesos-clay;
+    -fx-background-color: -mesos-bone;
+}
+
+.mesos-card-id {
+    -fx-text-fill: -mesos-ink;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.mesos-card-status {
+    -fx-text-fill: -mesos-ink-muted;
+    -fx-font-size: 12.5px;
+}
+
+.mesos-pill {
+    -fx-background-color: rgba(139,105,20,0.18);
+    -fx-background-radius: 3;
+    -fx-text-fill: -mesos-bronze;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-border-color: -mesos-bronze;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+}
+
+/* ==================== Totem slots ==================== */
+
+.mesos-totem-slot {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 6;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-opacity: 1.0;
+}
+.mesos-totem-slot-hover {
+    -fx-background-color: -mesos-bone;
+    -fx-background-radius: 6;
+    -fx-border-color: -mesos-bronze;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+.mesos-totem-slot-selected {
+    -fx-background-color: rgba(168,75,28,0.18);
+    -fx-background-radius: 6;
+    -fx-border-color: -mesos-clay;
+    -fx-border-width: 2.5;
+    -fx-border-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(168,75,28,0.35), 10, 0.3, 0, 0);
+    -fx-cursor: hand;
+}
+.mesos-totem-slot-taken {
+    -fx-background-color: derive(-mesos-paper-deep, -8%);
+    -fx-background-radius: 6;
+    -fx-border-color: -mesos-ink-muted;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 6;
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}
+.mesos-totem-slot-denied {
+    -fx-background-color: rgba(139,30,30,0.25);
+    -fx-background-radius: 6;
+    -fx-border-color: -mesos-danger;
+    -fx-border-width: 2.5;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+}
+
+/* ==================== Waiting ==================== */
+
+.mesos-waiting-title {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-size: 32px;
+}
+
+.mesos-waiting-status {
+    -fx-text-fill: -mesos-clay;
+    -fx-font-weight: bold;
+    -fx-font-size: 17px;
+}
+
+/* ==================== Board (sand / terracotta table) ==================== */
+
+.mesos-board-root {
+    -fx-background-color:
+        radial-gradient(center 50% 42%, radius 85%, #CDB892, #9A7A55),
+        linear-gradient(from 0% 0% to 100% 100%, rgba(243,230,200,0.18), rgba(58,38,28,0.18));
+}
+
+.mesos-board-vignette {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%,
+        rgba(42,28,18,0.22), rgba(42,28,18,0.0) 28%, rgba(42,28,18,0.0) 72%, rgba(42,28,18,0.26));
+}
+
+.mesos-board-playmat {
+    -fx-background-color: rgba(243,230,200,0.07);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(42,28,18,0.22), rgba(139,105,20,0.28);
+    -fx-border-width: 1.2, 1;
+    -fx-border-insets: 0, 5;
+    -fx-border-radius: 10, 7;
+}
+
+.mesos-board-tribal-corner {
+    -fx-pref-width: 72;
+    -fx-pref-height: 72;
+    -fx-min-width: 72;
+    -fx-min-height: 72;
+    -fx-max-width: 72;
+    -fx-max-height: 72;
+}
+
+.mesos-board-tribal-zigzag {
+    -fx-background-color:
+        linear-gradient(135deg, transparent 42%, rgba(168,75,28,0.35) 42%, rgba(168,75,28,0.35) 46%, transparent 46%),
+        linear-gradient(45deg, transparent 54%, rgba(139,105,20,0.4) 54%, rgba(139,105,20,0.4) 58%, transparent 58%);
+    -fx-opacity: 0.55;
+}
+
+.mesos-board-tribal-totem {
+    -fx-opacity: 0.52;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.35), 6, 0.25, 0, 1);
+}
+
+.mesos-player-board {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%,
+        #EDE0C0, #D8C295);
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: -mesos-ink, -mesos-bronze;
+    -fx-border-width: 1.5, 1;
+    -fx-border-insets: 0, 3;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.35), 14, 0.22, 0, 3);
+}
+
+.mesos-skip-button {
+    -fx-background-color: -mesos-clay;
+    -fx-text-fill: -mesos-bone;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1.2;
+    -fx-padding: 6 18 6 18;
+    -fx-cursor: hand;
+}
+.mesos-skip-button:hover {
+    -fx-background-color: -mesos-clay-bright;
+}
+
+/* ==================== End game ==================== */
+
+.mesos-end-panel {
+    -fx-background-color: -mesos-paper;
+    -fx-background-radius: 4;
+    -fx-border-color: -mesos-ink, -mesos-bronze;
+    -fx-border-width: 1.5, 1;
+    -fx-border-insets: 0, 4;
+    -fx-border-radius: 4, 2;
+    -fx-effect: dropshadow(gaussian, rgba(42,28,18,0.22), 22, 0.2, 0, 8);
+    -fx-padding: 0;
+}
+
+.mesos-end-title {
+    -fx-font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    -fx-font-weight: bold;
+    -fx-text-fill: -mesos-ink;
+    -fx-font-size: 30px;
+}
+
+.mesos-end-section-label {
+    -fx-text-fill: -mesos-ink-muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.5px;
+}
+
+.mesos-result-row {
+    -fx-background-color: -mesos-parchment;
+    -fx-background-radius: 3;
+    -fx-border-radius: 3;
+    -fx-border-color: -mesos-ink;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+.mesos-result-rank {
+    -fx-font-weight: bold;
+    -fx-text-fill: -mesos-clay;
+}
+
+.mesos-result-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: -mesos-ink;
+}
+
+.mesos-result-meta {
+    -fx-text-fill: -mesos-ink-muted;
+}

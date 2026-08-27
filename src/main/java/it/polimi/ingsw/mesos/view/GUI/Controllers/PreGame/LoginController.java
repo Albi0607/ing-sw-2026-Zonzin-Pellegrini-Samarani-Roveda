@@ -42,6 +42,7 @@ public class LoginController {
         //Riempio il ComboBox con le opzioni di rete e metto di default SOCKET
         networkComboBox.getItems().addAll("SOCKET", "RMI");
         networkComboBox.setValue("SOCKET");
+        UIEffects.applyParchmentCombo(networkComboBox);
 
         //default ip e port e clientIp
         ipTextField.setText("127.0.0.1");
@@ -60,13 +61,14 @@ public class LoginController {
         connectToLobbyButton.setDisable(true);
         nicknameTextField.textProperty().addListener((obs,oldVal,newVal)->{
             connectToLobbyButton.setDisable(newVal==null|| newVal.isEmpty());
+            nicknameTextField.getStyleClass().remove("mesos-field-error");
         });
 
         // effetto click
         UIEffects.applyClickEffect(connectToLobbyButton);
 
         //immagine di sfondo
-        UIEffects.applyBackground(rootPane);
+        UIEffects.applyLoginBackground(rootPane);
     }
 
     /**
@@ -112,11 +114,13 @@ public class LoginController {
             errorLabel.setVisible(true);
             errorLabel.setManaged(true);
             errorLabel.setText(errorMessage);
-            errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            errorLabel.getStyleClass().setAll("mesos-error-label");
         } else {
             System.out.println("[ERRORE CRITICO] errorLabel è NULL! Controlla se nel file FXML c'è fx:id=\"errorLabel\"");
         }
-        nicknameTextField.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 3px;");
+        if (!nicknameTextField.getStyleClass().contains("mesos-field-error")) {
+            nicknameTextField.getStyleClass().add("mesos-field-error");
+        }
         nicknameTextField.clear();
         nicknameTextField.requestFocus();
     }

@@ -3,7 +3,9 @@ package it.polimi.ingsw.mesos.view.GUI.Controllers;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.Board.CardController;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -20,23 +22,129 @@ public class UIEffects {
     // Background setup
 
     /**
-     * Loads and applies the standard Mesos background image to the given AnchorPane.
-     * The image is bound to the pane's width and height so it scales with the window.
+     * Applies a soft parchment wash with a faded Mesos box-art veil.
+     * The art sits behind the page wash at low opacity so the ledger UI stays legible.
      *
      * @param rootPane the AnchorPane to apply the background to
      */
     public static void applyBackground(AnchorPane rootPane) {
         try {
-            Image image = new Image(UIEffects.class.getResource("/images/tool/backgroundMesos.png").toExternalForm());
+            if (!rootPane.getStyleClass().contains("mesos-page")) {
+                rootPane.getStyleClass().add("mesos-page");
+            }
+            Image image = new Image(UIEffects.class.getResource("/images/tool/cover.png").toExternalForm());
             ImageView background = new ImageView(image);
             background.setPreserveRatio(false);
+            background.setOpacity(0.12);
+            background.getStyleClass().add("mesos-art-veil");
+            background.setMouseTransparent(true);
             background.fitWidthProperty().bind(rootPane.widthProperty());
             background.fitHeightProperty().bind(rootPane.heightProperty());
             rootPane.getChildren().add(0, background);
         } catch (Exception e) {
             System.err.println("ERRORE NEL CARICAMENTO DELL'IMMAGINE DI BACKGROUND: " + e.getMessage());
             e.printStackTrace();
+            if (!rootPane.getStyleClass().contains("mesos-page")) {
+                rootPane.getStyleClass().add("mesos-page");
+            }
         }
+    }
+
+    /**
+     * Applies the high-resolution Mesos cover art as the login screen backdrop.
+     * More visible than the soft veil used on other pre-game screens.
+     *
+     * @param rootPane the login root pane
+     */
+    public static void applyLoginBackground(AnchorPane rootPane) {
+        try {
+            if (!rootPane.getStyleClass().contains("mesos-page")) {
+                rootPane.getStyleClass().add("mesos-page");
+            }
+            Image image = new Image(UIEffects.class.getResource("/images/tool/cover.png").toExternalForm());
+            ImageView background = new ImageView(image);
+            background.setPreserveRatio(false);
+            background.setOpacity(0.52);
+            background.setMouseTransparent(true);
+            background.fitWidthProperty().bind(rootPane.widthProperty());
+            background.fitHeightProperty().bind(rootPane.heightProperty());
+            rootPane.getChildren().add(0, background);
+        } catch (Exception e) {
+            System.err.println("ERRORE NEL CARICAMENTO DELLA COVER DI LOGIN: " + e.getMessage());
+            e.printStackTrace();
+            applyBackground(rootPane);
+        }
+    }
+
+    /**
+     * Adds a quiet warm atmosphere behind the game board: cover art heavily
+     * blurred and desaturated so figures/title dissolve into a soft glow
+     * that does not compete with cards or player boards.
+     *
+     * @param rootPane the game scene root
+     */
+    public static void applyBoardAtmosphere(AnchorPane rootPane) {
+        try {
+            Image image = new Image(UIEffects.class.getResource("/images/tool/cover.png").toExternalForm());
+            ImageView atmosphere = new ImageView(image);
+            atmosphere.setPreserveRatio(false);
+            atmosphere.setOpacity(0.22);
+            atmosphere.setMouseTransparent(true);
+            atmosphere.fitWidthProperty().bind(rootPane.widthProperty());
+            atmosphere.fitHeightProperty().bind(rootPane.heightProperty());
+
+            ColorAdjust colorAdjust = new ColorAdjust();
+            colorAdjust.setSaturation(-0.55);
+            colorAdjust.setBrightness(-0.08);
+            colorAdjust.setContrast(-0.05);
+
+            GaussianBlur blur = new GaussianBlur(34);
+            blur.setInput(colorAdjust);
+            atmosphere.setEffect(blur);
+
+            rootPane.getChildren().add(0, atmosphere);
+        } catch (Exception e) {
+            System.err.println("ERRORE NEL CARICAMENTO DELL'ATMOSFERA BOARD: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Styles a ComboBox so button cell and popup cells always use dark ink on parchment.
+     * Prevents white-on-white text in the dropdown list.
+     *
+     * @param combo the combo box to style
+     * @param <T>   item type
+     */
+    public static <T> void applyParchmentCombo(javafx.scene.control.ComboBox<T> combo) {
+        javafx.scene.paint.Paint ink = Color.web("#2A1C12");
+        javafx.util.Callback<javafx.scene.control.ListView<T>, javafx.scene.control.ListCell<T>> factory = lv ->
+                new javafx.scene.control.ListCell<>() {
+                    @Override
+                    protected void updateItem(T item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.toString());
+                        }
+                        setTextFill(ink);
+                    }
+                };
+        combo.setButtonCell(new javafx.scene.control.ListCell<>() {
+            @Override
+            protected void updateItem(T item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(combo.getPromptText());
+                    setTextFill(Color.web("#6B5340"));
+                } else {
+                    setText(item.toString());
+                    setTextFill(ink);
+                }
+            }
+        });
+        combo.setCellFactory(factory);
     }
 
     // Visual effects for buttons
@@ -145,16 +253,18 @@ public class UIEffects {
      * @param button the skip button to apply the effect to
      */
     public static void applySkipHoverEffect(Button button) {
+        button.getStyleClass().setAll("mesos-skip-button");
         button.setStyle(
-                "-fx-background-color: #ff4400;" +
-                        "-fx-text-fill: white;" +
+                "-fx-background-color: #C45A22;" +
+                        "-fx-text-fill: #F7F0DE;" +
                         "-fx-font-weight: bold;" +
                         "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 3;" +
+                        "-fx-border-radius: 3;" +
+                        "-fx-border-color: #2A1C12;" +
+                        "-fx-border-width: 1.2;" +
                         "-fx-padding: 6 18 6 18;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(255,80,0,0.5), 10, 0.3, 0, 2);"
+                        "-fx-cursor: hand;"
         );
     }
 
@@ -165,13 +275,16 @@ public class UIEffects {
      * @param button the skip button to reset to its default style
      */
     public static void applySkipDefaultEffect(Button button) {
+        button.getStyleClass().setAll("mesos-skip-button");
         button.setStyle(
-                "-fx-background-color: #cc3300;" +
-                        "-fx-text-fill: white;" +
+                "-fx-background-color: #A84B1C;" +
+                        "-fx-text-fill: #F7F0DE;" +
                         "-fx-font-weight: bold;" +
                         "-fx-font-size: 14px;" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-border-radius: 8;" +
+                        "-fx-background-radius: 3;" +
+                        "-fx-border-radius: 3;" +
+                        "-fx-border-color: #2A1C12;" +
+                        "-fx-border-width: 1.2;" +
                         "-fx-padding: 6 18 6 18;" +
                         "-fx-cursor: hand;"
         );
@@ -239,12 +352,13 @@ public class UIEffects {
      */
     public static void applyMyResultHighlight(HBox container) {
         container.setStyle(
-                "-fx-background-color: yellow;" +
-                        "-fx-background-radius: 12;" +
-                        "-fx-border-radius: 12;" +
-                        "-fx-border-width: 1;" +
+                "-fx-background-color: rgba(168,75,28,0.22);" +
+                        "-fx-background-radius: 3;" +
+                        "-fx-border-radius: 3;" +
+                        "-fx-border-color: #A84B1C;" +
+                        "-fx-border-width: 1.5;" +
                         "-fx-padding: 10;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0.2, 0, 2);"
+                        "-fx-effect: dropshadow(gaussian, rgba(42,28,18,0.15), 8, 0.2, 0, 2);"
         );
     }
 
@@ -257,13 +371,17 @@ public class UIEffects {
      */
     public static void applyRoundLabelStyle(Label label) {
         label.setStyle(
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 17px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #f5e6c8;" +
-                        "-fx-background-color: rgba(0,0,0,0.35);" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-padding: 4 12 4 12;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
+                        "-fx-font-family: Georgia;" +
+                        "-fx-text-fill: #2A1C12;" +
+                        "-fx-background-color: #F3E6C8;" +
+                        "-fx-background-radius: 3;" +
+                        "-fx-padding: 5 14 5 14;" +
+                        "-fx-border-color: #8B6914;" +
+                        "-fx-border-width: 1.2;" +
+                        "-fx-border-radius: 3;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(42,28,18,0.35), 8, 0.25, 0, 2);"
         );
     }
 
@@ -274,13 +392,17 @@ public class UIEffects {
      */
     public static void applyEraLabelStyle(Label label) {
         label.setStyle(
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 17px;" +
                         "-fx-font-weight: bold;" +
-                        "-fx-text-fill: #d4a017;" +
-                        "-fx-background-color: rgba(0,0,0,0.35);" +
-                        "-fx-background-radius: 8;" +
-                        "-fx-padding: 4 12 4 12;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 6, 0.3, 0, 2);"
+                        "-fx-font-family: Georgia;" +
+                        "-fx-text-fill: #A84B1C;" +
+                        "-fx-background-color: #F3E6C8;" +
+                        "-fx-background-radius: 3;" +
+                        "-fx-padding: 5 14 5 14;" +
+                        "-fx-border-color: #8B6914;" +
+                        "-fx-border-width: 1.2;" +
+                        "-fx-border-radius: 3;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(42,28,18,0.35), 8, 0.25, 0, 2);"
         );
     }
 

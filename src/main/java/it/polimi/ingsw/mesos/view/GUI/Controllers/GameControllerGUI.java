@@ -111,6 +111,7 @@ public class GameControllerGUI {
         this.sceneManager = sceneManager;
         this.gameModel = model;
         this.localNickname = nickname;
+        UIEffects.applyBoardAtmosphere(rootPane);
         initBoard();
         initPlayerBoard();
         bindModel();

@@ -4,26 +4,19 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.VBox?>
 
-<HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="500.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d0d0d0; -fx-border-width: 1; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0.2, 0, 2);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.GameCardController">
+<HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="54.0" prefWidth="560.0" spacing="14.0" styleClass="mesos-card" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.GameCardController">
    <children>
-      <Label fx:id="roomIdLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="22.0" prefWidth="100.0" style="-fx-font-weight: bold; -fx-text-fill: #333333;" text="ROOM #01" textAlignment="CENTER">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="139.0" style="-fx-text-fill: #666666;" text="WAITING PLAYERS" textAlignment="CENTER">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="playersLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="87.0" style="-fx-text-fill: #666666;" text="PLAYERS 3/5" textAlignment="CENTER">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Region prefHeight="20.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
-      <Button fx:id="joinButton" mnemonicParsing="false" onAction="#handleJoinGame" prefHeight="30.0" prefWidth="78.0" style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 15; -fx-padding: 6 14;" text="JOIN" />
+      <VBox alignment="CENTER_LEFT" prefWidth="72.0" spacing="2.0">
+         <children>
+            <Label styleClass="mesos-field-label" text="ROOM" />
+            <Label fx:id="roomIdLabel" styleClass="mesos-card-id" text="01" />
+         </children>
+      </VBox>
+      <Label fx:id="statusLabel" styleClass="mesos-pill" text="WAITING PLAYERS" />
+      <Label fx:id="playersLabel" styleClass="mesos-card-status" text="3/5" />
+      <Region HBox.hgrow="ALWAYS" />
+      <Button fx:id="joinButton" mnemonicParsing="false" onAction="#handleJoinGame" prefWidth="88.0" styleClass="mesos-button-primary mesos-button-compact" text="JOIN" />
    </children>
 </HBox>

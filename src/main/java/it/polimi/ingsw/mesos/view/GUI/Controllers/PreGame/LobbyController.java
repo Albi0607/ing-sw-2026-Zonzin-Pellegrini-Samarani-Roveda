@@ -50,6 +50,7 @@ public class LobbyController {
 
         //riempo il comboBox con i possibili giocatori di una partita
         playersComboBox.getItems().addAll(2,3,4,5);
+        UIEffects.applyParchmentCombo(playersComboBox);
 
         //bottone di createNewGame inizialmente disabilitato di default che si abilità se viene scelto un numero di
         //giocatori
@@ -123,13 +124,13 @@ public class LobbyController {
     }
 
     /**
-     * Displays a message in the error label with orange text.
+     * Displays a message in the error label using the theme info style.
      *
      * @param message the message to display
      */
     public void showMessage(String message){
         errorLabel.setText(message);
-        errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
+        errorLabel.getStyleClass().setAll("mesos-info-label");
         errorLabel.setVisible(true);
     }
 

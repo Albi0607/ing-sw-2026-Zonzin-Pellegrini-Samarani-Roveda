@@ -9,11 +9,13 @@ import it.polimi.ingsw.mesos.view.GUI.Controllers.GameControllerGUI;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LobbyController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController;
 import it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.TotemChoiceController;
+import it.polimi.ingsw.mesos.view.GUI.Controllers.UIEffects;
 import it.polimi.ingsw.mesos.view.GUI.ObservableGame.ObservableGameModel;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -133,6 +135,9 @@ public class SceneManager {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/waitingRoomScene.fxml"));
             Parent root = loader.load();
+            if (root instanceof AnchorPane anchorPane) {
+                UIEffects.applyBackground(anchorPane);
+            }
 
             lobbyController = null;
             totemController=null;

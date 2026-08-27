@@ -4,22 +4,22 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="HBoxContainer" alignment="CENTER" maxHeight="-Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="500.0" HBox.hgrow="ALWAYS" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d0d0d0; -fx-border-width: 1; -fx-padding: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 8, 0.2, 0, 2);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.EndGame.EndGameCardController">
+<HBox fx:id="HBoxContainer" alignment="CENTER" maxHeight="-Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="36.0" prefWidth="500.0" HBox.hgrow="ALWAYS" spacing="15.0" styleClass="mesos-result-row" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.EndGame.EndGameCardController">
    <children>
-      <Label fx:id="positionLabel" text="0" prefWidth="30" style="-fx-font-weight: bold; -fx-text-fill: #ff6600;" alignment="CENTER"/>
-      <Label fx:id="nicknameLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="22.0" prefWidth="100.0" style="-fx-font-weight: bold; -fx-text-fill: #333333;" text="NICKNAME" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+      <Label fx:id="positionLabel" text="0" prefWidth="30" styleClass="mesos-result-rank" alignment="CENTER"/>
+      <Label fx:id="nicknameLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="22.0" prefWidth="100.0" styleClass="mesos-result-name" text="NICKNAME" textAlignment="CENTER" HBox.hgrow="ALWAYS">
          <font>
             <Font size="15.0" />
          </font>
       </Label>
-      <Label fx:id="ppLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="120.0" style="-fx-text-fill: #666666;" text="PUNTI PRESTIGIO" textAlignment="CENTER" HBox.hgrow="NEVER">
+      <Label fx:id="ppLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="120.0" styleClass="mesos-result-meta" text="PUNTI PRESTIGIO" textAlignment="CENTER" HBox.hgrow="NEVER">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label fx:id="foodLabel_time" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="150.0" minWidth="150.0" style="-fx-text-fill: #666666;" text="PUNTI CIBO" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+      <Label fx:id="foodLabel_time" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="150.0" minWidth="150.0" styleClass="mesos-result-meta" text="PUNTI CIBO" textAlignment="CENTER" HBox.hgrow="ALWAYS">
          <font><Font size="14.0" /></font>
       </Label>
-      <Label fx:id="numPlayersLabel" alignment="CENTER" prefHeight="18.0" prefWidth="98.0" text="NUMPLAYERS" HBox.hgrow="NEVER" />
+      <Label fx:id="numPlayersLabel" alignment="CENTER" prefHeight="18.0" prefWidth="98.0" styleClass="mesos-result-meta" text="NUMPLAYERS" HBox.hgrow="NEVER" />
    </children>
 </HBox>

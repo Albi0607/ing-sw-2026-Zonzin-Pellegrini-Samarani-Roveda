@@ -5,70 +5,117 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController">
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="1450.0" styleClass="mesos-page" stylesheets="@../css/mesos-theme.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PreGame.LoginController">
    <children>
-      <VBox alignment="CENTER" layoutX="425.0" layoutY="175.0" prefHeight="400.0" prefWidth="600.0" spacing="10.0" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 20; -fx-background-color: #e8e8e8; -fx-border-color: #cfcfcf; -fx-border-width: 1;" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="425.0" AnchorPane.rightAnchor="425.0" AnchorPane.topAnchor="175.0">
+      <!-- Optional faded art injected at index 0 by UIEffects.applyBackground -->
+
+      <Pane mouseTransparent="true" styleClass="mesos-corner mesos-corner-tl" AnchorPane.leftAnchor="28.0" AnchorPane.topAnchor="24.0" />
+      <Pane mouseTransparent="true" styleClass="mesos-corner mesos-corner-tr" AnchorPane.rightAnchor="28.0" AnchorPane.topAnchor="24.0" />
+      <Pane mouseTransparent="true" styleClass="mesos-corner mesos-corner-bl" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="28.0" />
+      <Pane mouseTransparent="true" styleClass="mesos-corner mesos-corner-br" AnchorPane.bottomAnchor="24.0" AnchorPane.rightAnchor="28.0" />
+
+      <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="460.0" spacing="14.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="495.0" AnchorPane.rightAnchor="495.0" AnchorPane.topAnchor="55.0">
          <children>
-            <Label alignment="CENTER" prefHeight="49.0" prefWidth="410.0" style="-fx-text-fill: red; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, black, 10, 0.5, 2, 2);" text="BENVENUTO IN MESOS" textAlignment="CENTER">
-               <VBox.margin>
-                  <Insets top="-20.0" />
-               </VBox.margin>
-               <font>
-                  <Font name="Arial Bold" size="35.0" />
-               </font>
-            </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="26.0" prefWidth="221.0" style="-fx-text-fill: #555555;" text="Inserisci un nickname univoco" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <TextField fx:id="nicknameTextField" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="28.0" prefWidth="250.0" promptText="Inserisci nickname" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8;" />
-            <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-text-fill: #555555;" text="Scegli la modalità di rete" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <ComboBox fx:id="networkComboBox" prefHeight="25.0" prefWidth="100.0" promptText="SOCKET" />
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="241.0" style="-fx-text-fill: #555555;" text="Inserisci indirizzo IP e porta del server" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="300.0">
+            <HBox alignment="CENTER" styleClass="mesos-header-box">
                <children>
-                  <TextField fx:id="ipTextField" alignment="CENTER" prefHeight="26.0" prefWidth="158.0" promptText="Indirizzo IP" />
-                  <TextField fx:id="portTextField" alignment="CENTER" prefHeight="26.0" prefWidth="85.0" promptText="Porta" />
+                  <Label styleClass="mesos-subtitle" text="Benvenuto nella tribù di" />
                </children>
             </HBox>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="241.0" style="-fx-text-fill: #555555;" text="IP di questa macchina" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Label>
-            <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="30.0" prefWidth="300.0">
+
+            <StackPane prefHeight="168.0" prefWidth="220.0" styleClass="mesos-emblem">
                <children>
-                  <TextField fx:id="clientIpTextField" alignment="CENTER" prefHeight="26.0" prefWidth="158.0" promptText="Indirizzo IP del client" />
+                  <Label styleClass="mesos-emblem-title" text="MESOS" />
+                  <StackPane styleClass="mesos-emblem-ring" StackPane.alignment="TOP_CENTER" translateY="-18.0">
+                     <children>
+                        <ImageView fitHeight="32.0" fitWidth="22.0" preserveRatio="true">
+                           <image><Image url="/images/totem/YELLOW.png"/></image>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+                  <StackPane styleClass="mesos-emblem-ring" StackPane.alignment="CENTER_LEFT" translateX="-18.0">
+                     <children>
+                        <ImageView fitHeight="32.0" fitWidth="22.0" preserveRatio="true">
+                           <image><Image url="/images/totem/BLUE.png"/></image>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+                  <StackPane styleClass="mesos-emblem-ring" StackPane.alignment="CENTER_RIGHT" translateX="18.0">
+                     <children>
+                        <ImageView fitHeight="32.0" fitWidth="22.0" preserveRatio="true">
+                           <image><Image url="/images/totem/RED.png"/></image>
+                        </ImageView>
+                     </children>
+                  </StackPane>
+                  <StackPane styleClass="mesos-emblem-ring" StackPane.alignment="BOTTOM_CENTER" translateY="18.0">
+                     <children>
+                        <ImageView fitHeight="32.0" fitWidth="22.0" preserveRatio="true">
+                           <image><Image url="/images/totem/PURPLE.png"/></image>
+                        </ImageView>
+                     </children>
+                  </StackPane>
                </children>
-            </HBox>
-            <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="20.0" prefWidth="200.0" style="-fx-text-fill: red;" textAlignment="CENTER" visible="false">
-               <font>
-                  <Font size="14.0" />
-               </font>
-               <VBox.margin>
-                  <Insets top="-10.0" />
-               </VBox.margin></Label>
-            <Button fx:id="connectToLobbyButton" mnemonicParsing="false" onAction="#handleConnect" style="-fx-background-radius: 10; -fx-padding: 8 20 8 20; -fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold;" text="Connetti alla lobby" textAlignment="CENTER">
-               <font>
-                  <Font size="14.0" />
-               </font>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Button>
+            </StackPane>
+
+            <VBox alignment="CENTER" spacing="0" styleClass="mesos-panel" prefWidth="460.0">
+               <children>
+                  <Pane styleClass="mesos-panel-rule" />
+                  <VBox alignment="CENTER" spacing="14.0">
+                     <children>
+                        <Label styleClass="mesos-subtitle" text="Completa per connetterti alla lobby" />
+
+                        <VBox spacing="5.0" maxWidth="360.0">
+                           <children>
+                              <Label styleClass="mesos-field-label" text="NICKNAME" />
+                              <TextField fx:id="nicknameTextField" styleClass="mesos-text-field" promptText="es. player1
+" />
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="5.0" maxWidth="360.0">
+                           <children>
+                              <Label styleClass="mesos-field-label" text="PROTOCOLLO DI RETE" />
+                              <ComboBox fx:id="networkComboBox" styleClass="mesos-combo" maxWidth="Infinity" promptText="SOCKET" />
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="5.0" maxWidth="360.0">
+                           <children>
+                              <Label styleClass="mesos-field-label" text="INDIRIZZO IP E PORTA DEL SERVER" />
+                              <HBox spacing="8.0">
+                                 <children>
+                                    <TextField fx:id="ipTextField" styleClass="mesos-text-field" promptText="Indirizzo IP" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="portTextField" styleClass="mesos-text-field" prefWidth="90.0" promptText="Porta" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+
+                        <VBox spacing="5.0" maxWidth="360.0">
+                           <children>
+                              <Label styleClass="mesos-field-label" text="IP DI QUESTA MACCHINA" />
+                              <TextField fx:id="clientIpTextField" styleClass="mesos-text-field" promptText="Indirizzo IP del client" />
+                           </children>
+                        </VBox>
+
+                        <Label fx:id="errorLabel" styleClass="mesos-error-label" textAlignment="CENTER" visible="false" wrapText="true" maxWidth="360.0" />
+
+                        <Pane styleClass="mesos-tribal-rule" maxWidth="360.0" />
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" left="36.0" right="36.0" top="18.0" />
+                     </padding>
+                  </VBox>
+                  <Button fx:id="connectToLobbyButton" mnemonicParsing="false" onAction="#handleConnect" maxWidth="Infinity" styleClass="mesos-button-ledger" text="CONNETTI ALLA LOBBY" />
+               </children>
+            </VBox>
          </children>
       </VBox>
    </children>

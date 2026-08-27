@@ -157,7 +157,7 @@ public class TotemChoiceController {
 
         if (this.dto.numPlayers >= this.dto.maxNumPlayers) {
             errorLabel.setText("Partita piena, ritorno alla lobby...");
-            errorLabel.setTextFill(javafx.scene.paint.Color.RED);
+            errorLabel.getStyleClass().setAll("mesos-error-label");
             errorLabel.setVisible(true);
 
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
@@ -170,8 +170,8 @@ public class TotemChoiceController {
 
     /**
      * Registers hover and click mouse event handlers on all totem slots.
-     * Hovering over a free unselected slot highlights it in green.
-     * Clicking a taken slot shows a red flash via showTaken.
+     * Hovering over a free unselected slot highlights it with the theme hover style.
+     * Clicking a taken slot shows a denied flash via showTaken.
      * Clicking a free slot selects its color and triggers a full refresh.
      */
     private void setupEvents() {
@@ -183,13 +183,7 @@ public class TotemChoiceController {
 
             slot.setOnMouseEntered(e -> {
                 if (isTaken(color) || color.equals(colorChoice)) return;
-                slot.setStyle("""
-                        -fx-background-color: #66ff66;
-                        -fx-background-radius: 15;
-                        -fx-border-color: white;
-                        -fx-border-width: 2;
-                        -fx-border-radius: 15;
-                        """);
+                applyTotemSlotStyle(slot, "mesos-totem-slot-hover");
             });
 
             slot.setOnMouseExited(e -> {
@@ -210,10 +204,9 @@ public class TotemChoiceController {
     }
 
     /**
-     * Refreshes the visual state of all totem slots.
-     * Taken slots are shown as dark.
-     * The selected slot is highlighted in bright green with a white border.
-     * Free unselected slots are shown in neutral dark gray.
+     * Refreshes the visual state of all totem slots using theme style classes.
+     * Taken slots are dimmed, the selected slot is highlighted in ember,
+     * and free slots use the default raised look.
      * Also updates the confirm button enabled state.
      */
     private void refresh() {
@@ -224,33 +217,29 @@ public class TotemChoiceController {
             Color color = totemColors.get(i);
 
             if (isTaken(color)) {
-                slot.setStyle("""
-                        -fx-background-color: #333333;
-                        -fx-opacity: 0.5;
-                        -fx-background-radius: 15;
-                        """);
+                applyTotemSlotStyle(slot, "mesos-totem-slot-taken");
             }
             else if (color.equals(colorChoice)) {
-                slot.setStyle("""
-                        -fx-background-color: #00cc00;
-                        -fx-background-radius: 15;
-                        -fx-border-color: white;
-                        -fx-border-width: 3;
-                        -fx-border-radius: 15;
-                        """);
+                applyTotemSlotStyle(slot, "mesos-totem-slot-selected");
             }
             else {
-                slot.setStyle("""
-                        -fx-background-color: #4a4a4a;
-                        -fx-background-radius: 15;
-                        -fx-border-color: gray;
-                        -fx-border-width: 2;
-                        -fx-border-radius: 15;
-                        """);
+                applyTotemSlotStyle(slot, "mesos-totem-slot");
             }
         }
         //rende il bottone attivo se viene scelto un colore
         updateButtonState();
+    }
+
+    /**
+     * Replaces totem slot style classes with the base class plus an optional state class.
+     */
+    private void applyTotemSlotStyle(StackPane slot, String stateClass) {
+        slot.setStyle("");
+        if ("mesos-totem-slot".equals(stateClass)) {
+            slot.getStyleClass().setAll("mesos-totem-slot");
+        } else {
+            slot.getStyleClass().setAll("mesos-totem-slot", stateClass);
+        }
     }
 
     /**
@@ -264,19 +253,13 @@ public class TotemChoiceController {
     }
 
     /**
-     * Briefly highlights a totem slot in red to indicate it is already taken.
+     * Briefly highlights a totem slot with the denied style to indicate it is already taken.
      * The slot will return to its normal state on the next refresh call.
      *
-     * @param slot the slot to highlight in red
+     * @param slot the slot to highlight as denied
      */
     private void showTaken(StackPane slot) {
-        slot.setStyle("""
-                -fx-background-color: #ff0000;
-                -fx-background-radius: 15;
-                -fx-border-color: darkred;
-                -fx-border-width: 3;
-                -fx-border-radius: 15;
-                """);
+        applyTotemSlotStyle(slot, "mesos-totem-slot-denied");
     }
 
     /**
@@ -288,13 +271,13 @@ public class TotemChoiceController {
     }
 
     /**
-     * Displays a message in the error label with orange text.
+     * Displays a message in the error label using the theme info style.
      *
      * @param message the message to display
      */
     public void showMessage(String message){
         errorLabel.setText(message);
-        errorLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
+        errorLabel.getStyleClass().setAll("mesos-info-label");
         errorLabel.setVisible(true);
         create_joinGameButton.setDisable(colorChoice == null);
     }

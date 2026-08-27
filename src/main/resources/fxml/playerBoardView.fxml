@@ -10,7 +10,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Button?>
 
-<VBox fx:id="playerBoardRoot" prefWidth="600" prefHeight="160" maxWidth="600" maxHeight="160" style="-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #484d54, #2e3236);-fx-background-radius: 12;-fx-border-radius: 12;-fx-border-color: #5a6170;-fx-border-width: 1;-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 15, 0.3, 0, 4);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard.PlayerBoardController">
+<VBox fx:id="playerBoardRoot" prefWidth="600" prefHeight="160" maxWidth="600" maxHeight="160" styleClass="mesos-player-board" stylesheets="@../css/mesos-theme.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polimi.ingsw.mesos.view.GUI.Controllers.PlayerBoard.PlayerBoardController">
    <padding>
       <Insets top="10.0" />
    </padding>
@@ -53,10 +53,7 @@
             <!-- SKIP rimane all'estrema destra fuori dal centro -->
             <Button fx:id="skipButton" text="SKIP" visible="false" managed="false"
                     disable="true"
-                    style="-fx-background-color: #cc3300;-fx-text-fill: white;
-                     -fx-font-weight: bold;-fx-font-size: 14px;
-                     -fx-background-radius: 8;-fx-border-radius: 8;
-                     -fx-padding: 6 18 6 18;-fx-cursor: hand;"
+                    styleClass="mesos-skip-button"
                     onMouseEntered="#onSkipHover"
                     onMouseExited="#onSkipHoverExit"
                     onAction="#onSkipClicked">
