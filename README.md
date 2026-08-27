@@ -37,9 +37,7 @@
 
 Mesos Board Game is a distributed Java application implementing the digital version of the Mesos board game from Cranio Creations. This project was developed as part of the final project for the Software Engineering course at Politecnico di Milano during the Academic Year 2025/2026.
 
-The application provides a complete multiplayer board game experience with support for both Graphical User Interface (GUI) and Command-Line Interface (CLI) clients, communicating with a centralized server through RMI and Socket protocols.
-
-Additional features has been developed 
+The application provides a complete multiplayer board game experience with support for both Graphical User Interface (GUI) and Command-Line Interface (CLI) clients, communicating with a centralized server through RMI and Socket protocols. 
 
 ---
 
