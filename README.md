@@ -127,28 +127,28 @@ it.polimi.ingsw.mesos
 
 <table>
   <tr>
-    <th width="30%" align="left">Interface</th>
-    <th width="70%" align="center">Screenshot</th>
+    <th width="15%" align="left">Interface</th>
+    <th width="85%" align="center">Screenshot</th>
   </tr>
   <tr>
-    <td align="left"><b>Login</b></td>
-    <td align="center"><img src="assets/images/login.png" alt="Login screen" width="100%"></td>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><img src="images/login.png" alt="Login screen" width="100%"></td>
   </tr>
   <tr>
-    <td align="left"><b>Lobby</b></td>
-    <td align="center"><img src="assets/images/lobby.png" alt="Lobby screen" width="100%"></td>
+    <td align="center"><b>Lobby</b></td>
+    <td align="center"><img src="images/lobby.png" alt="Lobby screen" width="100%"></td>
   </tr>
   <tr>
-    <td align="left"><b>Totem Selection</b></td>
-    <td align="center"><img src="assets/images/totem.png" alt="Totem selection" width="100%"></td>
+    <td align="center"><b>Totem Selection</b></td>
+    <td align="center"><img src="images/totem.png" alt="Totem selection" width="100%"></td>
   </tr>
   <tr>
-    <td align="left"><b>GUI Gameplay</b></td>
-    <td align="center"><img src="assets/images/gui-gameplay.png" alt="GUI gameplay" width="100%"></td>
+    <td align="center"><b>GUI Gameplay</b></td>
+    <td align="center"><img src="images/gui-gameplay.png" alt="GUI gameplay" width="100%"></td>
   </tr>
   <tr>
-    <td align="left"><b>CLI Gameplay</b></td>
-    <td align="center"><img src="assets/images/cli-gameplay.png" alt="CLI gameplay" width="100%"></td>
+    <td align="center"><b>CLI Gameplay</b></td>
+    <td align="center"><img src="images/cli-gameplay.png" alt="CLI gameplay" width="100%"></td>
   </tr>
 </table>
 
